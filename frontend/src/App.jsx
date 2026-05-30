@@ -150,7 +150,7 @@ const App = () => {
                 <Route path="/stock-voucher" element={<StockVoucher user={user} />} />
                 <Route path="/rekap-voucher" element={<RekapVoucher user={user} />} />
                 <Route path="/profiles" element={<Profiles user={user} />} />
-                <Route path="/nas" element={<NasMikrotik user={user} />} />
+                <Route path="/nas" element={<MikrotikScriptTemplate user={user} />} />
                 <Route path="/vendor/tripay" element={<TripayVendor user={user} />} />
                 <Route path="/transaksi" element={<Transaksi user={user} />} />
                 <Route path="/metode-pembayaran" element={<MetodePembayaran user={user} />} />
