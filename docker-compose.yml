@@ -59,8 +59,8 @@ services:
       dockerfile: Dockerfile
     environment:
       TZ: Asia/Jakarta
-    expose:
-      - "80"
+    ports:
+      - "8080:80"
     depends_on:
       - backend
     restart: always
