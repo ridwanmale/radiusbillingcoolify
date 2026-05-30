@@ -1,0 +1,171 @@
+server default {
+listen {
+	type = auth
+	ipaddr = *
+	port = 0
+}
+
+listen {
+	type = acct
+	ipaddr = *
+	port = 0
+}
+
+authorize {
+	sql
+	filter_username
+	preprocess
+	chap
+	mschap
+	digest
+	suffix
+	files
+
+	# --- DEVICE CONTROL & POLICY CHECKS ---
+	# 1. Ambil data policy dari tabel users_device_policy
+	update control {
+		Tmp-String-1 := "%{sql:SELECT IFNULL(device_mode, 'none') FROM users_device_policy WHERE username = '%{User-Name}' LIMIT 1}"
+		Tmp-String-2 := "%{sql:SELECT IFNULL(registered_mac, 'NONE') FROM users_device_policy WHERE username = '%{User-Name}' LIMIT 1}"
+	}
+
+	# Jika data tidak ditemukan, default ke none
+	if (!control:Tmp-String-1) {
+		update control {
+			Tmp-String-1 := "none"
+			Tmp-String-2 := "NONE"
+		}
+	}
+
+	# 2. Cek Expired (Masa Berlaku)
+	if ("%{sql:SELECT 1 FROM rincian_transaksi_voucher WHERE username = '%{User-Name}' AND expiration_date IS NOT NULL AND expiration_date <= NOW() LIMIT 1}") {
+		update reply {
+			&Reply-Message := "%{sql:SELECT message FROM radius_reply_messages WHERE msg_key = 'voucher_expired' LIMIT 1}"
+		}
+		reject
+	}
+
+	# 3. Device Control Logic (Shared 1 Device / Lock MAC / Auto-Lock)
+	if (control:Tmp-String-1 == "shared_1_device") {
+		update control {
+			&Simultaneous-Use := 1
+		}
+	}
+
+	if (control:Tmp-String-1 == "lock_mac") {
+		if (control:Tmp-String-2 == "NONE") {
+			update reply {
+				&Reply-Message := "%{sql:SELECT message FROM radius_reply_messages WHERE msg_key = 'mac_not_registered' LIMIT 1}"
+			}
+			reject
+		}
+		elsif (control:Tmp-String-2 != Calling-Station-Id) {
+			update reply {
+				&Reply-Message := "%{sql:SELECT message FROM radius_reply_messages WHERE msg_key = 'mac_mismatch' LIMIT 1}"
+			}
+			update control {
+				&Tmp-Integer-2 := "%{sql:INSERT INTO device_login_log (username, calling_station_id, registered_mac, nas_ip_address, login_status, reject_reason) VALUES ('%{User-Name}', '%{Calling-Station-Id}', '%{control:Tmp-String-2}', '%{NAS-IP-Address}', 'reject', 'MAC Mismatch')}"
+			}
+			reject
+		}
+	}
+
+	if (control:Tmp-String-1 == "auto_lock_mac") {
+		if (control:Tmp-String-2 == "NONE") {
+			# Bind MAC otomatis pada login pertama
+			update control {
+				&Tmp-Integer-2 := "%{sql:UPDATE users_device_policy SET registered_mac = '%{Calling-Station-Id}', locked_at = NOW() WHERE username = '%{User-Name}'}"
+			}
+		}
+		elsif (control:Tmp-String-2 != Calling-Station-Id) {
+			update reply {
+				&Reply-Message := "%{sql:SELECT message FROM radius_reply_messages WHERE msg_key = 'auto_lock_mismatch' LIMIT 1}"
+			}
+			update control {
+				&Tmp-Integer-2 := "%{sql:INSERT INTO device_login_log (username, calling_station_id, registered_mac, nas_ip_address, login_status, reject_reason) VALUES ('%{User-Name}', '%{Calling-Station-Id}', '%{control:Tmp-String-2}', '%{NAS-IP-Address}', 'reject', 'Auto-Lock Mismatch')}"
+			}
+			reject
+		}
+	}
+
+	# 4. Final Cek Simultaneous-Use (Standard or Overwritten)
+	if (control:Simultaneous-Use && control:Simultaneous-Use > 0) {
+		update control {
+			&Tmp-Integer-1 := "%{sql:SELECT COUNT(*) FROM radacct WHERE username='%{User-Name}' AND acctstoptime IS NULL}"
+		}
+		if (control:Tmp-Integer-1 >= control:Simultaneous-Use) {
+			update reply {
+				&Reply-Message := "%{sql:SELECT message FROM radius_reply_messages WHERE msg_key = 'simultaneous_limit' LIMIT 1}"
+			}
+			reject
+		}
+	}
+
+	pap
+}
+
+authenticate {
+	Auth-Type PAP {
+		pap
+	}
+	Auth-Type CHAP {
+		chap
+	}
+	Auth-Type MS-CHAP {
+		mschap
+	}
+	mschap
+	digest
+}
+
+preacct {
+	preprocess
+	acct_unique
+	suffix
+	files
+}
+
+accounting {
+	detail
+	unix
+	-sql
+	exec
+	attr_filter.accounting_response
+}
+
+session {
+	sql
+}
+
+post-auth {
+	update reply {
+		Session-Timeout := "%{sql:SELECT GREATEST(1, COALESCE((SELECT TIMESTAMPDIFF(SECOND, NOW(), expiration_date) FROM rincian_transaksi_voucher WHERE username = '%{User-Name}' AND expiration_date IS NOT NULL LIMIT 1), (SELECT pm.masa_aktif * CASE WHEN pm.satuan = 'Hari' THEN 86400 WHEN pm.satuan = 'Jam' THEN 3600 WHEN pm.satuan = 'Menit' THEN 60 ELSE 1 END FROM profiles_metadata pm JOIN radusergroup rug ON pm.groupname = rug.groupname WHERE rug.username = '%{User-Name}' LIMIT 1)))}"
+	}
+
+	# Update status login sukses & Last Seen MAC
+	update control {
+		&Tmp-Integer-2 := "%{sql:UPDATE users_device_policy SET last_seen_mac = '%{Calling-Station-Id}', last_login_at = NOW() WHERE username = '%{User-Name}'}"
+		&Tmp-Integer-3 := "%{sql:INSERT INTO device_login_log (username, calling_station_id, registered_mac, nas_ip_address, login_status) VALUES ('%{User-Name}', '%{Calling-Station-Id}', (SELECT registered_mac FROM users_device_policy WHERE username = '%{User-Name}' LIMIT 1), '%{NAS-IP-Address}', 'success')}"
+	}
+
+	# Set expiration_date & activated_at jika masih kosong (First Login)
+	if ("%{sql:SELECT 1 FROM rincian_transaksi_voucher WHERE username = '%{User-Name}' AND activated_at IS NULL LIMIT 1}") {
+		update control {
+			&Tmp-Integer-4 := "%{sql:UPDATE rincian_transaksi_voucher SET activated_at = NOW(), mac_address = '%{Calling-Station-Id}', status = 'Terjual', sold_at = COALESCE(sold_at, NOW()), expiration_date = DATE_ADD(NOW(), INTERVAL (SELECT pm.masa_aktif * CASE WHEN pm.satuan = 'Hari' THEN 1440 WHEN pm.satuan = 'Jam' THEN 60 WHEN pm.satuan = 'Menit' THEN 1 ELSE 1 END FROM profiles_metadata pm JOIN radusergroup rug ON pm.groupname = rug.groupname WHERE rug.username = '%{User-Name}' LIMIT 1) MINUTE) WHERE username = '%{User-Name}'}"
+		}
+	}
+
+	-sql
+	exec
+	
+	Post-Auth-Type REJECT {
+		-sql
+		attr_filter.access_reject
+	}
+}
+
+pre-proxy {
+}
+
+post-proxy {
+}
+}

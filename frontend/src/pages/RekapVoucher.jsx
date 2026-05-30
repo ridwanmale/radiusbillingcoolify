@@ -1,0 +1,371 @@
+import React, { useState, useEffect } from 'react';
+import ConfirmModal from '../components/ConfirmModal';
+
+const RekapVoucher = () => {
+  const [rekapList, setRekapList] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, message: '', onConfirm: null });
+  const triggerConfirm = (message, onConfirm) => setConfirmModal({ isOpen: true, message, onConfirm });
+  
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  
+  // Modal State
+  const [selectedBatch, setSelectedBatch] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const fetchRekap = async () => {
+    setIsLoading(true);
+    try {
+      const host = window.location.hostname;
+      const res = await fetch(`/api/rekap`);
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setRekapList(data);
+      } else {
+        console.error('Rekap API error:', data);
+        setRekapList([]);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRekap();
+  }, []);
+
+  const openModal = (batch) => {
+    setSelectedBatch(batch);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setSelectedBatch(null);
+    setIsModalOpen(false);
+  };
+
+  const handleDelete = async (statusType) => {
+    if (!selectedBatch) return;
+    
+    const count = statusType === 'sisa' ? selectedBatch.sisa_stock : selectedBatch.terjual;
+    if (count === 0) {
+      alert(`Tidak ada voucher dengan status ${statusType === 'sisa' ? 'Sisa Stock' : 'Terjual'} pada batch ini.`);
+      return;
+    }
+
+    triggerConfirm(`Yakin ingin MENGHAPUS PERMANEN ${count} voucher (${statusType === 'sisa' ? 'Sisa Stock' : 'Terjual'}) pada Kode Print ${selectedBatch.kode_print}? Aksi ini tidak dapat dibatalkan.`, async () => {
+
+    try {
+      const host = window.location.hostname;
+      const res = await fetch(`/api/rekap/${selectedBatch.kode_print}/${statusType}`, {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message);
+        closeModal();
+        fetchRekap(); // Refresh data
+      } else {
+        alert('Gagal: ' + data.error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Terjadi kesalahan jaringan.');
+    }
+    });
+  };
+
+  const formatRupiah = (number) => {
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    const dDate = new Date(dateString);
+    return dDate.toLocaleString('id-ID', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(',', '').replace(/\./g, ':');
+  };
+
+  // Filter and Pagination Logic
+  const filteredList = rekapList.filter(item => 
+    item.kode_print?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.outlet_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.profile?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredList.length / itemsPerPage) || 1;
+  const currentItems = filteredList.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  return (
+    <div>
+      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <div>
+          <h1 className="page-title">Rekap Voucher</h1>
+          <p style={{ color: 'var(--text-secondary)' }}>Rekapitulasi total pembuatan voucher berdasarkan Kode Print</p>
+        </div>
+        <button 
+          className="btn" 
+          onClick={fetchRekap} 
+          style={{ 
+            background: 'rgba(255, 255, 255, 0.05)', 
+            color: 'white', 
+            border: '1px solid rgba(255, 255, 255, 0.1)', 
+            borderRadius: '50px', 
+            padding: '0.6rem 1.5rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '0.9rem',
+            fontWeight: '600',
+            cursor: 'pointer',
+            transition: 'all 0.3s'
+          }}
+          onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+          onMouseOut={e => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'}
+        >
+          <span className="material-symbols-rounded" style={{ fontSize: '20px', color: '#10b981' }}>refresh</span> Refresh
+        </button>
+      </div>
+
+
+      <div style={{ marginBottom: '2rem' }}>
+        {/* ACTION BAR ABOVE TABLE */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '1rem', color: 'var(--text-secondary)' }}>
+            Show 
+            <select 
+              value={itemsPerPage} 
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="form-input"
+              style={{ width: '70px', padding: '4px 8px', background: 'rgba(255,255,255,0.05)', fontSize: '1rem' }}
+            >
+              <option value="10" style={{ background: '#1e1b1e' }}>10</option>
+              <option value="25" style={{ background: '#1e1b1e' }}>25</option>
+              <option value="50" style={{ background: '#1e1b1e' }}>50</option>
+              <option value="100" style={{ background: '#1e1b1e' }}>100</option>
+            </select>
+            entries
+          </div>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '1rem', color: 'var(--text-secondary)' }}>Search:</span>
+            <input 
+              type="text" 
+              placeholder="Kode, Outlet, Profile..." 
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="form-input"
+              style={{ width: '250px', padding: '6px 12px', background: 'rgba(255,255,255,0.05)', fontSize: '1rem' }}
+            />
+          </div>
+        </div>
+
+        <div className="glass-card" style={{ padding: '0' }}>
+          {isLoading ? (
+            <p style={{ padding: '2rem', textAlign: 'center' }}>Memuat data rekap...</p>
+          ) : (
+            <div className="table-container">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>Kode Print</th>
+                    <th>Tgl Pembuatan</th>
+                    <th>Outlet</th>
+                    <th>Profile</th>
+                    <th style={{ textAlign: 'center' }}>QTY</th>
+                    <th style={{ textAlign: 'center' }}>Sisa Stock</th>
+                    <th style={{ textAlign: 'center' }}>Terjual</th>
+                    <th>Total HPP</th>
+                    <th>Total Harga</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentItems.length === 0 ? (
+                    <tr>
+                      <td colSpan="9" style={{ textAlign: 'center', padding: '3rem' }}>Data tidak ditemukan.</td>
+                    </tr>
+                  ) : (
+                    currentItems.map((row, i) => (
+                      <tr 
+                        key={i} 
+                        onClick={() => openModal(row)} 
+                        style={{ cursor: 'pointer', verticalAlign: 'middle' }}
+                      >
+                        <td><strong>{row.kode_print}</strong></td>
+                        <td style={{ fontSize: '0.8rem', opacity: 0.8 }}>{formatDate(row.created_at)}</td>
+                        <td>{row.outlet_name || '-'}</td>
+                        <td><span className="badge" style={{ background: 'var(--accent-primary)', minWidth: '80px', textAlign: 'center' }}>{row.profile}</span></td>
+                        <td style={{ textAlign: 'center' }}><strong>{row.qty}</strong></td>
+                        <td style={{ textAlign: 'center', color: row.sisa_stock > 0 ? 'inherit' : 'var(--text-secondary)' }}>{row.sisa_stock}</td>
+                        <td style={{ textAlign: 'center', color: row.terjual > 0 ? 'var(--success)' : 'inherit' }}>{row.terjual}</td>
+                        <td>{formatRupiah(row.total_hpp)}</td>
+                        <td style={{ color: 'var(--success)', fontWeight: 'bold' }}>{formatRupiah(row.total_harga)}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          ) }
+        </div>
+      </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem' }}>
+          <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)' }}>
+            Menampilkan {filteredList.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} - {Math.min(filteredList.length, currentPage * itemsPerPage)} dari {filteredList.length} Batch
+          </p>
+<div style={{
+            display: 'flex',
+            alignItems: 'center',
+            background: 'rgba(255, 255, 255, 0.03)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: '12px',
+            padding: '4px'
+          }}>
+            <button 
+              className="btn-glass-premium" 
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              style={{
+                padding: '6px 16px',
+                background: currentPage === 1 ? 'transparent' : 'rgba(255, 255, 255, 0.05)',
+                border: 'none',
+                borderRadius: '8px',
+                color: 'white',
+                opacity: currentPage === 1 ? 0.2 : 1,
+                cursor: currentPage === 1 ? 'default' : 'pointer',
+                transition: 'all 0.3s ease',
+                fontWeight: '600',
+                fontSize: '0.9rem',
+                boxShadow: 'none'
+              }}
+            >
+              Prev
+            </button>
+            <div style={{
+              padding: '0 16px',
+              color: 'white',
+              fontWeight: '700',
+              fontSize: '0.95rem',
+              letterSpacing: '1px',
+              fontFamily: 'monospace'
+            }}>
+              {currentPage} / {totalPages}
+            </div>
+            <button 
+              className="btn-glass-premium" 
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage >= totalPages}
+              style={{
+                padding: '6px 16px',
+                background: currentPage >= totalPages ? 'transparent' : 'rgba(255, 255, 255, 0.05)',
+                border: 'none',
+                borderRadius: '8px',
+                color: 'white',
+                opacity: currentPage >= totalPages ? 0.2 : 1,
+                cursor: currentPage >= totalPages ? 'default' : 'pointer',
+                transition: 'all 0.3s ease',
+                fontWeight: '600',
+                fontSize: '0.9rem',
+                boxShadow: 'none'
+              }}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      {/* MODAL RINCIAN */}
+      <div className={`modal-overlay ${isModalOpen ? 'open' : ''}`} onClick={closeModal}>
+        <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+          <div className="modal-header">
+            <h2>Rincian Rekap: {selectedBatch?.kode_print}</h2>
+            <button className="modal-close" onClick={closeModal}>&times;</button>
+          </div>
+          
+          {selectedBatch && (
+            <div style={{ marginTop: '1rem' }}>
+              <ul style={{ listStyle: 'none', padding: 0, marginBottom: '2rem', lineHeight: '1.8' }}>
+                <li><strong>Profile:</strong> {selectedBatch.profile}</li>
+                <li><strong>Outlet:</strong> {selectedBatch.outlet_name || 'Tidak ada'}</li>
+                <li><strong>Tanggal:</strong> {formatDate(selectedBatch.created_at)}</li>
+                <hr style={{ border: 'none', borderBottom: '1px solid rgba(255,255,255,0.1)', margin: '1rem 0' }} />
+                <li><strong>Total Tercetak (QTY):</strong> {selectedBatch.qty} pcs</li>
+                <li><strong style={{ color: 'var(--success)' }}>Total Terjual:</strong> {selectedBatch.terjual} pcs</li>
+                <li><strong style={{ color: 'var(--warning)' }}>Sisa Stock:</strong> {selectedBatch.sisa_stock} pcs</li>
+                <hr style={{ border: 'none', borderBottom: '1px solid rgba(255,255,255,0.1)', margin: '1rem 0' }} />
+                <li><strong>Total HPP (Modal):</strong> {formatRupiah(selectedBatch.total_hpp)}</li>
+                <li><strong>Total Harga (Jual):</strong> <span style={{ color: 'var(--success)', fontWeight: 'bold' }}>{formatRupiah(selectedBatch.total_harga)}</span></li>
+                <li><strong>Total Laba (Potensi):</strong> <span style={{ color: 'var(--accent-primary)', fontWeight: 'bold' }}>{formatRupiah(selectedBatch.total_laba)}</span></li>
+              </ul>
+
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+                <button 
+                  className="btn btn-danger" 
+                  style={{ flex: 1, padding: '1rem', background: '#d97706' }} 
+                  onClick={() => handleDelete('sisa')}
+                  disabled={selectedBatch.sisa_stock === 0}
+                >
+                  🗑️ Hapus Sisa Stock
+                </button>
+                <button 
+                  className="btn btn-danger" 
+                  style={{ flex: 1, padding: '1rem' }} 
+                  onClick={() => handleDelete('terjual')}
+                  disabled={selectedBatch.terjual === 0}
+                >
+                  🗑️ Hapus Terjual
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+      <style>{`
+          .data-table th, .data-table td {
+            white-space: nowrap;
+            padding: 14px 18px;
+            vertical-align: middle;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+          }
+          .data-table th {
+            font-weight: 800;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-primary);
+            background: rgba(255,255,255,0.05);
+          }
+          .data-table td {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+          }
+          .table-container {
+            overflow-x: auto;
+            width: 100%;
+            border-radius: 12px;
+          }
+      `}</style>
+    
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        message={confirmModal.message}
+        onConfirm={confirmModal.onConfirm}
+        onCancel={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+      />
+    </div>
+  );
+};
+
+export default RekapVoucher;

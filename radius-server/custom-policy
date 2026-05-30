@@ -1,0 +1,98 @@
+# Policy untuk cek sisa waktu, batas login ganda, dan Device Control
+custom_check {
+	# 1. CEK EXPIRED (Masa Berlaku)
+	update control {
+		&Tmp-Integer-0 := "%{sql:SELECT TIMESTAMPDIFF(SECOND, NOW(), expiration_date) FROM rincian_transaksi_voucher WHERE username = '%{User-Name}' AND expiration_date IS NOT NULL LIMIT 1}"
+	}
+
+	if (&control:Tmp-Integer-0 && &control:Tmp-Integer-0 <= 0) {
+		update reply {
+			&Reply-Message := "Voucher Sudah Habis Masa Berlakunya"
+		}
+		reject
+	}
+
+	# 2. DEVICE CONTROL LOGIC
+	# Ambil data policy dari tabel users_device_policy
+	update control {
+		&Tmp-String-0 := "%{sql:SELECT CONCAT(IFNULL(device_mode, 'none'), '|', IFNULL(registered_mac, 'NONE')) FROM users_device_policy WHERE username = '%{User-Name}' LIMIT 1}"
+	}
+
+	if (&control:Tmp-String-0 =~ /^([^|]+)\|(.+)$/) {
+		&control:Tmp-String-1 := "%{1}" # Mode
+		&control:Tmp-String-2 := "%{2}" # Registered MAC
+	}
+	else {
+		&control:Tmp-String-1 := "none"
+		&control:Tmp-String-2 := "NONE"
+	}
+
+	# 2a. Shared 1 Device
+	if (&control:Tmp-String-1 == "shared_1_device") {
+		update control {
+			&Simultaneous-Use := 1
+		}
+	}
+
+	# 2b. Lock MAC Logic
+	if (&control:Tmp-String-1 == "lock_mac") {
+		if (&control:Tmp-String-2 == "NONE") {
+			update reply {
+				&Reply-Message := "Perangkat belum terdaftar. Hubungi Admin."
+			}
+			reject
+		}
+		elsif (&control:Tmp-String-2 != "%{Calling-Station-Id}") {
+			update reply {
+				&Reply-Message := "Akses ditolak: Perangkat berbeda (Registered: %{control:Tmp-String-2})"
+			}
+			# Log kegagalan ke database
+			update control {
+				&Tmp-Integer-2 := "%{sql:INSERT INTO device_login_log (username, calling_station_id, registered_mac, nas_ip_address, login_status, reject_reason) VALUES ('%{User-Name}', '%{Calling-Station-Id}', '%{control:Tmp-String-2}', '%{NAS-IP-Address}', 'reject', 'MAC Mismatch')}"
+			}
+			reject
+		}
+	}
+
+	# 2c. Auto Lock MAC Logic
+	if (&control:Tmp-String-1 == "auto_lock_mac") {
+		if (&control:Tmp-String-2 == "NONE") {
+			# Bind MAC otomatis pada login pertama
+			update control {
+				&Tmp-Integer-2 := "%{sql:UPDATE users_device_policy SET registered_mac = '%{Calling-Station-Id}', locked_at = NOW() WHERE username = '%{User-Name}'}"
+			}
+		}
+		elsif (&control:Tmp-String-2 != "%{Calling-Station-Id}") {
+			update reply {
+				&Reply-Message := "Akses ditolak: Perangkat tidak sesuai (Auto-Locked)"
+			}
+			# Log kegagalan
+			update control {
+				&Tmp-Integer-2 := "%{sql:INSERT INTO device_login_log (username, calling_station_id, registered_mac, nas_ip_address, login_status, reject_reason) VALUES ('%{User-Name}', '%{Calling-Station-Id}', '%{control:Tmp-String-2}', '%{NAS-IP-Address}', 'reject', 'Auto-Lock Mismatch')}"
+			}
+			reject
+		}
+	}
+
+	# 3. CEK SIMULTANEOUS-USE (Standard or Overwritten)
+	if (&control:Simultaneous-Use && &control:Simultaneous-Use > 0) {
+		update control {
+			&Tmp-Integer-1 := "%{sql:SELECT COUNT(*) FROM radacct WHERE username='%{User-Name}' AND acctstoptime IS NULL}"
+		}
+
+		if (&control:Tmp-Integer-1 >= &control:Simultaneous-Use) {
+			update reply {
+				&Reply-Message := "Batas perangkat terlampaui (Maks: %{control:Simultaneous-Use})"
+			}
+			reject
+		}
+	}
+
+	# Log Login Berhasil
+	if (ok) {
+		update control {
+			&Tmp-Integer-2 := "%{sql:UPDATE users_device_policy SET last_seen_mac = '%{Calling-Station-Id}', last_login_at = NOW() WHERE username = '%{User-Name}'}"
+			&Tmp-Integer-3 := "%{sql:INSERT INTO device_login_log (username, calling_station_id, registered_mac, nas_ip_address, login_status) VALUES ('%{User-Name}', '%{Calling-Station-Id}', '%{control:Tmp-String-2}', '%{NAS-IP-Address}', 'success')}"
+		}
+	}
+}

@@ -1,0 +1,842 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+
+const PaymentBridgeCenter = () => {
+  const [activeTab, setActiveTab] = useState('transactions');
+  const [loading, setLoading] = useState(false);
+
+  // --- STATE FOR CUSTOM CONFIRM MODAL ---
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    message: '',
+    title: 'Konfirmasi Tindakan',
+    confirmText: 'YA, LANJUTKAN',
+    confirmBg: 'var(--accent-primary)',
+    confirmShadow: 'rgba(139, 92, 246, 0.3)',
+    icon: 'warning',
+    iconBg: 'rgba(139, 92, 246, 0.1)',
+    iconColor: 'var(--accent-primary)',
+    onConfirm: null
+  });
+
+  const showConfirm = ({
+    message,
+    title = 'Konfirmasi Tindakan',
+    confirmText = 'YA, LANJUTKAN',
+    confirmBg = 'var(--accent-primary)',
+    confirmShadow = 'rgba(139, 92, 246, 0.3)',
+    icon = 'warning',
+    iconBg,
+    iconColor,
+    onConfirm
+  }) => {
+    setConfirmModal({
+      isOpen: true,
+      message,
+      title,
+      confirmText,
+      confirmBg,
+      confirmShadow,
+      icon,
+      iconBg: iconBg || 'rgba(139, 92, 246, 0.1)',
+      iconColor: iconColor || 'var(--accent-primary)',
+      onConfirm: () => {
+        onConfirm();
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
+  };
+
+  // --- STATE FOR TRANSACTIONS (Voucher Store) ---
+  const [transactions, setTransactions] = useState([]);
+  const [trxSearch, setTrxSearch] = useState('');
+  const [trxStatusFilter, setTrxStatusFilter] = useState('ALL');
+  const [selectedTrxs, setSelectedTrxs] = useState([]);
+  const [showCleanupModal, setShowCleanupModal] = useState(false);
+  const [cleanupDays, setCleanupDays] = useState(3);
+
+  // --- STATE FOR DETECTION LOGS ---
+  const [logs, setLogs] = useState([]);
+  const [logSearch, setLogSearch] = useState('');
+  const [selectedLogs, setSelectedLogs] = useState([]);
+
+  // --- STATE FOR DEVICES ---
+  const [devices, setDevices] = useState([]);
+
+  // --- STATE FOR MIDTRANS SETTINGS ---
+  const [midtransSettings, setMidtransSettings] = useState({
+    is_enabled: false,
+    merchant_id: '',
+    server_key: '',
+    client_key: ''
+  });
+  const [testingMidtrans, setTestingMidtrans] = useState(false);
+  const [showServerKey, setShowServerKey] = useState(false);
+
+  // --- DATA FETCHING ---
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [trxRes, logsRes, devRes, settingsRes] = await Promise.all([
+        fetch('/api/online-store/admin/transactions').then(res => res.json()),
+        fetch('/api/payment-detections/logs').then(res => res.json()),
+        fetch('/api/payment-detections/devices').then(res => res.json()),
+        fetch('/api/settings/payment-gateway').then(res => res.json()).catch(() => ({}))
+      ]);
+      setTransactions(trxRes);
+      setLogs(logsRes);
+      setDevices(devRes);
+      if (settingsRes?.midtrans) {
+        setMidtransSettings(settingsRes.midtrans);
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+      toast.error('Gagal mengambil data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    const interval = setInterval(fetchData, 15000); // Auto refresh 15s
+    return () => clearInterval(interval);
+  }, []);
+
+  // --- HANDLERS (Transactions) ---
+  const handleApproveTrx = (orderId) => {
+    showConfirm({
+      message: `Apakah Anda yakin ingin menyetujui pembayaran untuk transaksi ${orderId}?`,
+      title: 'Setujui Pembayaran',
+      confirmText: 'SETUJUI',
+      confirmBg: '#10b981',
+      confirmShadow: 'rgba(16, 185, 129, 0.3)',
+      icon: 'check_circle',
+      iconBg: 'rgba(16, 185, 129, 0.1)',
+      iconColor: '#10b981',
+      onConfirm: async () => {
+        try {
+          const res = await axios.post('/api/online-store/admin/approve', { order_id: orderId });
+          toast.success('Berhasil disetujui!');
+          fetchData();
+        } catch (err) {
+          toast.error('Gagal: ' + (err.response?.data?.error || err.message));
+        }
+      }
+    });
+  };
+
+  const handleDeleteTrx = (id) => {
+    showConfirm({
+      message: 'Apakah Anda yakin ingin menghapus transaksi ini?',
+      title: 'Hapus Transaksi',
+      confirmText: 'HAPUS',
+      confirmBg: '#ef4444',
+      confirmShadow: 'rgba(239, 68, 68, 0.3)',
+      icon: 'delete',
+      iconBg: 'rgba(239, 68, 68, 0.1)',
+      iconColor: '#ef4444',
+      onConfirm: async () => {
+        try {
+          await axios.delete(`/api/online-store/admin/transactions/${id}`);
+          toast.success('Transaksi berhasil dihapus');
+          fetchData();
+        } catch (err) {
+          toast.error('Gagal menghapus');
+        }
+      }
+    });
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedTrxs.length === 0) return;
+    showConfirm({
+      message: `Apakah Anda yakin ingin menghapus ${selectedTrxs.length} transaksi terpilih?`,
+      title: 'Hapus Transaksi',
+      confirmText: 'HAPUS SEMUA',
+      confirmBg: '#ef4444',
+      confirmShadow: 'rgba(239, 68, 68, 0.3)',
+      icon: 'delete_forever',
+      iconBg: 'rgba(239, 68, 68, 0.1)',
+      iconColor: '#ef4444',
+      onConfirm: async () => {
+        try {
+          await axios.post('/api/online-store/admin/transactions/bulk-delete', { ids: selectedTrxs });
+          toast.success(`${selectedTrxs.length} transaksi dihapus`);
+          setSelectedTrxs([]);
+          fetchData();
+        } catch (err) {
+          toast.error('Gagal menghapus massal');
+        }
+      }
+    });
+  };
+
+  const handleCleanup = async () => {
+    try {
+      const res = await axios.post('/api/online-store/admin/transactions/cleanup', { days: cleanupDays });
+      toast.success(res.data.message);
+      setShowCleanupModal(false);
+      fetchData();
+    } catch (err) {
+      toast.error('Gagal melakukan pembersihan');
+    }
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedTrxs.length === filteredTrx.length) {
+      setSelectedTrxs([]);
+    } else {
+      setSelectedTrxs(filteredTrx.map(t => t.id));
+    }
+  };
+
+  const toggleSelectTrx = (id) => {
+    setSelectedTrxs(prev => 
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  // --- HANDLERS (Logs) ---
+  const handleDeleteLog = (id) => {
+    showConfirm({
+      message: 'Apakah Anda yakin ingin menghapus log deteksi ini?',
+      title: 'Hapus Log Deteksi',
+      confirmText: 'HAPUS',
+      confirmBg: '#ef4444',
+      confirmShadow: 'rgba(239, 68, 68, 0.3)',
+      icon: 'delete',
+      iconBg: 'rgba(239, 68, 68, 0.1)',
+      iconColor: '#ef4444',
+      onConfirm: async () => {
+        try {
+          await axios.delete(`/api/payment-detections/logs/${id}`);
+          toast.success('Log deteksi berhasil dihapus');
+          fetchData();
+        } catch (err) {
+          toast.error('Gagal menghapus log');
+        }
+      }
+    });
+  };
+
+  const handleBulkDeleteLogs = () => {
+    if (selectedLogs.length === 0) return;
+    showConfirm({
+      message: `Apakah Anda yakin ingin menghapus ${selectedLogs.length} log terpilih?`,
+      title: 'Hapus Log Deteksi',
+      confirmText: 'HAPUS SEMUA',
+      confirmBg: '#ef4444',
+      confirmShadow: 'rgba(239, 68, 68, 0.3)',
+      icon: 'delete_forever',
+      iconBg: 'rgba(239, 68, 68, 0.1)',
+      iconColor: '#ef4444',
+      onConfirm: async () => {
+        try {
+          await axios.post('/api/payment-detections/logs/bulk-delete', { ids: selectedLogs });
+          toast.success(`${selectedLogs.length} log dihapus`);
+          setSelectedLogs([]);
+          fetchData();
+        } catch (err) {
+          toast.error('Gagal menghapus massal log');
+        }
+      }
+    });
+  };
+
+  const toggleSelectAllLogs = () => {
+    if (selectedLogs.length === filteredLogs.length) {
+      setSelectedLogs([]);
+    } else {
+      setSelectedLogs(filteredLogs.map(l => l.id));
+    }
+  };
+
+  const toggleSelectLog = (id) => {
+    setSelectedLogs(prev => 
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
+
+  // --- HANDLERS (Devices) ---
+  const handleDeleteDevice = (id) => {
+    showConfirm({
+      message: 'Apakah Anda yakin ingin menghapus perangkat ini?',
+      title: 'Hapus Perangkat',
+      confirmText: 'HAPUS',
+      confirmBg: '#ef4444',
+      confirmShadow: 'rgba(239, 68, 68, 0.3)',
+      icon: 'delete',
+      iconBg: 'rgba(239, 68, 68, 0.1)',
+      iconColor: '#ef4444',
+      onConfirm: async () => {
+        try {
+          await axios.delete(`/api/payment-detections/devices/${id}`);
+          toast.success('Perangkat dihapus');
+          fetchData();
+        } catch (err) {
+          toast.error('Gagal menghapus perangkat');
+        }
+      }
+    });
+  };
+
+  const handleToggleDevice = async (id, currentStatus) => {
+    try {
+      await axios.post(`/api/payment-detections/devices/${id}/toggle`, { 
+        status: currentStatus === 'active' ? 'inactive' : 'active' 
+      });
+      fetchData();
+    } catch (err) {
+      toast.error('Gagal mengubah status');
+    }
+  };
+
+  // --- HANDLERS (Midtrans Settings) ---
+  const handleSaveMidtrans = async () => {
+    try {
+      await axios.post('/api/settings/payment-gateway', { midtrans: midtransSettings });
+      toast.success('Pengaturan Midtrans berhasil disimpan!');
+    } catch (err) {
+      toast.error('Gagal menyimpan: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const handleTestMidtrans = async () => {
+    if (!midtransSettings.server_key || !midtransSettings.merchant_id) {
+      toast.warning('Isi Server Key dan Merchant ID terlebih dahulu!');
+      return;
+    }
+    
+    setTestingMidtrans(true);
+    try {
+      const res = await axios.post('/api/settings/test-midtrans', { 
+        server_key: midtransSettings.server_key,
+        merchant_id: midtransSettings.merchant_id
+      });
+      toast.success(res.data.message || 'Koneksi Midtrans berhasil!');
+    } catch (err) {
+      toast.error('Gagal terhubung: ' + (err.response?.data?.error || err.message));
+    } finally {
+      setTestingMidtrans(false);
+    }
+  };
+
+  // --- RENDER HELPERS ---
+  const getStatusBadge = (status) => {
+    const styles = {
+      PAID: { bg: 'rgba(16, 185, 129, 0.1)', color: '#10b981', label: 'PAID' },
+      USED: { bg: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', label: 'USED' },
+      PENDING: { bg: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', label: 'PENDING' },
+      matched: { bg: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', label: 'MATCHED' },
+      unmatched: { bg: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', label: 'UNMATCHED' },
+      online: { bg: 'rgba(16, 185, 129, 0.1)', color: '#10b981', label: 'ONLINE' },
+      offline: { bg: 'rgba(148, 163, 184, 0.1)', color: '#94a3b8', label: 'OFFLINE' }
+    };
+    const style = styles[status] || styles.offline;
+    return (
+      <span style={{ 
+        background: style.bg, 
+        color: style.color, 
+        padding: '4px 10px', 
+        borderRadius: '50px', 
+        fontSize: '0.75rem', 
+        fontWeight: '800',
+        border: `1px solid ${style.color}33`
+      }}>
+        {style.label}
+      </span>
+    );
+  };
+
+  // --- FILTERING ---
+  const filteredTrx = transactions.filter(t => {
+    const matchesSearch = (t.order_id || '').toLowerCase().includes(trxSearch.toLowerCase());
+    const matchesStatus = trxStatusFilter === 'ALL' || t.status === trxStatusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const filteredLogs = logs.filter(l => 
+    (l.notification_text || '').toLowerCase().includes(logSearch.toLowerCase()) ||
+    (l.matched_order_id || '').toString().includes(logSearch)
+  );
+
+  return (
+    <div className="payment-bridge-container" style={{ padding: '20px', color: 'white' }}>
+      {/* HEADER SECTION */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+        <div>
+          <h1 style={{ margin: 0, fontSize: '2.5rem', fontWeight: '900', letterSpacing: '-1.5px', background: 'linear-gradient(135deg, #fff 0%, #94a3b8 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            Payment Bridge Center
+          </h1>
+          <p style={{ margin: '5px 0 0', color: 'rgba(255,255,255,0.5)', fontWeight: '500' }}>Pusat Integrasi Pembayaran QRIS & Notifikasi</p>
+        </div>
+        <div style={{ display: 'flex', gap: '15px' }}>
+          <div className="glass-card" style={{ padding: '10px 20px', textAlign: 'center', minWidth: '120px' }}>
+            <div style={{ fontSize: '0.7rem', color: '#94a3b8', fontWeight: '700' }}>DEVICES</div>
+            <div style={{ fontSize: '1.2rem', fontWeight: '900', color: '#38bdf8' }}>{devices.length}</div>
+          </div>
+          <div className="glass-card" style={{ padding: '10px 20px', textAlign: 'center', minWidth: '120px' }}>
+            <div style={{ fontSize: '0.7rem', color: '#94a3b8', fontWeight: '700' }}>PENDING</div>
+            <div style={{ fontSize: '1.2rem', fontWeight: '900', color: '#f59e0b' }}>{transactions.filter(t => t.status === 'PENDING').length}</div>
+          </div>
+          <button 
+            onClick={fetchData} 
+            className="btn-glass" 
+            style={{ borderRadius: '50%', width: '45px', height: '45px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <span className={`material-symbols-rounded ${loading ? 'spin' : ''}`}>refresh</span>
+          </button>
+        </div>
+      </div>
+
+      {/* TAB NAVIGATION */}
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '25px', background: 'rgba(255,255,255,0.03)', padding: '6px', borderRadius: '16px', width: 'fit-content' }}>
+        {[
+          { id: 'transactions', label: 'Transaksi Store', icon: 'shopping_cart' },
+          { id: 'logs', label: 'History Deteksi', icon: 'notifications_active' },
+          { id: 'devices', label: 'Kelola Perangkat', icon: 'devices' }
+        ].map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '10px 20px',
+              border: 'none',
+              borderRadius: '12px',
+              background: activeTab === tab.id ? 'rgba(56, 189, 248, 0.15)' : 'transparent',
+              color: activeTab === tab.id ? '#38bdf8' : 'rgba(255,255,255,0.6)',
+              cursor: 'pointer',
+              fontWeight: '700',
+              fontSize: '0.9rem',
+              transition: 'all 0.3s ease'
+            }}
+          >
+            <span className="material-symbols-rounded" style={{ fontSize: '20px' }}>{tab.icon}</span>
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* TAB CONTENT: TRANSACTIONS */}
+      {activeTab === 'transactions' && (
+        <div className="fade-in">
+          <div className="glass-card" style={{ padding: '20px', marginBottom: '20px', display: 'flex', gap: '15px', alignItems: 'center' }}>
+            <div style={{ position: 'relative', flex: 1 }}>
+              <span className="material-symbols-rounded" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }}>search</span>
+              <input 
+                type="text" 
+                placeholder="Cari Order ID..." 
+                value={trxSearch}
+                onChange={(e) => setTrxSearch(e.target.value)}
+                style={{ width: '100%', padding: '12px 12px 12px 45px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: 'white', outline: 'none' }}
+              />
+            </div>
+            <select 
+              value={trxStatusFilter} 
+              onChange={(e) => setTrxStatusFilter(e.target.value)}
+              className="form-select-premium"
+              style={{ 
+                padding: '12px 20px', 
+                background: 'rgba(255,255,255,0.05)', 
+                border: '1px solid rgba(255,255,255,0.1)', 
+                borderRadius: '12px', 
+                color: 'white', 
+                outline: 'none', 
+                cursor: 'pointer',
+                fontWeight: '700'
+              }}
+            >
+              <option value="ALL" style={{ background: '#0a0a0c', color: 'white' }}>Semua Status</option>
+              <option value="PENDING" style={{ background: '#0a0a0c', color: 'white' }}>Pending</option>
+              <option value="PAID" style={{ background: '#0a0a0c', color: 'white' }}>Paid</option>
+            </select>
+
+            <button 
+              onClick={() => setShowCleanupModal(true)}
+              className="btn-glass"
+              style={{ padding: '12px 20px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px', color: '#fbbf24', borderColor: 'rgba(251, 191, 36, 0.3)' }}
+            >
+              <span className="material-symbols-rounded">auto_delete</span>
+              Auto Cleanup
+            </button>
+
+            {selectedTrxs.length > 0 && (
+              <button 
+                onClick={handleBulkDelete}
+                className="btn-danger-small"
+                style={{ padding: '12px 20px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}
+              >
+                <span className="material-symbols-rounded">delete_sweep</span>
+                Hapus ({selectedTrxs.length})
+              </button>
+            )}
+          </div>
+
+          <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
+            <div className="table-container" style={{ margin: 0, border: 'none', background: 'transparent', borderRadius: 0 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead style={{ background: 'rgba(255,255,255,0.02)' }}>
+                <tr>
+                  <th style={{ padding: '15px 20px', textAlign: 'left', width: '40px' }}>
+                    <input 
+                      type="checkbox" 
+                      checked={filteredTrx.length > 0 && selectedTrxs.length === filteredTrx.length}
+                      onChange={toggleSelectAll}
+                      style={{ cursor: 'pointer', transform: 'scale(1.2)' }}
+                    />
+                  </th>
+                  <th style={{ padding: '15px 20px', textAlign: 'left', color: '#94a3b8', fontSize: '0.75rem' }}>WAKTU</th>
+                  <th style={{ padding: '15px 20px', textAlign: 'left', color: '#94a3b8', fontSize: '0.75rem' }}>ORDER ID</th>
+                  <th style={{ padding: '15px 20px', textAlign: 'left', color: '#94a3b8', fontSize: '0.75rem' }}>PAKET</th>
+                  <th style={{ padding: '15px 20px', textAlign: 'left', color: '#94a3b8', fontSize: '0.75rem' }}>KODE VOUCHER</th>
+                  <th style={{ padding: '15px 20px', textAlign: 'left', color: '#94a3b8', fontSize: '0.75rem' }}>NOMINAL</th>
+                  <th style={{ padding: '15px 20px', textAlign: 'left', color: '#94a3b8', fontSize: '0.75rem' }}>STATUS</th>
+                  <th style={{ padding: '15px 20px', textAlign: 'right', color: '#94a3b8', fontSize: '0.75rem' }}>AKSI</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredTrx.slice(0, 50).map(trx => (
+                  <tr key={trx.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', background: selectedTrxs.includes(trx.id) ? 'rgba(56, 189, 248, 0.05)' : 'transparent' }}>
+                    <td style={{ padding: '12px 20px' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={selectedTrxs.includes(trx.id)}
+                        onChange={() => toggleSelectTrx(trx.id)}
+                        style={{ cursor: 'pointer', transform: 'scale(1.2)' }}
+                      />
+                    </td>
+                    <td style={{ padding: '12px 20px', fontSize: '0.85rem', color: '#cbd5e1' }}>{new Date(trx.created_at).toLocaleString('id-ID')}</td>
+                    <td style={{ padding: '12px 20px', fontWeight: '700', color: '#38bdf8' }}>{trx.order_id}</td>
+                    <td style={{ padding: '12px 20px' }}>{trx.package_id}</td>
+                    <td style={{ padding: '12px 20px' }}>
+                      {trx.status === 'PAID' || trx.status === 'USED' ? (
+                        <code style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', padding: '4px 8px', borderRadius: '6px', fontWeight: '800' }}>{trx.voucher_code}</code>
+                      ) : (
+                        <span style={{ color: '#64748b' }}>-</span>
+                      )}
+                    </td>
+                    <td style={{ padding: '12px 20px', fontWeight: '800' }}>Rp {Number(trx.total_amount).toLocaleString('id-ID', { minimumFractionDigits: 0 })}</td>
+                    <td style={{ padding: '12px 20px' }}>{getStatusBadge(trx.status)}</td>
+                    <td style={{ padding: '12px 20px', textAlign: 'right' }}>
+                      <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                        {trx.status === 'PENDING' && (
+                          <button onClick={() => handleApproveTrx(trx.order_id)} className="btn-success-small" title="Approve">
+                            <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>check_circle</span>
+                          </button>
+                        )}
+                        <button onClick={() => handleDeleteTrx(trx.id)} className="btn-danger-small" title="Hapus">
+                          <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>delete</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB CONTENT: LOGS */}
+      {activeTab === 'logs' && (
+        <div className="fade-in">
+          <div className="glass-card" style={{ padding: '20px', marginBottom: '20px', display: 'flex', gap: '15px', alignItems: 'center' }}>
+            <div style={{ position: 'relative', flex: 1 }}>
+              <span className="material-symbols-rounded" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }}>search</span>
+              <input 
+                type="text" 
+                placeholder="Cari isi notifikasi atau matched order..." 
+                value={logSearch}
+                onChange={(e) => setLogSearch(e.target.value)}
+                style={{ width: '100%', padding: '12px 12px 12px 45px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: 'white', outline: 'none' }}
+              />
+            </div>
+            {selectedLogs.length > 0 && (
+              <button 
+                onClick={handleBulkDeleteLogs}
+                className="btn-danger-small"
+                style={{ padding: '12px 20px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}
+              >
+                <span className="material-symbols-rounded">delete_sweep</span>
+                Hapus ({selectedLogs.length})
+              </button>
+            )}
+          </div>
+
+          <div className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
+            <div className="table-container" style={{ margin: 0, border: 'none', background: 'transparent', borderRadius: 0 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead style={{ background: 'rgba(255,255,255,0.02)' }}>
+                <tr>
+                  <th style={{ padding: '15px 20px', textAlign: 'left', width: '40px' }}>
+                    <input 
+                      type="checkbox" 
+                      checked={filteredLogs.length > 0 && selectedLogs.length === filteredLogs.length}
+                      onChange={toggleSelectAllLogs}
+                      style={{ cursor: 'pointer', transform: 'scale(1.2)' }}
+                    />
+                  </th>
+                  <th style={{ padding: '15px 20px', textAlign: 'left', color: '#94a3b8', fontSize: '0.75rem' }}>WAKTU</th>
+                  <th style={{ padding: '15px 20px', textAlign: 'left', color: '#94a3b8', fontSize: '0.75rem' }}>DETEKSI NOMINAL</th>
+                  <th style={{ padding: '15px 20px', textAlign: 'left', color: '#94a3b8', fontSize: '0.75rem' }}>NOTIFIKASI</th>
+                  <th style={{ padding: '15px 20px', textAlign: 'left', color: '#94a3b8', fontSize: '0.75rem' }}>MATCHING</th>
+                  <th style={{ padding: '15px 20px', textAlign: 'left', color: '#94a3b8', fontSize: '0.75rem' }}>SUMBER</th>
+                  <th style={{ padding: '15px 20px', textAlign: 'right', color: '#94a3b8', fontSize: '0.75rem' }}>AKSI</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredLogs.slice(0, 50).map(log => (
+                  <tr key={log.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', background: selectedLogs.includes(log.id) ? 'rgba(56, 189, 248, 0.05)' : 'transparent' }}>
+                    <td style={{ padding: '12px 20px' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={selectedLogs.includes(log.id)}
+                        onChange={() => toggleSelectLog(log.id)}
+                        style={{ cursor: 'pointer', transform: 'scale(1.2)' }}
+                      />
+                    </td>
+                    <td style={{ padding: '12px 20px', fontSize: '0.85rem', color: '#cbd5e1' }}>{new Date(log.received_at).toLocaleString('id-ID')}</td>
+                    <td style={{ padding: '12px 20px', fontWeight: '800', color: '#10b981' }}>Rp {Number(log.amount_detected).toLocaleString('id-ID', { minimumFractionDigits: 0 })}</td>
+                    <td style={{ padding: '12px 20px', fontSize: '0.85rem', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {log.notification_text}
+                    </td>
+                    <td style={{ padding: '12px 20px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        {getStatusBadge(log.match_status)}
+                        {log.matched_order_id && <span style={{ fontSize: '0.7rem', color: '#38bdf8', fontWeight: '700' }}>ID: {log.matched_order_id}</span>}
+                      </div>
+                    </td>
+                    <td style={{ padding: '12px 20px' }}>
+                      <span style={{ fontSize: '0.75rem', background: 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: '4px' }}>{log.source_app.split('.').pop()}</span>
+                    </td>
+                    <td style={{ padding: '12px 20px', textAlign: 'right' }}>
+                      <button onClick={() => handleDeleteLog(log.id)} className="btn-danger-small" style={{ width: '35px', height: '35px' }}>
+                        <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>delete</span>
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB CONTENT: DEVICES */}
+      {activeTab === 'devices' && (
+        <div className="fade-in">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '20px' }}>
+            {devices.map(device => (
+              <div key={device.id} className="glass-card device-card" style={{ padding: '25px', position: 'relative' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <div style={{ 
+                      width: '50px', 
+                      height: '50px', 
+                      borderRadius: '12px', 
+                      background: 'rgba(56, 189, 248, 0.1)', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center' 
+                    }}>
+                      <span className="material-symbols-rounded" style={{ color: '#38bdf8', fontSize: '28px' }}>smartphone</span>
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: '800', fontSize: '1.1rem' }}>{device.device_name || 'Android Device'}</div>
+                      <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>ID: {device.device_id}</div>
+                    </div>
+                  </div>
+                  {getStatusBadge(device.last_seen_at && (new Date() - new Date(device.last_seen_at) < 600000) ? 'online' : 'offline')}
+                </div>
+
+                <div style={{ background: 'rgba(0,0,0,0.2)', padding: '15px', borderRadius: '12px', marginBottom: '20px' }}>
+                  <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: '700', marginBottom: '8px', textTransform: 'uppercase' }}>API Access Token</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <code style={{ flex: 1, fontSize: '0.85rem', color: '#fbbf24', overflow: 'hidden', textOverflow: 'ellipsis' }}>{device.api_token}</code>
+                    <button onClick={() => { navigator.clipboard.writeText(device.api_token); toast.info('Token disalin!'); }} className="btn-icon">
+                      <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>content_copy</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                    Terakhir Aktif:<br/>
+                    <span style={{ color: '#cbd5e1' }}>{device.last_seen_at ? new Date(device.last_seen_at).toLocaleString('id-ID') : 'Belum pernah'}</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <button onClick={() => handleToggleDevice(device.id, device.status)} className="btn-glass" style={{ padding: '8px 15px', borderRadius: '8px', fontSize: '0.8rem', fontWeight: '700' }}>
+                      {device.status === 'active' ? 'Nonaktifkan' : 'Aktifkan'}
+                    </button>
+                    <button onClick={() => handleDeleteDevice(device.id)} className="btn-danger-small" style={{ width: '35px', height: '35px', borderRadius: '8px' }}>
+                      <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>delete</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {/* ADD DEVICE PLACEHOLDER (OPTIONAL) */}
+            <div className="glass-card" style={{ border: '2px dashed rgba(255,255,255,0.1)', background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px', cursor: 'pointer' }}>
+              <span className="material-symbols-rounded" style={{ fontSize: '48px', color: 'rgba(255,255,255,0.1)', marginBottom: '10px' }}>add_circle</span>
+              <div style={{ color: 'rgba(255,255,255,0.3)', fontWeight: '700' }}>Tambah Perangkat Baru dari App</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showCleanupModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div className="glass-card" style={{ width: '100%', maxWidth: '400px', padding: '30px', animation: 'scaleUp 0.3s ease-out' }}>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: '900', marginBottom: '15px', color: '#fbbf24', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span className="material-symbols-rounded">auto_delete</span>
+              Pembersihan Otomatis
+            </h2>
+            <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '25px', lineHeight: '1.5' }}>
+              Hapus transaksi dengan status <strong>PENDING</strong> yang sudah melewati batas waktu tertentu.
+            </p>
+            
+            <div style={{ marginBottom: '25px' }}>
+              <label style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '700', marginBottom: '10px', display: 'block' }}>HAPUS JIKA SUDAH LEBIH DARI (HARI):</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                <input 
+                  type="number" 
+                  value={cleanupDays} 
+                  onChange={(e) => setCleanupDays(e.target.value)}
+                  style={{ flex: 1, padding: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: 'white', outline: 'none', fontSize: '1.1rem', fontWeight: '800', textAlign: 'center' }}
+                />
+                <div style={{ fontWeight: '700', color: '#94a3b8' }}>HARI</div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button 
+                onClick={() => setShowCleanupModal(false)}
+                style={{ flex: 1, padding: '12px', background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: '12px', color: 'white', fontWeight: '700', cursor: 'pointer' }}
+              >
+                Batal
+              </button>
+              <button 
+                onClick={handleCleanup}
+                className="btn-success-premium"
+                style={{ flex: 2, padding: '12px', borderRadius: '12px', color: 'white', fontWeight: '800', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' }}
+              >
+                Mulai Pembersihan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CUSTOM CONFIRMATION MODAL */}
+      <div className={`modal-overlay ${confirmModal.isOpen ? 'open' : ''}`} style={{ zIndex: 10000 }}>
+        <div className="modal-content glass-card" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px', textAlign: 'center', padding: '2rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
+            <div style={{ 
+              width: '60px', 
+              height: '60px', 
+              borderRadius: '50%', 
+              background: confirmModal.iconBg, 
+              color: confirmModal.iconColor, 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              marginBottom: '10px'
+            }}>
+              <span className="material-symbols-rounded" style={{ fontSize: '32px' }}>{confirmModal.icon}</span>
+            </div>
+            
+            <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'white', fontWeight: 'bold' }}>{confirmModal.title}</h3>
+            
+            <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+              {confirmModal.message}
+            </p>
+            
+            <div style={{ display: 'flex', gap: '12px', width: '100%', marginTop: '1.5rem' }}>
+              <button 
+                type="button"
+                onClick={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))} 
+                className="btn" 
+                style={{ 
+                  flex: 1, 
+                  background: 'rgba(255, 255, 255, 0.05)', 
+                  border: '1px solid rgba(255, 255, 255, 0.1)', 
+                  color: 'white', 
+                  borderRadius: '50px',
+                  padding: '10px',
+                  fontWeight: '600',
+                  cursor: 'pointer'
+                }}
+              >
+                BATAL
+              </button>
+              <button 
+                type="button"
+                onClick={confirmModal.onConfirm} 
+                className="btn" 
+                style={{ 
+                  flex: 1, 
+                  background: confirmModal.confirmBg, 
+                  border: 'none', 
+                  color: 'white', 
+                  borderRadius: '50px',
+                  padding: '10px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  boxShadow: `0 8px 20px ${confirmModal.confirmShadow}`
+                }}
+                onMouseOver={e => e.currentTarget.style.filter = 'brightness(1.1)'}
+                onMouseOut={e => e.currentTarget.style.filter = 'brightness(1.0)'}
+              >
+                {confirmModal.confirmText}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes scaleUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .payment-bridge-container { animation: fadeIn 0.5s ease-out; }
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .glass-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; transition: all 0.3s ease; }
+        .glass-card:hover { border-color: rgba(56, 189, 248, 0.3); background: rgba(255, 255, 255, 0.05); }
+        
+        .btn-glass { background: rgba(255, 255, 255, 0.05); color: white; border: 1px solid rgba(255, 255, 255, 0.1); cursor: pointer; transition: all 0.2s; }
+        .btn-glass:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); }
+        
+        .btn-success-small { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); padding: 6px; borderRadius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .btn-success-small:hover { background: #10b981; color: white; }
+        
+        .btn-danger-small { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 6px; borderRadius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .btn-danger-small:hover { background: #ef4444; color: white; }
+        
+        .btn-icon { background: transparent; border: none; color: #94a3b8; cursor: pointer; padding: 5px; display: flex; align-items: center; transition: color 0.2s; }
+        .btn-icon:hover { color: #38bdf8; }
+        
+        .device-card { overflow: hidden; }
+        .device-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: #38bdf8; opacity: 0.5; }
+        
+        .form-select-premium option {
+          background-color: #0a0a0c !important;
+          color: white !important;
+          padding: 10px;
+        }
+
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .spin { animation: spin 1s linear infinite; }
+      `}} />
+    </div>
+  );
+};
+
+export default PaymentBridgeCenter;

@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-radius}
+      MYSQL_USER: ${MYSQL_USER:-radius}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?}
+      TZ: Asia/Jakarta
+    command: ["mysqld", "--default-time-zone=+07:00", "--log_bin_trust_function_creators=1"]
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./db-init:/docker-entrypoint-initdb.d:ro
+    restart: always
+
+  radius:
+    build:
+      context: ./radius-server
+      dockerfile: Dockerfile
+    environment:
+      TZ: Asia/Jakarta
+    ports:
+      - "1812:1812/udp"
+      - "1813:1813/udp"
+      - "1814:1812/udp"
+      - "1815:1813/udp"
+      - "11812:1812/udp"
+      - "11813:1813/udp"
+    depends_on:
+      - db
+    restart: always
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      DB_HOST: db
+      DB_USER: ${MYSQL_USER:-radius}
+      DB_PASSWORD: ${MYSQL_PASSWORD:?}
+      DB_NAME: ${MYSQL_DATABASE:-radius}
+      ENABLE_TELEGRAM_BOT_LISTENER: ${ENABLE_TELEGRAM_BOT_LISTENER:-true}
+      TZ: Asia/Jakarta
+    expose:
+      - "5000"
+    depends_on:
+      - db
+    volumes:
+      - ./vpn-config:/vpn-config
+      - ./vpnusers.txt:/vpnusers.txt
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      TZ: Asia/Jakarta
+    expose:
+      - "80"
+    depends_on:
+      - backend
+    restart: always
+
+volumes:
+  db-data:

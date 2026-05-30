@@ -1,0 +1,13 @@
+.env
+.env.*
+node_modules
+dist
+build
+*.log
+__pycache__/
+.git
+
+# data sensitif / runtime
+vpn-config/*
+!vpn-config/.gitkeep
+vpnusers.txt

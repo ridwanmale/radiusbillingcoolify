@@ -1,0 +1,101 @@
+const express = require('express');
+const router = express.Router();
+const db = require('../config/db');
+const { notifyTelegram } = require('../utils/telegram');
+
+// Login endpoint
+router.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Username and password are required' });
+  }
+  const connection = await db.getConnection();
+  try {
+    const [users] = await connection.query('SELECT * FROM admin_users WHERE username = ?', [username]);
+    if (users.length === 0) {
+      await notifyTelegram("⚠️ <b>Percobaan Login Gagal</b>\n\nUsername: " + username + "\nAlasan: User tidak ditemukan\nIP: " + (req.headers['x-forwarded-for'] || req.connection.remoteAddress));
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+
+    const user = users[0];
+    // Plain text comparison for now as per user's request for simplicity, 
+    // though normally we'd use bcrypt
+    if (password !== user.password) {
+      await notifyTelegram("⚠️ <b>Percobaan Login Gagal</b>\n\nUsername: " + username + "\nAlasan: Password salah\nIP: " + (req.headers['x-forwarded-for'] || req.connection.remoteAddress));
+      return res.status(401).json({ error: 'Invalid username or password' });
+    }
+
+    const { logActivity } = require('./logs');
+    await logActivity(user.username, 'Login', 'Admin masuk ke aplikasi', req);
+
+    res.json({ 
+      message: 'Login successful', 
+      user: { id: user.id, username: user.username, role: user.role } 
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  } finally {
+    connection.release();
+  }
+});
+
+// User Management Endpoints
+router.get('/users', async (req, res) => {
+  const connection = await db.getConnection();
+  try {
+    const [users] = await connection.query('SELECT id, username, role, created_at FROM admin_users');
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  } finally {
+    connection.release();
+  }
+});
+
+router.post('/users', async (req, res) => {
+  const { username, password, role = 'admin' } = req.body;
+  const connection = await db.getConnection();
+  try {
+    await connection.query('INSERT INTO admin_users (username, password, role) VALUES (?, ?, ?)', [username, password, role]);
+    
+    const { logActivity } = require('./logs');
+    await logActivity(req.body.admin_username, 'Add Admin', `Menambah user admin baru: ${username}`, req);
+    
+    res.json({ message: 'User created' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  } finally {
+    connection.release();
+  }
+});
+
+router.put('/users/:id', async (req, res) => {
+  const { password } = req.body;
+  const connection = await db.getConnection();
+  try {
+    await connection.query('UPDATE admin_users SET password = ? WHERE id = ?', [password, req.params.id]);
+    res.json({ message: 'Password updated' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  } finally {
+    connection.release();
+  }
+});
+
+router.delete('/users/:id', async (req, res) => {
+  const connection = await db.getConnection();
+  try {
+    await connection.query('DELETE FROM admin_users WHERE id = ?', [req.params.id]);
+
+    const { logActivity } = require('./logs');
+    await logActivity(req.query.admin_username, 'Delete Admin', `Menghapus user admin ID: ${req.params.id}`, req);
+
+    res.json({ message: 'User deleted' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  } finally {
+    connection.release();
+  }
+});
+
+module.exports = router;
