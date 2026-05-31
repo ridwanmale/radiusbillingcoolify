@@ -42,6 +42,7 @@ services:
       DB_PASSWORD: ${MYSQL_PASSWORD:?}
       DB_NAME: ${MYSQL_DATABASE:-radius}
       ENABLE_TELEGRAM_BOT_LISTENER: ${ENABLE_TELEGRAM_BOT_LISTENER:-true}
+      RADIUS_CONTAINER_PREFIX: ${RADIUS_CONTAINER_PREFIX:?}
       TZ: Asia/Jakarta
     expose:
       - "5000"
