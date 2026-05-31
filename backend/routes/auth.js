@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
-const { notifyAdmin } = require('../utils/telegram');
+const { notifyTelegram } = require('../utils/telegram');
 
 // Login endpoint
 router.post('/login', async (req, res) => {
@@ -13,7 +13,7 @@ router.post('/login', async (req, res) => {
   try {
     const [users] = await connection.query('SELECT * FROM admin_users WHERE username = ?', [username]);
     if (users.length === 0) {
-      await notifyAdmin("⚠️ <b>Percobaan Login Gagal</b>\n\nUsername: " + username + "\nAlasan: User tidak ditemukan\nIP: " + (req.headers['x-forwarded-for'] || req.connection.remoteAddress));
+      await notifyTelegram("⚠️ <b>Percobaan Login Gagal</b>\n\nUsername: " + username + "\nAlasan: User tidak ditemukan\nIP: " + (req.headers['x-forwarded-for'] || req.connection.remoteAddress));
       return res.status(401).json({ error: 'Invalid username or password' });
     }
 
@@ -21,7 +21,7 @@ router.post('/login', async (req, res) => {
     // Plain text comparison for now as per user's request for simplicity, 
     // though normally we'd use bcrypt
     if (password !== user.password) {
-      await notifyAdmin("⚠️ <b>Percobaan Login Gagal</b>\n\nUsername: " + username + "\nAlasan: Password salah\nIP: " + (req.headers['x-forwarded-for'] || req.connection.remoteAddress));
+      await notifyTelegram("⚠️ <b>Percobaan Login Gagal</b>\n\nUsername: " + username + "\nAlasan: Password salah\nIP: " + (req.headers['x-forwarded-for'] || req.connection.remoteAddress));
       return res.status(401).json({ error: 'Invalid username or password' });
     }
 

@@ -54,22 +54,7 @@ const notifyTelegram = async (message, outletName = 'Global') => {
   }
 };
 
-
-/**
- * Kirim notifikasi khusus ke Bot Admin
- */
-const notifyAdmin = async (message) => {
-  return await notifyTelegram(message, 'Admin');
-};
-
-module.exports = {
-  sendTelegramNotification,
-  notifyTelegram,
-  notifyAdmin // Pastikan ini diekspor
-};
-
 module.exports = {
   sendTelegramNotification,
   notifyTelegram
-  notifyAdmin 
 };
