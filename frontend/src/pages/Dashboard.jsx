@@ -9,7 +9,7 @@ const Dashboard = () => {
     stock_count: 0,
     total_sold: 0,
     voucher_online: 0,
-    pppoe_online: 0, // Ditambahkan: state untuk PPPoE
+    pppoe_online: 0, // State baru untuk PPPoE
     total_profiles: 0,
     daily_income: 0,
     online_income: 0,
@@ -97,7 +97,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+      <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
         {/* Card Voucher Fisik */}
         <div className="glass-card" style={{ borderTop: '2px solid rgba(16, 185, 129, 0.5)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -124,7 +124,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Card Hotspot Online (Lengkap dengan tombol Sinkron Sesi Anda) */}
+        {/* Card Hotspot Online */}
         <div 
           className="glass-card" 
           onClick={() => navigate('/voucher-online')}
@@ -157,20 +157,20 @@ const Dashboard = () => {
           <button 
             onClick={async (e) => {
               e.stopPropagation();
-              const method = prompt("Pilih Metode Sinkronisasi Sesi:\n1. Sinkronisasi Cerdas\n2. Reset Sesi ke 0\n\nKetik angka 1 atau 2:", "1");
+              const method = prompt("Pilih Metode Sinkronisasi Sesi:\n1. Sinkronisasi Cerdas (Hanya bersihkan sesi yang tidak aktif > 5 menit)\n2. Reset Sesi ke 0 (Paksa semua sesi aktif menjadi Offline/0 agar tidak ganda)\n\nKetik angka 1 atau 2:", "1");
               if (method === "1") {
                 const res = await fetch(`/api/dashboard/sync?mode=stale`, { method: 'POST' });
                 if (res.ok) {
                   const data = await res.json();
-                  alert(`Sinkronisasi Cerdas berhasil! ${data.cleaned} sesi dibersihkan.`);
+                  alert(`Sinkronisasi Cerdas berhasil! ${data.cleaned} sesi mati dibersihkan.`);
                   fetchStats();
                 }
               } else if (method === "2") {
-                triggerConfirm("Lanjutkan reset sesi total?", async () => {
+                triggerConfirm("PERINGATAN: Seluruh sesi aktif akan di-set Offline (0).\nMikroTik akan memperbarui kembali status sesi yang benar-benar aktif secara otomatis dalam 5 menit.\n\nLanjutkan reset sesi total?", async () => {
                   const res = await fetch(`/api/dashboard/sync?mode=reset`, { method: 'POST' });
                   if (res.ok) {
                     const data = await res.json();
-                    alert(`Reset Total berhasil! ${data.cleaned} sesi di-reset.`);
+                    alert(`Reset Total berhasil! ${data.cleaned} sesi di-reset menjadi Offline (0).`);
                     fetchStats();
                   }
                 });
@@ -181,16 +181,16 @@ const Dashboard = () => {
               border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', 
               alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-secondary)'
             }}
-            title="Sinkron Sesi"
+            title="Sinkron Sesi (Hapus Sesi Nyangkut)"
           >
             <span className="material-symbols-rounded" style={{ fontSize: '1.2rem' }}>sync</span>
           </button>
         </div>
 
-        {/* Card PPPoE Online - BARU DITAMBAHKAN */}
+        {/* Card PPPoE Online - Direct ke Monitoring Online */}
         <div 
           className="glass-card" 
-          onClick={() => navigate('/pppoe-online')}
+          onClick={() => navigate('/monitoring-online')}
           style={{ 
             borderTop: '2px solid rgba(139, 92, 246, 0.5)', 
             cursor: 'pointer',
@@ -423,11 +423,62 @@ const Dashboard = () => {
       </div>
 
       <style>{`
-        /* CSS tetap sama dengan milik Anda */
         @media (max-width: 1024px) {
-          .page-header { flex-direction: column !important; }
+          .page-header {
+            flex-direction: column !important;
+          }
+          .stats-grid {
+            gap: 1rem !important;
+          }
         }
-        /* ... dst ... */
+
+        @media (max-width: 768px) {
+          .page-header {
+            flex-direction: column !important;
+            align-items: stretch !important;
+          }
+          .page-title {
+            font-size: 1.5rem;
+          }
+          .page-subtitle {
+            font-size: 0.9rem;
+          }
+          .stats-grid {
+            gridTemplateColumns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+            gap: 1rem !important;
+          }
+          .glass-card {
+            padding: 1rem !important;
+          }
+          .stat-value {
+            font-size: 1.5rem !important;
+          }
+          .data-table th,
+          .data-table td {
+            padding: 0.5rem !important;
+            font-size: 0.75rem !important;
+          }
+          .data-table code {
+            font-size: 0.7rem;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .page-header {
+            gap: 0.5rem !important;
+          }
+          .stats-grid {
+            gridTemplateColumns: 1fr !important;
+          }
+          .data-table th,
+          .data-table td {
+            padding: 0.3rem !important;
+            font-size: 0.7rem !important;
+          }
+          .material-symbols-rounded {
+            font-size: 1rem !important;
+          }
+        }
       `}</style>
     
       <ConfirmModal
