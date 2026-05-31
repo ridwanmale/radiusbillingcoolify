@@ -379,7 +379,7 @@ const pppoeBillingJobs = async () => {
       await connection.commit();
       
       // Telegram Notification
-      const tgMessage = `<b>ðŸš« ISOLIR OTOMATIS</b>\n\nPelanggan: <b>${cust.name}</b>\nUsername: <code>${cust.pppoe_username}</code>\nStatus: Terisolir (Tagihan Belum Dibayar)`;
+      const tgMessage = `<b>« ISOLIR OTOMATIS</b>\n\nPelanggan: <b>${cust.name}</b>\nUsername: <code>${cust.pppoe_username}</code>\nStatus: Terisolir (Tagihan Belum Dibayar)`;
       await notifyTelegram(tgMessage);
 
       console.log(`[PPPoE Billing] Auto isolated customer ${cust.name} due to unpaid invoice`);
@@ -449,9 +449,9 @@ const checkFirstLogins = async () => {
           const loginTime = formatDT(session.acctstarttime);
           const expireTime = formatDT(session.expiration_date);
           
-          let title = "<b>ðŸš€ Voucher Fisik Aktif!</b>";
+          let title = "<b>🚀 Voucher Fisik Aktif!</b>";
           if (isOnlineVoucher) {
-            title = "<b>ðŸŒ Voucher Online Aktif!</b>";
+            title = "<b>🌐 Voucher Online Aktif!</b>";
           }
 
           const message = `${title}\n\n` +
@@ -485,14 +485,14 @@ setInterval(() => checkFirstLogins().catch(err => console.error('[Telegram Inter
 // TELEGRAM BOT LISTENER: Cek Voucher Command
 // =============================================
 if (process.env.ENABLE_TELEGRAM_BOT_LISTENER === 'true') {
-  console.log('ðŸš€ [Telegram Bot] Initializing "Cek Voucher" bot listener...');
+  console.log('🚀 [Telegram Bot] Initializing "Cek Voucher" bot listener...');
   try {
     initTelegramBotListener();
   } catch (err) {
     console.error('[Telegram Bot Startup] Error:', err.message);
   }
 } else {
-  console.log('â„¹ï¸ [Telegram Bot] Listener disabled (ENABLE_TELEGRAM_BOT_LISTENER is not true).');
+  console.log(' [Telegram Bot] Listener disabled (ENABLE_TELEGRAM_BOT_LISTENER is not true).');
 }
 
 
