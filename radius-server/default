@@ -13,6 +13,12 @@ listen {
 
 authorize {
 	sql
+        if (notfound) {
+		update reply {
+			&Reply-Message := "%{%{sql:SELECT message FROM radius_reply_messages WHERE msg_key = 'INVALID_VOUCHER' LIMIT 1}:-Voucher tidak ada}"
+		}
+		reject
+	}
 	filter_username
 	preprocess
 	chap
