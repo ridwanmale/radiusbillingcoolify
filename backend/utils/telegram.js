@@ -71,4 +71,5 @@ module.exports = {
 module.exports = {
   sendTelegramNotification,
   notifyTelegram
+  notifyAdmin 
 };
