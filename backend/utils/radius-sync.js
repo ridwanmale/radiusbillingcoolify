@@ -63,4 +63,10 @@ async function reloadRadiusContainer() {
   }
 }
 
-module.exports = { reloadRadiusContainer };
+// alias untuk kompatibilitas kode lama
+const syncRadiusClientsConf = reloadRadiusContainer;
+
+module.exports = {
+  reloadRadiusContainer,
+  syncRadiusClientsConf
+};
