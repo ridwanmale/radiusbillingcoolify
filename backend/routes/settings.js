@@ -200,7 +200,7 @@ router.post('/telegram/test', async (req, res) => {
 
   try {
     const fetch = require('node-fetch');
-    const message = "ðŸ”” *TES NOTIFIKASI*\n\nSelamat! Bot Telegram Anda sudah terhubung dengan sistem RADIUS Billing.";
+    const message = "*TES NOTIFIKASI*\n\nSelamat! Bot Telegram Anda sudah terhubung dengan sistem RADIUS Billing.";
     
     const response = await fetch(`https://api.telegram.org/bot${bot_token}/sendMessage`, {
       method: 'POST',
