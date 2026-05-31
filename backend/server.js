@@ -492,7 +492,7 @@ if (process.env.ENABLE_TELEGRAM_BOT_LISTENER === 'true') {
     console.error('[Telegram Bot Startup] Error:', err.message);
   }
 } else {
-  console.log(' [Telegram Bot] Listener disabled (ENABLE_TELEGRAM_BOT_LISTENER is not true).');
+  console.log('[Telegram Bot] Listener disabled (ENABLE_TELEGRAM_BOT_LISTENER is not true).');
 }
 
 
