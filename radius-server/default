@@ -13,12 +13,14 @@ listen {
 
 authorize {
 	sql
-        if (notfound) {
+
+	if (notfound) {
 		update reply {
 			&Reply-Message := "%{%{sql:SELECT message FROM radius_reply_messages WHERE msg_key = 'INVALID_VOUCHER' LIMIT 1}:-Voucher tidak ada}"
 		}
 		reject
 	}
+
 	filter_username
 	preprocess
 	chap
@@ -143,6 +145,8 @@ session {
 }
 
 post-auth {
+	reply_log
+
 	update reply {
 		Session-Timeout := "%{sql:SELECT GREATEST(1, COALESCE((SELECT TIMESTAMPDIFF(SECOND, NOW(), expiration_date) FROM rincian_transaksi_voucher WHERE username = '%{User-Name}' AND expiration_date IS NOT NULL LIMIT 1), (SELECT pm.masa_aktif * CASE WHEN pm.satuan = 'Hari' THEN 86400 WHEN pm.satuan = 'Jam' THEN 3600 WHEN pm.satuan = 'Menit' THEN 60 ELSE 1 END FROM profiles_metadata pm JOIN radusergroup rug ON pm.groupname = rug.groupname WHERE rug.username = '%{User-Name}' LIMIT 1)))}"
 	}
@@ -164,6 +168,7 @@ post-auth {
 	exec
 	
 	Post-Auth-Type REJECT {
+		reply_log
 		-sql
 		attr_filter.access_reject
 	}
