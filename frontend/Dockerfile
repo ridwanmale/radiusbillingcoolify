@@ -1,5 +1,5 @@
 # Stage 1: Build stage
-FROM node:18-alpine AS builder
+FROM node:18-alpine3.18 AS builder
 
 WORKDIR /usr/src/app
 
@@ -13,7 +13,7 @@ ENV VITE_API_URL=/api
 RUN npm run build
 
 # Stage 2: Production stage using Nginx
-FROM nginx:alpine
+FROM nginx:alpine3.18
 
 # Copy built static files from builder stage
 COPY --from=builder /usr/src/app/dist /usr/share/nginx/html
