@@ -19,6 +19,9 @@ CURRENT_DIR=$(pwd)
 # 0. Link GitHub
 read -p "Masukkan link GitHub repositori (Kosongkan jika ingin pakai file lokal): " GITHUB_URL
 
+# 0.5 File Backup Database
+read -p "Masukkan path file backup database .sql (kosongkan jika install database kosong/baru): " DB_BACKUP_FILE
+
 # 1. Direktori Instalasi
 read -p "Masukkan path direktori instalasi (tekan Enter untuk default: /opt/radiusbilling): " INSTALL_DIR
 INSTALL_DIR=${INSTALL_DIR:-/opt/radiusbilling}
@@ -100,6 +103,20 @@ fi
 # Pindah ke direktori target yang sudah siap
 cd "$INSTALL_DIR" || { echo "Gagal masuk ke direktori $INSTALL_DIR"; exit 1; }
 
+# Memproses file backup database jika diinputkan
+if [[ -n "$DB_BACKUP_FILE" ]]; then
+    if [[ -f "$DB_BACKUP_FILE" ]]; then
+        echo "Memproses file backup database: $DB_BACKUP_FILE"
+        # Menghapus file inisialisasi database bawaan agar tidak bentrok dengan data backup
+        rm -rf db-init/*
+        # Menyalin file backup ke db-init agar otomatis dijalankan Docker saat pertama kali booting
+        cp "$DB_BACKUP_FILE" "db-init/00-restore.sql"
+        echo "File backup siap di-restore."
+    else
+        echo "PERINGATAN: File $DB_BACKUP_FILE tidak ditemukan! Instalasi akan menggunakan database bawaan yang kosong."
+    fi
+fi
+
 # Install Docker jika belum ada
 if ! command -v docker &> /dev/null; then
     echo "Menginstal Docker..."
@@ -120,6 +137,12 @@ if ! command -v docker &> /dev/null; then
 else
     echo "Docker sudah terinstal. Melanjutkan..."
 fi
+
+# Trik Khusus Proxmox LXC (Unprivileged)
+# Menghapus AppArmor di dalam container agar Docker tidak mencoba memodifikasi kernel security host
+echo "Menerapkan perbaikan khusus untuk Proxmox LXC (Mencegah error AppArmor)..."
+apt-get remove --purge -y apparmor
+systemctl daemon-reload
 
 # Pastikan service Docker berjalan dan autorun
 systemctl enable docker
