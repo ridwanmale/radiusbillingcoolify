@@ -10,6 +10,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:?}
       TZ: Asia/Jakarta
     command: ["mysqld", "--default-time-zone=+07:00", "--log_bin_trust_function_creators=1"]
+    privileged: true
     volumes:
       - db-data:/var/lib/mysql
       - ./db-init:/docker-entrypoint-initdb.d:ro
@@ -28,6 +29,7 @@ services:
       - "1815:1813/udp"
       - "11812:1812/udp"
       - "11813:1813/udp"
+    privileged: true
     depends_on:
       - db
     restart: always
@@ -46,6 +48,7 @@ services:
       TZ: Asia/Jakarta
     expose:
       - "5000"
+    privileged: true
     depends_on:
       - db
     volumes:
@@ -62,6 +65,7 @@ services:
       TZ: Asia/Jakarta
     ports:
       - "8088:80"
+    privileged: true
     depends_on:
       - backend
     restart: always
