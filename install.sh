@@ -11,6 +11,9 @@ echo "  Memulai Instalasi RadiusBilling (Proxmox/VPS) "
 echo "================================================"
 echo ""
 
+# Simpan lokasi awal eksekusi script
+CURRENT_DIR=$(pwd)
+
 # --- SESI INPUT DARI USER ---
 
 # 0. Link GitHub
@@ -19,6 +22,8 @@ read -p "Masukkan link GitHub repositori (Kosongkan jika ingin pakai file lokal)
 # 1. Direktori Instalasi
 read -p "Masukkan path direktori instalasi (tekan Enter untuk default: /opt/radiusbilling): " INSTALL_DIR
 INSTALL_DIR=${INSTALL_DIR:-/opt/radiusbilling}
+# Hapus trailing slash jika ada
+INSTALL_DIR=${INSTALL_DIR%/}
 
 # 2. MySQL Root Password
 while [[ -z "$MYSQL_ROOT_PASSWORD" ]]; do
@@ -47,17 +52,33 @@ apt-get install -y ca-certificates curl gnupg git
 echo "Menyiapkan file aplikasi..."
 if [[ -n "$GITHUB_URL" ]]; then
     echo "Link GitHub terdeteksi. Mengkloning repositori dari $GITHUB_URL..."
-    # Menghapus instalasi lama di folder yang sama agar git clone tidak bentrok
+    
+    # Keluar dari direktori saat ini untuk menghindari error "Unable to read current working directory" 
+    # jika user menjalankan script dari dalam direktori target yang akan dihapus.
+    cd /tmp || exit
+    
+    # Menghapus instalasi lama agar git clone tidak error direktori tidak kosong
     rm -rf "$INSTALL_DIR"
+    
+    # Lakukan cloning ke INSTALL_DIR
     git clone "$GITHUB_URL" "$INSTALL_DIR"
+    
+    if [ ! -d "$INSTALL_DIR" ]; then
+        echo "Gagal melakukan git clone. Pastikan link GitHub benar dan publik, atau periksa koneksi internet."
+        exit 1
+    fi
 else
-    echo "Link GitHub kosong. Menyalin file dari direktori lokal saat ini..."
+    echo "Link GitHub kosong. Menyalin file lokal..."
     mkdir -p "$INSTALL_DIR"
-    cp -r ./* "$INSTALL_DIR/"
+    
+    # Hanya salin jika direktori eksekusi BUKAN direktori instalasi target
+    if [ "$CURRENT_DIR" != "$INSTALL_DIR" ]; then
+        cp -r "$CURRENT_DIR"/* "$INSTALL_DIR/"
+    fi
 fi
 
-# Pindah ke direktori kerja
-cd "$INSTALL_DIR" || exit
+# Pindah ke direktori target yang sudah siap
+cd "$INSTALL_DIR" || { echo "Gagal masuk ke direktori $INSTALL_DIR"; exit 1; }
 
 # Install Docker jika belum ada
 if ! command -v docker &> /dev/null; then
