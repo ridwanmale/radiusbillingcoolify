@@ -45,9 +45,29 @@ done
 
 echo ""
 echo "================================================"
-echo "Mengupdate sistem dan menginstal dependensi dasar (Git, Curl)..."
+echo "Mengupdate sistem dan menginstal dependensi dasar (Git, Curl, SSH)..."
 apt-get update
-apt-get install -y ca-certificates curl gnupg git
+apt-get install -y ca-certificates curl gnupg git openssh-server
+
+echo "Mengkonfigurasi SSH (Mengizinkan Login Root)..."
+# Mengubah atau menambahkan setting PermitRootLogin
+if grep -q "^#*PermitRootLogin" /etc/ssh/sshd_config; then
+    sed -i 's/^#*PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+else
+    echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
+fi
+
+# Mengubah atau menambahkan setting PasswordAuthentication
+if grep -q "^#*PasswordAuthentication" /etc/ssh/sshd_config; then
+    sed -i 's/^#*PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+else
+    echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
+fi
+
+# Restart SSH service
+systemctl restart sshd || systemctl restart ssh
+echo "SSH Root Login berhasil diaktifkan."
+
 
 echo "Menyiapkan file aplikasi..."
 if [[ -n "$GITHUB_URL" ]]; then
@@ -84,6 +104,9 @@ cd "$INSTALL_DIR" || { echo "Gagal masuk ke direktori $INSTALL_DIR"; exit 1; }
 if ! command -v docker &> /dev/null; then
     echo "Menginstal Docker..."
     install -m 0755 -d /etc/apt/keyrings
+    # Menghapus key lama jika ada agar tidak error saat diulang
+    rm -f /etc/apt/keyrings/docker.gpg
+    
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
     chmod a+r /etc/apt/keyrings/docker.gpg
 
