@@ -312,7 +312,7 @@ const Sidebar = ({ onLogout, user, appSettings, onCloseMobile }) => {
           <>
             <div className="nav-item-dropdown">
               <button 
-                className={`nav-link dropdown-toggle ${isGroupActive(['/setting-midtrans', '/setting-tripay', '/metode-pembayaran']) ? 'active' : ''}`}
+                className={`nav-link dropdown-toggle ${isGroupActive(['/setting-midtrans', '/setting-tripay']) ? 'active' : ''}`}
                 onClick={() => toggleMenu('paymentGroup')}
                 style={{ borderRadius: '12px', marginBottom: '4px', width: '100%' }}
               >
@@ -333,9 +333,7 @@ const Sidebar = ({ onLogout, user, appSettings, onCloseMobile }) => {
                 <Link to="/setting-tripay" className={`nav-link nested-link ${isPathActive('/setting-tripay') ? 'active' : ''}`}>
                    Setting Tripay
                 </Link>
-                <Link to="/metode-pembayaran" className={`nav-link nested-link ${isPathActive('/metode-pembayaran') ? 'active' : ''}`}>
-                   Metode Bayar
-                </Link>
+
               </div>
             </div>
 
