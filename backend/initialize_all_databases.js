@@ -524,6 +524,36 @@ async function initializeAllDatabases() {
     }
     console.log('✔ Mikrotik Script Templates initialized.\n');
 
+    // 13. GDRIVE BACKUP TABLES
+    console.log('[13] Initializing GDrive Backup tables...');
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS gdrive_settings (
+        id INT NOT NULL PRIMARY KEY DEFAULT 1,
+        folder_id VARCHAR(255) DEFAULT '',
+        cron_time VARCHAR(64) DEFAULT '0 2 * * *',
+        is_enabled TINYINT(1) DEFAULT 0
+      ) ENGINE=InnoDB;
+    `);
+    await db.query(`
+      INSERT IGNORE INTO gdrive_settings (id, folder_id, cron_time, is_enabled)
+      VALUES (1, '', '0 2 * * *', 0)
+    `);
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS backup_logs (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        file_name VARCHAR(255) NOT NULL,
+        file_size VARCHAR(64),
+        status ENUM('success', 'failed') DEFAULT 'success',
+        message TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB;
+    `);
+    await db.query(
+      'INSERT IGNORE INTO role_menu_access (role, menu_id, is_allowed) VALUES (?, ?, ?)',
+      ['superadmin', 'gdrive_backup', 1]
+    );
+    console.log('✔ GDrive Backup tables initialized.\n');
+
     console.log('========================================================');
     console.log('   🎉 ALL DATABASES INITIALIZED SUCCESSFULLY!           ');
     console.log('   Your system and portal are 100% ready for use.       ');

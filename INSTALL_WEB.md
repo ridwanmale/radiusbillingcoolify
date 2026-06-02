@@ -35,6 +35,14 @@ Setelah proses selesai, aplikasi web Anda otomatis berjalan. Buka browser dan ke
 http://<IP_WEB_SERVER_ANDA>:8088
 ```
 
+## Setup Backup Google Drive (Opsional)
+Fitur Backup GDrive berjalan secara otomatis di Web Server. Untuk mengaktifkannya, Anda harus memasukkan kredensial Service Account:
+1. Buat **Service Account** di Google Cloud Console.
+2. Unduh file JSON kredensial (keys) yang diberikan.
+3. Ganti nama file tersebut menjadi `service-account.json`.
+4. Upload file tersebut ke Web Server Anda, lalu letakkan di folder `backend/config/` (contoh lokasi jika menggunakan docker volume, atau copy manual ke dalam container/folder source code di `/backend/config/service-account.json`).
+5. Buka dashboard web, masuk ke menu **Backup GDrive**, lengkapi Folder ID dan nyalakan penjadwalannya.
+
 ## Troubleshooting
 Jika saat membuka web, data pelanggan tidak muncul atau loading terus-menerus:
 1. Pastikan IP Core Server sudah diketik dengan benar (periksa kembali isi file `.env`).

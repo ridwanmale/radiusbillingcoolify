@@ -1,4 +1,4 @@
-﻿require('dotenv').config();
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const db = require('./config/db');
@@ -38,6 +38,7 @@ const paymentMethodsRoutes = require('./routes/payment_methods');
 const paymentDetectionRoutes = require('./routes/payment_detections');
 const voucherTypesRoutes = require('./routes/voucher_types');
 const mikrotikScriptRoutes = require('./routes/mikrotik_scripts');
+const gdriveBackupRoutes = require('./routes/gdriveBackup');
 
 
 // API Routes (Dahulukan API)
@@ -65,6 +66,7 @@ app.use('/api/payment-methods', paymentMethodsRoutes);
 app.use('/api/payment-detections', paymentDetectionRoutes);
 app.use('/api/voucher-types', voucherTypesRoutes);
 app.use('/api/mikrotik-scripts', mikrotikScriptRoutes);
+app.use('/api/gdrive-backup', gdriveBackupRoutes);
 
 
 // Health check endpoint
@@ -190,6 +192,35 @@ const upgradePool = async (pool, name) => {
       await pool.query('ALTER TABLE profiles_metadata ADD COLUMN code_length INT DEFAULT NULL');
       console.log(`[DB UPGRADE] Column code_length successfully added on ${name}.`);
     }
+
+    // 4. Create GDrive Backup Tables
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS gdrive_settings (
+        id INT NOT NULL PRIMARY KEY DEFAULT 1,
+        folder_id VARCHAR(255) DEFAULT '',
+        cron_time VARCHAR(64) DEFAULT '0 2 * * *',
+        is_enabled TINYINT(1) DEFAULT 0
+      ) ENGINE=InnoDB;
+    `);
+    await pool.query(`
+      INSERT IGNORE INTO gdrive_settings (id, folder_id, cron_time, is_enabled)
+      VALUES (1, '', '0 2 * * *', 0)
+    `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS backup_logs (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        file_name VARCHAR(255) NOT NULL,
+        file_size VARCHAR(64),
+        status ENUM('success', 'failed') DEFAULT 'success',
+        message TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB;
+    `);
+    await pool.query(
+      'INSERT IGNORE INTO role_menu_access (role, menu_id, is_allowed) VALUES (?, ?, ?)',
+      ['superadmin', 'gdrive_backup', 1]
+    );
+
     console.log(`[DB UPGRADE] Completed schema verification on ${name}.`);
   } catch (err) {
     console.error(`[DB UPGRADE ERROR] Failed to upgrade database on ${name}:`, err.message);
@@ -495,6 +526,44 @@ if (process.env.ENABLE_TELEGRAM_BOT_LISTENER === 'true') {
   console.log('[Telegram Bot] Listener disabled (ENABLE_TELEGRAM_BOT_LISTENER is not true).');
 }
 
+// =============================================
+// GDRIVE BACKUP CRON JOB
+// =============================================
+const cron = require('node-cron');
+const { performBackup } = require('./utils/gdriveBackupService');
 
+let gdriveBackupTask = null;
 
+const scheduleGDriveBackup = async () => {
+  try {
+    const connection = await db.getConnection();
+    const [settings] = await connection.query('SELECT * FROM gdrive_settings WHERE id = 1');
+    connection.release();
 
+    if (gdriveBackupTask) {
+      gdriveBackupTask.stop();
+      gdriveBackupTask = null;
+    }
+
+    if (settings.length > 0 && settings[0].is_enabled) {
+      const cronTime = settings[0].cron_time || '0 2 * * *';
+      console.log(`[GDrive Backup] Scheduling daily backup at: ${cronTime}`);
+      gdriveBackupTask = cron.schedule(cronTime, async () => {
+        console.log('[GDrive Backup] Executing scheduled backup...');
+        try {
+          await performBackup();
+          console.log('[GDrive Backup] Scheduled backup completed successfully.');
+        } catch (error) {
+          console.error('[GDrive Backup] Scheduled backup failed:', error.message);
+        }
+      });
+    }
+  } catch (err) {
+    // If table doesn't exist yet, it will fail silently here, which is fine before init
+    // console.error('[GDrive Backup] Failed to schedule cron job:', err.message);
+  }
+};
+
+// Check for schedule on startup and every 5 minutes to see if settings changed
+scheduleGDriveBackup();
+setInterval(scheduleGDriveBackup, 5 * 60 * 1000);
