@@ -79,6 +79,7 @@ if ! command -v docker-compose &> /dev/null; then
     else
         echo "Docker Compose tidak ditemukan. Menginstal Docker..."
         if [ "$EUID" -eq 0 ]; then
+            apt-get update -qq && apt-get install -y -qq ca-certificates curl gnupg
             install -m 0755 -d /etc/apt/keyrings
             rm -f /etc/apt/keyrings/docker.gpg
             curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
@@ -87,6 +88,7 @@ if ! command -v docker-compose &> /dev/null; then
             apt-get update -qq
             apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
         else
+            sudo apt-get update -qq && sudo apt-get install -y -qq ca-certificates curl gnupg
             sudo install -m 0755 -d /etc/apt/keyrings
             rm -f /etc/apt/keyrings/docker.gpg
             curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
