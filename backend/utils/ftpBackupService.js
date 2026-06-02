@@ -70,6 +70,24 @@ async function performFTPBackup() {
     await client.ensureDir(remotePath);
     await client.uploadFrom(filePath, fileName);
     
+    // ROTATION LOGIC: Keep only the 7 most recent backups
+    try {
+      const list = await client.list();
+      const backupFiles = list
+        .filter(f => f.name.startsWith('backup-radius-ftp-') && f.name.endsWith('.sql'))
+        .sort((a, b) => b.name.localeCompare(a.name)); // Descending: newest first
+        
+      if (backupFiles.length > 7) {
+        const filesToDelete = backupFiles.slice(7);
+        for (const file of filesToDelete) {
+          console.log(`[FTP Backup] Deleting old backup: ${file.name}`);
+          await client.remove(file.name);
+        }
+      }
+    } catch (rotErr) {
+      console.error('[FTP Backup] Failed to rotate old files:', rotErr.message);
+    }
+    
     client.close();
     console.log(`[FTP Backup] Upload successful!`);
 
