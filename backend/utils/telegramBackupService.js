@@ -49,8 +49,10 @@ async function performBackup() {
     const dbName = process.env.DB_NAME || 'radius';
     const dbHost = process.env.DB_HOST || 'localhost';
 
-    const timestamp = new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Jakarta' }).replace(/[: ]/g, '-');
-    const fileName = `backup-${dbName}-${timestamp}_WIB.sql`;
+    const systemTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const tzAbbr = new Intl.DateTimeFormat('id-ID', { timeZoneName: 'short' }).format(new Date()).split(' ').pop();
+    const timestamp = new Date().toLocaleString('sv-SE', { timeZone: systemTimeZone }).replace(/[: ]/g, '-');
+    const fileName = `backup-${dbName}-${timestamp}_${tzAbbr}.sql`;
     const backupsDir = path.join(__dirname, '../scratch'); // Use scratch or tmp folder
     if (!fs.existsSync(backupsDir)) {
       fs.mkdirSync(backupsDir);

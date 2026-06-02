@@ -28,7 +28,7 @@ const scheduleBackups = async () => {
           console.error('[Backup] Scheduled Telegram backup failed:', error.message);
         }
       }, {
-        timezone: "Asia/Jakarta"
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
       });
     }
 
@@ -48,7 +48,7 @@ const scheduleBackups = async () => {
           console.error('[Backup] Scheduled FTP backup failed:', error.message);
         }
       }, {
-        timezone: "Asia/Jakarta"
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
       });
     }
 
