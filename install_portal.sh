@@ -76,8 +76,34 @@ if ! command -v docker-compose &> /dev/null; then
     if docker compose version &> /dev/null; then
         DOCKER_CMD="docker compose"
     else
-        echo "Error: docker-compose tidak ditemukan. Silakan instal Docker Compose terlebih dahulu."
-        exit 1
+        echo "Docker Compose tidak ditemukan. Menginstal Docker..."
+        if [ "$EUID" -eq 0 ]; then
+            install -m 0755 -d /etc/apt/keyrings
+            rm -f /etc/apt/keyrings/docker.gpg
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+            chmod a+r /etc/apt/keyrings/docker.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+            apt-get update -qq
+            apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        else
+            sudo install -m 0755 -d /etc/apt/keyrings
+            rm -f /etc/apt/keyrings/docker.gpg
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+            sudo chmod a+r /etc/apt/keyrings/docker.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        fi
+        
+        # Cek ulang setelah instalasi
+        if docker compose version &> /dev/null; then
+            DOCKER_CMD="docker compose"
+        elif command -v docker-compose &> /dev/null; then
+            DOCKER_CMD="docker-compose"
+        else
+            echo "Error: Gagal menginstal Docker Compose. Silakan instal secara manual."
+            exit 1
+        fi
     fi
 fi
 
