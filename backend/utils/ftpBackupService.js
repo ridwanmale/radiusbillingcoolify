@@ -30,8 +30,8 @@ async function performFTPBackup() {
     }
 
     // 2. Generate MySQL Dump
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const fileName = `backup-radius-ftp-${timestamp}.sql`;
+    const timestamp = new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Jakarta' }).replace(/[: ]/g, '-');
+    const fileName = `backup-radius-ftp-${timestamp}_WIB.sql`;
     filePath = path.join(backupsDir, fileName);
 
     const dbUser = process.env.DB_USER || 'radius';

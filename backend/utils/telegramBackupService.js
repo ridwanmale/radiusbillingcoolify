@@ -49,8 +49,8 @@ async function performBackup() {
     const dbName = process.env.DB_NAME || 'radius';
     const dbHost = process.env.DB_HOST || 'localhost';
 
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const fileName = `backup-${dbName}-${timestamp}.sql`;
+    const timestamp = new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Jakarta' }).replace(/[: ]/g, '-');
+    const fileName = `backup-${dbName}-${timestamp}_WIB.sql`;
     const backupsDir = path.join(__dirname, '../scratch'); // Use scratch or tmp folder
     if (!fs.existsSync(backupsDir)) {
       fs.mkdirSync(backupsDir);
