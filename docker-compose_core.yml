@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    user: "root"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-radius}
+      MYSQL_USER: ${MYSQL_USER:-radius}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?}
+      TZ: Asia/Jakarta
+    command: ["mysqld", "--default-time-zone=+07:00", "--log_bin_trust_function_creators=1"]
+    ports:
+      - "3306:3306" # Dibuka agar Web Server bisa connect
+    privileged: true
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./db-init:/docker-entrypoint-initdb.d:ro
+    restart: always
+
+  radius:
+    build:
+      context: ./radius-server
+      dockerfile: Dockerfile
+    environment:
+      TZ: Asia/Jakarta
+    ports:
+      - "1812:1812/udp"
+      - "1813:1813/udp"
+      - "1814:1812/udp"
+      - "1815:1813/udp"
+      - "11812:1812/udp"
+      - "11813:1813/udp"
+    privileged: true
+    depends_on:
+      - db
+    restart: always
+
+volumes:
+  db-data:

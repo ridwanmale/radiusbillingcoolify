@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      DB_HOST: ${DB_HOST:?} # IP dari Core Server
+      DB_USER: ${MYSQL_USER:-radius}
+      DB_PASSWORD: ${MYSQL_PASSWORD:?}
+      DB_NAME: ${MYSQL_DATABASE:-radius}
+      ENABLE_TELEGRAM_BOT_LISTENER: ${ENABLE_TELEGRAM_BOT_LISTENER:-true}
+      RADIUS_CONTAINER_PREFIX: ${RADIUS_CONTAINER_PREFIX:?}
+      TZ: Asia/Jakarta
+    expose:
+      - "5000"
+    privileged: true
+    volumes:
+      - ./vpn-config:/vpn-config
+      - ./vpnusers.txt:/vpnusers.txt
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      TZ: Asia/Jakarta
+    ports:
+      - "8088:80"
+    privileged: true
+    depends_on:
+      - backend
+    restart: always
