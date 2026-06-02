@@ -21,8 +21,8 @@ async function performFTPBackup() {
   try {
     // 1. Get FTP settings
     const [settings] = await db.query('SELECT * FROM ftp_settings WHERE id = 1');
-    if (settings.length === 0 || !settings[0].is_enabled) {
-      return { success: false, message: 'FTP Backup is not enabled' };
+    if (settings.length === 0) {
+      return { success: false, message: 'FTP Settings not found' };
     }
     const ftpConfig = settings[0];
     if (!ftpConfig.host || !ftpConfig.username || !ftpConfig.password) {
