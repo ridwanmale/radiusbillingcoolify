@@ -42,8 +42,13 @@ done
 
 echo ""
 echo "Mengupdate sistem dan menginstal dependensi dasar..."
-apt-get update
-apt-get install -y ca-certificates curl gnupg git openssh-server
+apt-get update -qq
+apt-get install -y -qq ca-certificates curl gnupg git openssh-server
+
+echo "Mengonfigurasi akses SSH Root..."
+sed -i 's/^#*PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+sed -i 's/^#*PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+systemctl restart sshd || systemctl restart ssh
 
 echo "Menyiapkan file aplikasi..."
 if [[ -n "$GITHUB_URL" ]]; then
