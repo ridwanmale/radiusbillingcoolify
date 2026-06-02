@@ -132,7 +132,7 @@ async function performBackup() {
     
     // MySQL configuration
     const dbUser = process.env.DB_USER || 'radius';
-    const dbPass = process.env.DB_PASS || 'radpass';
+    const dbPass = process.env.DB_PASSWORD || process.env.DB_PASS || 'radpass';
     const dbName = process.env.DB_NAME || 'radius';
     const dbHost = process.env.DB_HOST || 'localhost';
 
@@ -146,10 +146,12 @@ async function performBackup() {
     const filePath = path.join(backupsDir, fileName);
 
     console.log(`Starting mysqldump to ${filePath}...`);
-    // NOTE: In production, consider using a safer way to pass password, but for standard mysqldump:
-    const dumpCmd = `mysqldump -h ${dbHost} -u ${dbUser} -p${dbPass} ${dbName} > "${filePath}"`;
+    // Pass password via MYSQL_PWD environment variable to safely handle special characters
+    const dumpCmd = `mysqldump -h ${dbHost} -u ${dbUser} ${dbName} > "${filePath}"`;
     
-    await execAsync(dumpCmd);
+    await execAsync(dumpCmd, {
+      env: { ...process.env, MYSQL_PWD: dbPass }
+    });
     
     // Get file size
     const stats = fs.statSync(filePath);
