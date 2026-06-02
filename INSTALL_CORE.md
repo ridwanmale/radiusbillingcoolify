@@ -26,7 +26,7 @@ Core Server adalah pusat dari sistem RadiusBilling Anda. Server ini tidak memili
 
 4. **Ikuti Instruksi pada Layar:**
    - Saat ditanya link GitHub, masukkan link repositori GitHub Anda.
-   - Anda akan diminta untuk membuat **Password Database (MySQL)**. **CATAT PASSWORD INI**, karena akan digunakan untuk menghubungkan Web Server nantinya.
+   - **[PENTING] Jika Anda memiliki Backup Database:** Pastikan file `.sql` Anda sudah ada di dalam VPS (misalnya di-upload menggunakan WinSCP ke folder `/root/db_fix.sql`). Saat script meminta *path file backup database*, ketik jalur lengkapnya: `/root/db_fix.sql`.
    - Tunggu hingga instalasi Docker dan proses *building* selesai otomatis.
 
 ## ⚠️ Konfigurasi Firewall (Sangat Penting)
