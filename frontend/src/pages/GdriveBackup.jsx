@@ -231,13 +231,28 @@ const GdriveBackup = ({ user }) => {
           </div>
 
           <div style={{ marginBottom: '20px' }}>
-            <label style={styles.label}>Jadwal Otomatis (Cron Format)</label>
+            <label style={styles.label}>Jam Berapa Backup Dilakukan?</label>
             <div style={{ display: 'flex', gap: '8px' }}>
               <input 
-                type="text" 
-                style={styles.input} 
-                value={settings.cron_time}
-                onChange={e => setSettings({...settings, cron_time: e.target.value})}
+                type="time" 
+                style={{...styles.input, maxWidth: '150px'}} 
+                value={(function() {
+                  try {
+                    const parts = settings.cron_time.split(' ');
+                    const min = parts[0];
+                    const hr = parts[1];
+                    return `${String(hr).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+                  } catch (e) {
+                    return '02:00';
+                  }
+                })()}
+                onChange={e => {
+                  const val = e.target.value; // e.g. "02:30"
+                  if (val) {
+                    const [hr, min] = val.split(':');
+                    setSettings({...settings, cron_time: `${parseInt(min, 10)} ${parseInt(hr, 10)} * * *`});
+                  }
+                }}
               />
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px' }}>
                 <input 
@@ -245,11 +260,11 @@ const GdriveBackup = ({ user }) => {
                   checked={settings.is_enabled === 1}
                   onChange={e => setSettings({...settings, is_enabled: e.target.checked ? 1 : 0})}
                 />
-                <span style={{ fontSize: '13px', color: '#d0d6e0' }}>Aktifkan</span>
+                <span style={{ fontSize: '13px', color: '#d0d6e0' }}>Aktifkan Backup Otomatis</span>
               </div>
             </div>
             <p style={{ color: '#8a8f98', fontSize: '12px', marginTop: '6px', margin: '4px 0 0 0' }}>
-              Format standar cron. Contoh: <code>0 2 * * *</code> (Setiap hari jam 02:00 pagi). File berumur di atas 7 hari akan dihapus otomatis (Rolling 7 Hari).
+              Sistem akan melakukan ekspor database harian pada jam yang Anda tentukan. File berumur di atas 7 hari akan dihapus otomatis (Rolling 7 Hari).
             </p>
           </div>
 
