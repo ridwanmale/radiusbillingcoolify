@@ -27,14 +27,22 @@ Proses instalasi sangat mudah karena sudah menggunakan script interaktif.
    ```
    *(Catatan: Ganti `<USERNAME_GITHUB_ANDA>` dengan username GitHub Anda, atau sesuaikan dengan link repository Anda).*
 
-3. **Jalankan Script Instalasi:**
-   ```bash
-   bash install_portal.sh
-   ```
-4. Anda akan diminta untuk memasukkan Port yang ingin digunakan.
-   - Anda bisa menekan `Enter` untuk menggunakan port default (`8089`).
-   - Atau ketik angka port baru (misalnya `8090`) lalu tekan `Enter`.
-5. Script akan otomatis mengunduh (*clone/pull*) file yang dibutuhkan, membangun image, dan menjalankan containernya di latar belakang.
+3. **Jalankan script instalasi:**
+```bash
+sudo ./install_portal.sh
+```
+
+4. **Ikuti panduan di layar:**
+   - **Link GitHub:** Tekan `Enter` untuk menggunakan repositori default.
+   - **Path Instalasi:** Tekan `Enter` untuk default (`/opt/radiusbilling-portal`).
+   - **URL Web Admin API:** Masukkan URL lengkap Web Admin Anda. 
+     - *Contoh Jika Pakai Cloudflare/Domain:* `https://admin.domainanda.com`
+     - *Contoh Jika IP Lokal:* `http://192.168.1.10:8088`
+     - *(Catatan: Script ini akan otomatis menyuntikkan URL tersebut ke dalam sistem portal, sehingga Anda tidak perlu lagi mengedit file secara manual)*.
+   - **Port:** Tekan `Enter` untuk menggunakan port default `8089`.
+
+5. **Tunggu proses instalasi selesai.**
+   Script akan otomatis mendownload file, menyuntikkan URL API yang Anda masukkan, mengkonfigurasi Docker, dan menjalankan container.nya di latar belakang.
 
 ---
 

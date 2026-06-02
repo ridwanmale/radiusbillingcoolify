@@ -47,6 +47,16 @@ while [[ -z "$MYSQL_PASSWORD" ]]; do
 done
 
 echo ""
+echo "--- Pengaturan URL Portal ---"
+echo "Secara default, portal akan mencoba menghubungi Web Admin di IP yang sama pada port 8088."
+echo "Namun, jika Anda menggunakan Cloudflare/Domain untuk Web Admin, silakan masukkan URL-nya."
+read -p "Masukkan URL Web Admin (kosongkan untuk default otomatis): " INPUT_WEB_ADMIN_URL
+if [[ -n "$INPUT_WEB_ADMIN_URL" ]]; then
+    # Bersihkan slash di akhir URL jika ada
+    WEB_ADMIN_URL=${INPUT_WEB_ADMIN_URL%/}
+fi
+
+echo ""
 echo "================================================"
 echo "Mengupdate sistem dan menginstal dependensi dasar (Git, Curl, SSH)..."
 apt-get update
@@ -102,6 +112,11 @@ fi
 
 # Pindah ke direktori target yang sudah siap
 cd "$INSTALL_DIR" || { echo "Gagal masuk ke direktori $INSTALL_DIR"; exit 1; }
+
+if [[ -n "$WEB_ADMIN_URL" ]]; then
+    echo "Menginjeksi URL Web Admin ke dalam portal.js..."
+    sed -i "s|const API_URL.*|const API_URL = '${WEB_ADMIN_URL}/api';|g" portal/portal.js
+fi
 
 # Memproses file backup database jika diinputkan
 if [[ -n "$DB_BACKUP_FILE" ]]; then

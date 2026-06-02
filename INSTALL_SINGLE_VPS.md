@@ -47,6 +47,11 @@ Saat script berjalan, Anda akan diminta mengisi beberapa informasi. Berikut adal
    - *Nama User MySQL* (Bisa kosongkan untuk standar `radius`).
    - *Password User MySQL* (Wajib diisi).
 
+5. **Pengaturan URL Portal:**
+   - Script akan meminta **URL Web Admin** agar portal pembeli (di port 8089) dapat terhubung dengan sempurna ke Web Admin API (di port 8088).
+   - *Jika Anda menggunakan Cloudflare Tunnels*, masukkan domain Anda (misal: `https://admin.domain.com`).
+   - *Jika tidak / dibiarkan kosong*, sistem akan menggunakan deteksi cerdas berdasarkan IP VPS secara otomatis.
+
 ## 4. Proses Otomatis
 Setelah Anda menekan Enter pada pengisian terakhir, sistem akan berjalan otomatis melakukan:
 - Update sistem operasi dan instalasi Git, Curl, dan OpenSSH-Server.

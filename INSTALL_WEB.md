@@ -35,6 +35,10 @@ Setelah proses selesai, aplikasi web Anda otomatis berjalan. Buka browser dan ke
 http://<IP_WEB_SERVER_ANDA>:8088
 ```
 
+> [!NOTE]
+> **Catatan Terkait Portal Mandiri (Standalone):**
+> Jika Anda menginstal Portal Pembelian Voucher di VPS yang berbeda, server Web Admin ini **tidak perlu dikonfigurasi** dengan nama domain/IP portal tersebut. Sistem *Cross-Origin* (CORS) dan *Redirect Payment Gateway* (Duitku/Midtrans) di Web Admin telah diotomatisasi secara dinamis untuk menerima permintaan dari domain portal mana pun (selama URL portal diset saat instalasi Portal).
+
 ## Setup Backup Google Drive (Opsional)
 Fitur Backup GDrive berjalan secara otomatis di Web Server. Untuk mengaktifkannya, Anda harus memasukkan kredensial Service Account:
 1. Buat **Service Account** di Google Cloud Console.

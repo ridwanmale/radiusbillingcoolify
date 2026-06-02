@@ -19,7 +19,10 @@ read -p "Masukkan path direktori instalasi (tekan Enter untuk default: /opt/radi
 INSTALL_DIR=${INSTALL_DIR:-/opt/radiusbilling-portal}
 INSTALL_DIR=${INSTALL_DIR%/}
 
-read -p "Masukkan IP Address Web Admin Anda (Wajib diisi jika beda VPS): " BACKEND_IP
+read -p "Masukkan URL Web Admin Anda (Contoh: https://admin.domain.com atau http://192.168.1.10:8088): " INPUT_WEB_ADMIN_URL
+WEB_ADMIN_URL=${INPUT_WEB_ADMIN_URL:-http://127.0.0.1:8088}
+# Bersihkan slash di akhir URL jika ada
+WEB_ADMIN_URL=${WEB_ADMIN_URL%/}
 
 # Meminta port dari pengguna
 read -p "Masukkan port yang ingin digunakan untuk portal ini [Default: 8089]: " INPUT_PORT
@@ -29,6 +32,7 @@ PORTAL_PORT=${INPUT_PORT:-8089}
 
 echo ""
 echo "Mengatur portal berjalan di port: $PORTAL_PORT"
+echo "Menghubungkan Portal ke Web Admin API: $WEB_ADMIN_URL/api"
 echo ""
 
 echo "Mengupdate sistem dan menginstal dependensi dasar..."
@@ -60,10 +64,8 @@ fi
 
 cd "$INSTALL_DIR" || exit 1
 
-# Ganti IP API jika pengguna memasukkan IP khusus
-if [[ -n "$BACKEND_IP" ]]; then
-    sed -i "s/\`http:\/\/\${window.location.hostname}:8088\/api\`/\"http:\/\/$BACKEND_IP:8088\/api\"/g" portal/portal.js
-fi
+echo "Menginjeksi URL Web Admin ke dalam portal.js..."
+sed -i "s|const API_URL.*|const API_URL = '${WEB_ADMIN_URL}/api';|g" portal/portal.js
 
 # Export port sebagai environment variable untuk docker-compose
 export PORTAL_PORT=$PORTAL_PORT
