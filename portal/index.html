@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Pembelian Voucher</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            primary: '#5e6ad2',
+                            hover: '#828fff',
+                            focus: '#5e69d1'
+                        },
+                        canvas: '#010102',
+                        surface: {
+                            1: '#0f1011',
+                            2: '#141516',
+                            3: '#18191a',
+                            4: '#191a1b'
+                        },
+                        ink: {
+                            DEFAULT: '#f7f8f8',
+                            muted: '#d0d6e0',
+                            subtle: '#8a8f98',
+                            tertiary: '#62666d'
+                        },
+                        hairline: {
+                            DEFAULT: '#23252a',
+                            strong: '#34343a'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'SF Pro Display', 'system-ui', 'sans-serif'],
+                    },
+                    letterSpacing: {
+                        tightest: '-.075em',
+                        tighter: '-.05em',
+                        tight: '-.025em',
+                        normal: '-0.05px',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #010102; /* canvas */
+            color: #f7f8f8; /* ink */
+            font-family: 'Inter', sans-serif;
+            letter-spacing: -0.05px;
+        }
+        h1, h2, h3, .display-font {
+            letter-spacing: -0.6px;
+        }
+        /* Loader CSS */
+        .loader {
+            border: 3px solid #23252a; /* hairline */
+            border-top: 3px solid #5e6ad2; /* primary */
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .linear-card {
+            background-color: #0f1011; /* surface-1 */
+            border: 1px solid #23252a; /* hairline */
+            border-radius: 12px;
+        }
+        .linear-input {
+            background-color: #0f1011; /* surface-1 */
+            border: 1px solid #34343a; /* hairline-strong */
+            color: #f7f8f8; /* ink */
+        }
+        .linear-input:focus {
+            outline: 2px solid rgba(94, 105, 209, 0.5); /* primary-focus outline */
+            outline-offset: 1px;
+        }
+        .linear-button {
+            background-color: #5e6ad2;
+            color: #ffffff;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-weight: 500;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        .linear-button:hover {
+            background-color: #828fff;
+        }
+        .linear-button:active {
+            background-color: #5e69d1;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center py-12 px-4 sm:px-6">
+
+    <!-- Loading State -->
+    <div id="loading" class="w-full max-w-md text-center py-12">
+        <div class="loader"></div>
+        <p class="text-ink-subtle mt-4 text-sm">Memuat sistem portal...</p>
+    </div>
+
+    <!-- Main Content -->
+    <div id="portal-container" class="w-full max-w-3xl hidden">
+        <!-- Header -->
+        <div class="mb-10 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div>
+                <h1 id="portal-title" class="text-3xl sm:text-4xl font-semibold text-ink display-font">Wi-Fi Voucher Store</h1>
+                <p id="portal-desc" class="text-ink-muted text-lg mt-2">Beli voucher internet instan 24 jam</p>
+            </div>
+            <!-- Optional brand mark or icon could go here -->
+        </div>
+
+        <!-- Content Body -->
+        <div>
+            <h2 class="text-sm font-medium text-ink-subtle uppercase tracking-wider mb-4">Pilih Paket Layanan</h2>
+            <div id="packages-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Packages will be rendered here -->
+            </div>
+            
+            <div id="no-packages" class="hidden text-center py-12 text-ink-subtle text-sm linear-card">
+                Tidak ada paket voucher yang tersedia saat ini.
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Form Pembelian -->
+    <div id="checkout-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50 transition-opacity">
+        <div class="bg-surface-2 border border-hairline rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div class="p-5 border-b border-hairline flex justify-between items-center">
+                <h3 class="font-medium text-lg text-ink">Checkout</h3>
+                <button onclick="closeModal()" class="text-ink-subtle hover:text-ink p-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="linear-card p-4 mb-6">
+                    <p class="text-sm text-ink-subtle mb-1">Paket Layanan</p>
+                    <p id="selected-package-name" class="font-semibold text-ink text-lg"></p>
+                    <div class="mt-2 flex justify-between items-end">
+                        <span class="text-sm text-ink-muted">Total Harga</span>
+                        <span id="selected-package-price" class="text-brand-primary font-semibold text-xl"></span>
+                    </div>
+                </div>
+                
+                <form id="checkout-form" onsubmit="handleCheckout(event)">
+                    <input type="hidden" id="input-package-id">
+                    <input type="hidden" id="input-amount">
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-ink-muted mb-2">Nama Pelanggan (Opsional)</label>
+                        <input type="text" id="input-name" placeholder="John Doe" class="w-full px-4 py-2 linear-input rounded-md text-sm outline-none transition-all">
+                    </div>
+                    
+                    <button type="submit" id="btn-checkout" class="w-full linear-button flex justify-center items-center h-10">
+                        <span>Lanjutkan ke Pembayaran</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Pembayaran Sukses -->
+    <div id="success-container" class="w-full max-w-md linear-card p-10 text-center hidden mx-auto mt-12">
+        <div class="w-12 h-12 bg-surface-2 border border-green-500/30 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        </div>
+        <h2 class="text-2xl font-semibold text-ink mb-2 display-font">Transaksi Berhasil</h2>
+        <p class="text-ink-subtle mb-8 text-sm">Pembayaran telah dikonfirmasi dan voucher sudah aktif.</p>
+        
+        <div class="bg-surface-2 border border-hairline rounded-lg p-6 mb-8 text-center">
+            <p class="text-xs text-ink-subtle uppercase tracking-wider mb-3">Kode Voucher Internet</p>
+            <p id="success-voucher-code" class="text-3xl font-mono text-brand-primary tracking-widest bg-canvas p-3 rounded-md border border-hairline inline-block">......</p>
+        </div>
+        
+        <button onclick="window.location.reload()" class="linear-button w-full">
+            Kembali ke Beranda
+        </button>
+    </div>
+
+    <script src="portal.js"></script>
+</body>
+</html>

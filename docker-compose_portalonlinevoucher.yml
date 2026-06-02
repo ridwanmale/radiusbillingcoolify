@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  portal:
+    build:
+      context: ./portal
+      dockerfile: Dockerfile
+    ports:
+      - "${PORTAL_PORT:-8089}:80"
+    restart: always
