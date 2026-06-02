@@ -26,12 +26,12 @@ async function getAuthClient() {
 async function getServiceAccountEmail() {
   try {
     if (!fs.existsSync(SERVICE_ACCOUNT_FILE)) {
-      return 'Service Account Belum Dikonfigurasi (Silakan upload config/service-account.json di server)';
+      return 'NOT_CONFIGURED';
     }
     const keyData = JSON.parse(fs.readFileSync(SERVICE_ACCOUNT_FILE, 'utf8'));
-    return keyData.client_email || 'Tidak ditemukan client_email di JSON';
+    return keyData.client_email || 'NOT_CONFIGURED';
   } catch (error) {
-    return 'Error membaca service account';
+    return 'NOT_CONFIGURED';
   }
 }
 

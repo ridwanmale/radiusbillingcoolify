@@ -179,17 +179,38 @@ const GdriveBackup = ({ user }) => {
             </p>
           </div>
         </div>
-        <div style={{ 
-          padding: '16px', 
-          backgroundColor: '#010102', 
-          borderRadius: '8px', 
-          border: '1px solid #23252a',
-          fontFamily: 'monospace',
-          color: '#5e6ad2',
-          fontSize: '16px'
-        }}>
-          {serviceEmail}
-        </div>
+        {serviceEmail === 'NOT_CONFIGURED' ? (
+          <div style={{
+            padding: '16px',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            borderRadius: '8px',
+            border: '1px solid rgba(239, 68, 68, 0.2)',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '12px',
+            color: '#ef4444'
+          }}>
+            <span className="material-symbols-rounded" style={{ fontSize: '20px', marginTop: '2px' }}>warning</span>
+            <div>
+              <h3 style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '600' }}>Service Account Belum Dikonfigurasi</h3>
+              <p style={{ margin: 0, fontSize: '13px', color: '#fca5a5', lineHeight: '1.5' }}>
+                Sistem tidak menemukan file kredensial Google Drive Anda. Silakan ikuti panduan di dokumentasi untuk mengunduh <code>service-account.json</code> dari Google Cloud, lalu letakkan di folder <code>backend/config/</code> pada server Anda.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div style={{ 
+            padding: '16px', 
+            backgroundColor: '#010102', 
+            borderRadius: '8px', 
+            border: '1px solid #23252a',
+            fontFamily: 'monospace',
+            color: '#5e6ad2',
+            fontSize: '16px'
+          }}>
+            {serviceEmail}
+          </div>
+        )}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', marginBottom: '24px' }}>
