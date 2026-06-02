@@ -26,7 +26,11 @@ Core Server adalah pusat dari sistem RadiusBilling Anda. Server ini tidak memili
 
 4. **Ikuti Instruksi pada Layar:**
    - Saat ditanya link GitHub, masukkan link repositori GitHub Anda.
-   - **[PENTING] Jika Anda memiliki Backup Database:** Pastikan file `.sql` Anda sudah ada di dalam VPS (misalnya di-upload menggunakan WinSCP ke folder `/root/db_fix.sql`). Saat script meminta *path file backup database*, ketik jalur lengkapnya: `/root/db_fix.sql`.
+   - **[PENTING] Jika Anda memiliki Backup Database:** 
+     - Apabila file `.sql` Anda sudah ada di GitHub (misalnya `db-init/db_fix.sql`), maka saat ditanya path file backup, Anda wajib mengetik jalur mutlak sesuai dengan letak folder instalasi Anda.
+     - Contoh: Jika lokasi instalasi Anda biarkan *default* (`/opt/radiusbilling-core`), maka ketik: **`/opt/radiusbilling-core/db-init/db_fix.sql`**
+     - Jika lokasi instalasi Anda ubah ke `/home/saya/radius`, maka ketik: **`/home/saya/radius/db-init/db_fix.sql`**
+     - Alternatif lain: Anda juga bisa meng-upload file `.sql` secara manual (via WinSCP) langsung ke VPS (misalnya ke `/root/db_fix.sql`), lalu ketik jalur tersebut.
    - Tunggu hingga instalasi Docker dan proses *building* selesai otomatis.
 
 ## ⚠️ Konfigurasi Firewall (Sangat Penting)
