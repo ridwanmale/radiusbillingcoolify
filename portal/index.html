@@ -114,6 +114,13 @@
                 <h2 style="font-weight: 900; font-size: 1.8rem; margin: 0 0 10px;">PEMBAYARAN BERHASIL!</h2>
                 <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 15px;">Voucher Anda sudah aktif. Silakan login untuk menikmati internet.</p>
                 
+                <div style="font-size: 0.8rem; color: #64748b; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    Order ID: <code id="success-order-id" style="color: #94a3b8; font-weight: bold;">-</code>
+                    <button onclick="copyToClipboard(document.getElementById('success-order-id').innerText)" style="background: none; border: none; color: #64748b; cursor: pointer; display: inline-flex; align-items: center; padding: 2px;" title="Salin Order ID">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                    </button>
+                </div>
+
                 <div style="background: rgba(16, 185, 129, 0.1); padding: 25px; border-radius: 24px; margin: 0 0 25px; border: 1px solid rgba(16, 185, 129, 0.2);">
                     <div style="font-size: 0.85rem; color: #10b981; font-weight: 700; margin-bottom: 8px;">KODE VOUCHER</div>
                     <div id="success-code" style="font-size: clamp(1.3rem, 7vw, 2.5rem); font-weight: 900; letter-spacing: clamp(2px, 1.5vw, 6px); color: white; word-break: break-all;">-</div>

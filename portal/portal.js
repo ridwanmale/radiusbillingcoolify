@@ -303,6 +303,7 @@ async function checkStatusById(providedId) {
 
 function showSuccess() {
     switchView('success');
+    document.getElementById('success-order-id').innerText = currentTransaction.order_id;
     document.getElementById('success-code').innerText = currentTransaction.voucher_code;
     showToast('Pembayaran berhasil divalidasi!', 'success');
 }
