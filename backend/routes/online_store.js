@@ -221,7 +221,7 @@ router.post('/duitku/create-invoice', checkStoreOpen, async (req, res) => {
       email: customer_email || 'customer@example.com',
       phoneNumber: customer_phone || '08123456789',
       callbackUrl: `${publicUrl}/api/online-store/duitku/callback`,
-      returnUrl: `${publicUrl}/portal?order_id=${order_id}`,
+      returnUrl: req.body.return_url ? `${req.body.return_url}?order_id=${order_id}` : `${publicUrl}/portal?order_id=${order_id}`,
       signature,
       paymentMethod: payment_method || '', // Kosongkan untuk semua metode
     };
@@ -296,7 +296,7 @@ router.post('/tripay/create-transaction', checkStoreOpen, async (req, res) => {
         { name: `Voucher Hotspot - ${package_id}`, price: parseInt(amount), quantity: 1 }
       ],
       callback_url: `${publicUrl}/api/online-store/tripay/callback`,
-      return_url: `${publicUrl}/portal?order_id=${merchant_ref}`,
+      return_url: req.body.return_url ? `${req.body.return_url}?order_id=${merchant_ref}` : `${publicUrl}/portal?order_id=${merchant_ref}`,
       signature: signature
     };
 
@@ -376,7 +376,7 @@ router.post('/midtrans/create-transaction', checkStoreOpen, async (req, res) => 
         name: `Voucher Hotspot - ${package_id}`
       }],
       callbacks: {
-        finish: `${publicUrl}/portal?order_id=${order_id}`
+        finish: req.body.return_url ? `${req.body.return_url}?order_id=${order_id}` : `${publicUrl}/portal?order_id=${order_id}`
       }
     };
 

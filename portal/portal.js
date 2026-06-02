@@ -140,7 +140,12 @@ async function processPayment(methodId) {
     showToast('Memproses...', 'info');
     
     try {
-        const payload = { package_id: selectedPkg.groupname, amount: selectedPkg.harga, customer_name: 'Customer' };
+        const payload = { 
+            package_id: selectedPkg.groupname, 
+            amount: selectedPkg.harga, 
+            customer_name: 'Customer',
+            return_url: window.location.href.split('?')[0]
+        };
         
         let endpoint = '';
         if (methodId === 'duitku') endpoint = '/online-store/duitku/create-invoice';
