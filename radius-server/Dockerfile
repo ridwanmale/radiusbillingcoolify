@@ -5,7 +5,8 @@ RUN apk update && apk add --no-cache \
     freeradius \
     freeradius-mysql \
     freeradius-utils \
-    mariadb-client
+    mariadb-client \
+    netcat-openbsd
 
 # Enable SQL module
 RUN ln -sf /etc/raddb/mods-available/sql /etc/raddb/mods-enabled/sql

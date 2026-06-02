@@ -71,6 +71,8 @@ systemctl enable docker
 systemctl start docker
 
 echo "Membuat file konfigurasi (.env)..."
+# Hapus .env lama jika ada, supaya nilai baru selalu ditulis
+rm -f .env
 cat > .env <<EOF
 DB_HOST=$DB_HOST
 MYSQL_DATABASE=$MYSQL_DATABASE
