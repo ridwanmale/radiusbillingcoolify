@@ -19,6 +19,8 @@ read -p "Masukkan path direktori instalasi (tekan Enter untuk default: /opt/radi
 INSTALL_DIR=${INSTALL_DIR:-/opt/radiusbilling-portal}
 INSTALL_DIR=${INSTALL_DIR%/}
 
+read -p "Masukkan IP Address Web Admin Anda (Wajib diisi jika beda VPS): " BACKEND_IP
+
 # Meminta port dari pengguna
 read -p "Masukkan port yang ingin digunakan untuk portal ini [Default: 8089]: " INPUT_PORT
 
@@ -57,6 +59,11 @@ else
 fi
 
 cd "$INSTALL_DIR" || exit 1
+
+# Ganti IP API jika pengguna memasukkan IP khusus
+if [[ -n "$BACKEND_IP" ]]; then
+    sed -i "s/\`http:\/\/\${window.location.hostname}:8088\/api\`/\"http:\/\/$BACKEND_IP:8088\/api\"/g" portal/portal.js
+fi
 
 # Export port sebagai environment variable untuk docker-compose
 export PORTAL_PORT=$PORTAL_PORT
