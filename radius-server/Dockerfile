@@ -16,6 +16,9 @@ RUN ln -sf /etc/raddb/mods-available/sql /etc/raddb/mods-enabled/sql
 RUN sed -i 's/^[[:space:]]*#[[:space:]]*sql\([[:space:]]*\)$/	sql\1/g' /etc/raddb/sites-available/default && \
     sed -i 's/^[[:space:]]*#[[:space:]]*-sql\([[:space:]]*\)$/	-sql\1/g' /etc/raddb/sites-available/default
 
+# Allow Reply-Message to pass through Access-Reject packets
+RUN sed -i '/^DEFAULT/a \	Reply-Message =* ANY,' /etc/raddb/mods-config/attr_filter/access_reject
+
 # Copy custom configs
 COPY clients.conf /etc/raddb/clients.conf
 COPY sql.conf /etc/raddb/mods-available/sql
