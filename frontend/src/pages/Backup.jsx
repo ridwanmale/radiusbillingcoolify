@@ -9,6 +9,7 @@ const Backup = () => {
   const [lastBackup, setLastBackup] = useState(null);
   const [logs, setLogs] = useState([]);
   const [jsonCredentials, setJsonCredentials] = useState('');
+  const [isEditingCredentials, setIsEditingCredentials] = useState(false);
   
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
@@ -89,6 +90,7 @@ const Backup = () => {
       await axios.post('/api/backup/gdrive/credentials', { credentials: jsonCredentials });
       alert('Kredensial berhasil disimpan!');
       setJsonCredentials('');
+      setIsEditingCredentials(false);
       fetchData();
     } catch (error) {
       alert(error.response?.data?.message || 'Gagal menyimpan kredensial. Pastikan format JSON valid.');
@@ -241,13 +243,13 @@ const Backup = () => {
                 </button>
               </div>
 
-              {!serviceEmail ? (
+              {(!serviceEmail || serviceEmail === 'File kredensial tidak valid' || isEditingCredentials) ? (
                 <div style={{ background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
                   <h3 style={{ color: '#ef4444', margin: '0 0 10px 0', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span className="material-symbols-rounded">warning</span> Kredensial Belum Dikonfigurasi
+                    <span className="material-symbols-rounded">warning</span> {serviceEmail === 'File kredensial tidak valid' ? 'File Kredensial Rusak / Tidak Valid' : 'Kredensial Belum Dikonfigurasi'}
                   </h3>
                   <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '1rem', lineHeight: '1.5' }}>
-                    Sistem memerlukan file `service-account.json` dari Google Cloud. Daripada repot mengunggah file ke VPS, buka file JSON tersebut di Notepad, <b>Copy</b> semua isinya, lalu <b>Paste</b> di kotak bawah ini:
+                    Sistem memerlukan isi teks dari file `service-account.json` Google Cloud. Buka file JSON tersebut di Notepad, <b>Copy</b> semua isinya, lalu <b>Paste</b> di kotak bawah ini:
                   </p>
                   <textarea 
                     value={jsonCredentials}
@@ -259,19 +261,34 @@ const Backup = () => {
                       resize: 'vertical', marginBottom: '1rem'
                     }}
                   />
-                  <button onClick={saveJsonCredentials} style={{ background: '#10b981', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
-                    Simpan Kredensial
-                  </button>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <button onClick={saveJsonCredentials} style={{ background: '#10b981', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
+                      Simpan Kredensial
+                    </button>
+                    {isEditingCredentials && (
+                      <button onClick={() => setIsEditingCredentials(false)} style={{ background: 'transparent', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.2)', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
+                        Batal
+                      </button>
+                    )}
+                  </div>
                 </div>
               ) : (
-                <div style={{ background: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '12px', padding: '1.2rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ background: 'rgba(16, 185, 129, 0.1)', padding: '10px', borderRadius: '50%' }}>
-                    <span className="material-symbols-rounded" style={{ color: '#10b981' }}>check_circle</span>
+                <div style={{ background: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '12px', padding: '1.2rem', marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ background: 'rgba(16, 185, 129, 0.1)', padding: '10px', borderRadius: '50%' }}>
+                      <span className="material-symbols-rounded" style={{ color: '#10b981' }}>check_circle</span>
+                    </div>
+                    <div>
+                      <h4 style={{ color: 'white', margin: '0 0 4px 0', fontSize: '0.95rem' }}>Service Account Aktif</h4>
+                      <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem', fontFamily: 'monospace' }}>{serviceEmail}</span>
+                    </div>
                   </div>
-                  <div>
-                    <h4 style={{ color: 'white', margin: '0 0 4px 0', fontSize: '0.95rem' }}>Service Account Aktif</h4>
-                    <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem', fontFamily: 'monospace' }}>{serviceEmail}</span>
-                  </div>
+                  <button 
+                    onClick={() => setIsEditingCredentials(true)}
+                    style={{ background: 'transparent', color: 'rgba(255,255,255,0.6)', border: '1px solid rgba(255,255,255,0.2)', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+                  >
+                    <span className="material-symbols-rounded" style={{ fontSize: '14px' }}>edit</span> Ubah
+                  </button>
                 </div>
               )}
 
