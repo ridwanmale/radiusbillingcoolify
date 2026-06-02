@@ -546,3 +546,6 @@ const { scheduleBackups } = require('./utils/backupScheduler');
 // Check for schedule on startup and every 5 minutes as fallback
 scheduleBackups();
 setInterval(scheduleBackups, 5 * 60 * 1000);
+
+// Run DB Auto-Migration on startup
+require('./migrate_db');

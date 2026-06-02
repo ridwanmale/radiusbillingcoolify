@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const OnlineStoreCenter = () => {
   const [loading, setLoading] = useState(false);
@@ -19,7 +21,8 @@ const OnlineStoreCenter = () => {
     hotspot_login_url: 'http://10.5.50.1/login',
     enable_schedule: false,
     open_time: '08:00',
-    close_time: '22:00'
+    close_time: '22:00',
+    success_message_html: ''
   });
   const [isSaving, setIsSaving] = useState(false);
 
@@ -99,10 +102,30 @@ const OnlineStoreCenter = () => {
                   <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Warna Utama</label>
                   <input type="color" className="form-input-premium" style={{ height: '42px', padding: '2px' }} value={settings.primary_color} onChange={e => setSettings({...settings, primary_color: e.target.value})} />
                 </div>
-                <div className="form-group">
-                  <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>IP MikroTik / DNS Hotspot</label>
-                  <input type="text" className="form-input-premium" placeholder="Contoh: 10.5.50.1 atau wifi.hotspot" value={settings.hotspot_login_url} onChange={e => setSettings({...settings, hotspot_login_url: e.target.value})} />
+              </div>
+
+              <div className="form-group" style={{ marginBottom: '20px' }}>
+                <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Pesan Sukses (Setelah Pembayaran)</label>
+                <div style={{ background: 'white', borderRadius: '8px', color: 'black' }}>
+                  <ReactQuill 
+                    theme="snow" 
+                    value={settings.success_message_html || ''} 
+                    onChange={val => setSettings({...settings, success_message_html: val})} 
+                    modules={{
+                      toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'align': [] }],
+                        ['clean']
+                      ]
+                    }}
+                  />
                 </div>
+                <p style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '5px' }}>Pesan ini akan ditampilkan di halaman voucher setelah pembeli berhasil membayar.</p>
+              </div>
+              <div className="form-group">
+                <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>IP MikroTik / DNS Hotspot</label>
+                <input type="text" className="form-input-premium" placeholder="Contoh: 10.5.50.1 atau wifi.hotspot" value={settings.hotspot_login_url} onChange={e => setSettings({...settings, hotspot_login_url: e.target.value})} />
               </div>
               <p style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '-10px', marginBottom: '20px' }}>* Cukup isi IP atau DNS saja (Contoh: 10.5.50.1). Sistem akan otomatis mengarahkan ke /login.</p>
 

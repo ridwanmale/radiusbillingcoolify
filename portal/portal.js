@@ -303,6 +303,16 @@ async function checkStatusById(providedId) {
 
 function showSuccess() {
     switchView('success');
+    
+    const msgContainer = document.getElementById('dynamic-success-message');
+    if (msgContainer) {
+        if (portalSettings && portalSettings.success_message_html) {
+            msgContainer.innerHTML = portalSettings.success_message_html;
+        } else {
+            msgContainer.innerHTML = `<p>Voucher Anda sudah aktif. Silakan salin kode / <strong style="color: #fbbf24;">SCREENSHOOT</strong> untuk bukti pembelian. Ingin akses cepat masuk ke hotspot silakan klik tombol <strong style="color: #fbbf24;">LOGIN KE HOTSPOT</strong>.</p>`;
+        }
+    }
+
     document.getElementById('success-order-id').innerText = currentTransaction.order_id;
     document.getElementById('success-code').innerText = currentTransaction.voucher_code;
     showToast('Pembayaran berhasil divalidasi!', 'success');

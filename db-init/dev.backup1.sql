@@ -392,7 +392,8 @@ CREATE TABLE `portal_settings` (
   `enable_tripay` tinyint(1) DEFAULT '0',
   `enable_schedule` tinyint(1) DEFAULT '0',
   `open_time` varchar(5) COLLATE utf8mb4_general_ci DEFAULT '08:00',
-  `close_time` varchar(5) COLLATE utf8mb4_general_ci DEFAULT '22:00',
+  close_time varchar(5) COLLATE utf8mb4_general_ci DEFAULT '22:00',
+  success_message_html text COLLATE utf8mb4_general_ci,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
