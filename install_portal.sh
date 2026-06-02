@@ -29,18 +29,19 @@ echo ""
 echo "Mengatur portal berjalan di port: $PORTAL_PORT"
 echo ""
 
+echo "Mengupdate sistem dan menginstal dependensi dasar..."
+if [ "$EUID" -eq 0 ]; then
+    rm -f /etc/apt/sources.list.d/docker.list
+    apt-get update -qq || true
+    apt-get install -y -qq ca-certificates curl gnupg git
+else
+    sudo rm -f /etc/apt/sources.list.d/docker.list
+    sudo apt-get update -qq || true
+    sudo apt-get install -y -qq ca-certificates curl gnupg git
+fi
+
 echo "Menyiapkan file aplikasi..."
 if [[ -n "$GITHUB_URL" ]]; then
-    # Memastikan git terinstal
-    if ! command -v git &> /dev/null; then
-        echo "Git belum terinstal. Mencoba menginstal git..."
-        if [ "$EUID" -eq 0 ]; then
-            apt-get update -qq && apt-get install -y -qq git
-        else
-            sudo apt-get update -qq && sudo apt-get install -y -qq git
-        fi
-    fi
-
     cd /tmp || exit
     rm -rf "$INSTALL_DIR"
     git clone "$GITHUB_URL" "$INSTALL_DIR"
@@ -71,51 +72,45 @@ if [ ! -d "portal" ]; then
     exit 1
 fi
 
+if ! command -v docker &> /dev/null; then
+    echo "Menginstal Docker..."
+    if [ "$EUID" -eq 0 ]; then
+        install -m 0755 -d /etc/apt/keyrings
+        rm -f /etc/apt/keyrings/docker.gpg
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        chmod a+r /etc/apt/keyrings/docker.gpg
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+        apt-get update -qq
+        apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    else
+        sudo install -m 0755 -d /etc/apt/keyrings
+        rm -f /etc/apt/keyrings/docker.gpg
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        sudo chmod a+r /etc/apt/keyrings/docker.gpg
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        sudo apt-get update -qq
+        sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    fi
+    
+    if [ "$EUID" -eq 0 ]; then
+        systemctl daemon-reload
+        systemctl enable docker
+        systemctl start docker
+    else
+        sudo systemctl daemon-reload
+        sudo systemctl enable docker
+        sudo systemctl start docker
+    fi
+fi
+
 # Pastikan docker-compose terinstall (menggunakan versi v2 'docker compose' sebagai fallback jika 'docker-compose' tidak ada)
 DOCKER_CMD="docker-compose"
 if ! command -v docker-compose &> /dev/null; then
     if docker compose version &> /dev/null; then
         DOCKER_CMD="docker compose"
     else
-        echo "Docker Compose tidak ditemukan. Menginstal Docker..."
-        # Hapus repo docker yang mungkin rusak dari percobaan sebelumnya
-        if [ "$EUID" -eq 0 ]; then
-            rm -f /etc/apt/sources.list.d/docker.list
-            apt-get update -qq || true
-            apt-get install -y -qq ca-certificates curl gnupg
-            
-            install -m 0755 -d /etc/apt/keyrings
-            rm -f /etc/apt/keyrings/docker.gpg
-            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-            chmod a+r /etc/apt/keyrings/docker.gpg
-            echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-            
-            apt-get update -qq
-            apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-        else
-            sudo rm -f /etc/apt/sources.list.d/docker.list
-            sudo apt-get update -qq || true
-            sudo apt-get install -y -qq ca-certificates curl gnupg
-            
-            sudo install -m 0755 -d /etc/apt/keyrings
-            rm -f /etc/apt/keyrings/docker.gpg
-            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-            sudo chmod a+r /etc/apt/keyrings/docker.gpg
-            echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-            
-            sudo apt-get update -qq
-            sudo apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-        fi
-        
-        # Cek ulang setelah instalasi
-        if docker compose version &> /dev/null; then
-            DOCKER_CMD="docker compose"
-        elif command -v docker-compose &> /dev/null; then
-            DOCKER_CMD="docker-compose"
-        else
-            echo "Error: Gagal menginstal Docker Compose. Silakan instal secara manual."
-            exit 1
-        fi
+        echo "Error: docker-compose masih tidak ditemukan setelah instalasi Docker."
+        exit 1
     fi
 fi
 
