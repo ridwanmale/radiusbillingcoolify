@@ -17,21 +17,24 @@ Sebelum melakukan instalasi, pastikan hal-hal berikut sudah terpenuhi:
 
 ## 🚀 Langkah Instalasi
 
-Proses instalasi sangat mudah karena sudah menggunakan script interaktif. 
+Proses instalasi sangat mudah karena sudah menggunakan script interaktif.
 
-1. Buka terminal atau akses SSH ke server Anda.
-2. Masuk ke dalam direktori project `radiusbillingcoolify`:
+1. **Login ke VPS / Server Anda** melalui terminal atau SSH.
+2. **Download Script Instalasi dari GitHub:**
    ```bash
-   cd "/path/ke/folder/radiusbillingcoolify"
+   wget https://raw.githubusercontent.com/<USERNAME_GITHUB_ANDA>/radiusbillingcoolify/main/install_portal.sh
+   chmod +x install_portal.sh
    ```
-3. Jalankan script instalasi portal:
+   *(Catatan: Ganti `<USERNAME_GITHUB_ANDA>` dengan username GitHub Anda, atau sesuaikan dengan link repository Anda).*
+
+3. **Jalankan Script Instalasi:**
    ```bash
    bash install_portal.sh
    ```
-4. Anda akan diminta untuk memasukkan Port yang ingin digunakan. 
+4. Anda akan diminta untuk memasukkan Port yang ingin digunakan.
    - Anda bisa menekan `Enter` untuk menggunakan port default (`8089`).
    - Atau ketik angka port baru (misalnya `8090`) lalu tekan `Enter`.
-5. Script akan otomatis membangun (*build*) image menggunakan Nginx dan menjalankan containernya di latar belakang.
+5. Script akan otomatis mengunduh (*clone/pull*) file yang dibutuhkan, membangun image, dan menjalankan containernya di latar belakang.
 
 ---
 
