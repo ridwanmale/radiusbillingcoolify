@@ -3,13 +3,10 @@ import axios from 'axios';
 
 const Backup = () => {
   const [activeTab, setActiveTab] = useState('local');
-  const [gdriveSettings, setGdriveSettings] = useState({ folder_id: '', cron_time: '0 2 * * *', is_enabled: 0 });
+  const [telegramSettings, setTelegramSettings] = useState({ bot_token: '', chat_id: '', cron_time: '0 2 * * *', is_enabled: 0 });
   const [ftpSettings, setFtpSettings] = useState({ host: '', port: 21, username: '', password: '', remote_path: '/', cron_time: '0 2 * * *', is_enabled: 0 });
-  const [serviceEmail, setServiceEmail] = useState('');
   const [lastBackup, setLastBackup] = useState(null);
   const [logs, setLogs] = useState([]);
-  const [jsonCredentials, setJsonCredentials] = useState('');
-  const [isEditingCredentials, setIsEditingCredentials] = useState(false);
   
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
@@ -22,9 +19,8 @@ const Backup = () => {
     try {
       setLoading(true);
       const res = await axios.get('/api/backup');
-      setServiceEmail(res.data.serviceEmail);
-      if (res.data.gdriveSettings) {
-        setGdriveSettings(res.data.gdriveSettings);
+      if (res.data.telegramSettings) {
+        setTelegramSettings(res.data.telegramSettings);
       }
       if (res.data.ftpSettings) {
         setFtpSettings(res.data.ftpSettings);
@@ -59,14 +55,14 @@ const Backup = () => {
     return `${parseInt(m)} ${parseInt(h)} * * *`;
   };
 
-  const saveGdriveSettings = async (e) => {
+  const saveTelegramSettings = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/api/backup/gdrive/settings', gdriveSettings);
-      alert('Pengaturan Google Drive berhasil disimpan!');
+      await axios.post('/api/backup/telegram/settings', telegramSettings);
+      alert('Pengaturan Telegram berhasil disimpan!');
       fetchData();
     } catch (error) {
-      alert('Gagal menyimpan pengaturan Google Drive');
+      alert('Gagal menyimpan pengaturan Telegram');
     }
   };
 
@@ -81,30 +77,14 @@ const Backup = () => {
     }
   };
 
-  const saveJsonCredentials = async () => {
-    if (!jsonCredentials.trim()) {
-      alert('Teks JSON tidak boleh kosong');
-      return;
-    }
+  const triggerTelegramBackup = async () => {
     try {
-      await axios.post('/api/backup/gdrive/credentials', { credentials: jsonCredentials });
-      alert('Kredensial berhasil disimpan!');
-      setJsonCredentials('');
-      setIsEditingCredentials(false);
+      alert('Memulai backup ke Telegram, harap tunggu...');
+      await axios.post('/api/backup/telegram/trigger');
+      alert('Backup Telegram sukses!');
       fetchData();
     } catch (error) {
-      alert(error.response?.data?.message || 'Gagal menyimpan kredensial. Pastikan format JSON valid.');
-    }
-  };
-
-  const triggerGdriveBackup = async () => {
-    try {
-      alert('Memulai backup ke Google Drive, harap tunggu...');
-      await axios.post('/api/backup/gdrive/trigger');
-      alert('Backup GDrive sukses!');
-      fetchData();
-    } catch (error) {
-      alert('Backup GDrive gagal: ' + (error.response?.data?.message || error.message));
+      alert('Backup Telegram gagal: ' + (error.response?.data?.message || error.message));
     }
   };
 
@@ -165,16 +145,16 @@ const Backup = () => {
           Direct Download
         </button>
         <button 
-          onClick={() => setActiveTab('gdrive')}
+          onClick={() => setActiveTab('telegram')}
           style={{
             flex: 1, padding: '10px', borderRadius: '8px', border: 'none', 
-            background: activeTab === 'gdrive' ? 'rgba(16, 185, 129, 0.1)' : 'transparent',
-            color: activeTab === 'gdrive' ? '#10b981' : 'rgba(255,255,255,0.5)',
-            fontWeight: activeTab === 'gdrive' ? 'bold' : 'normal',
+            background: activeTab === 'telegram' ? 'rgba(56, 189, 248, 0.1)' : 'transparent',
+            color: activeTab === 'telegram' ? '#38bdf8' : 'rgba(255,255,255,0.5)',
+            fontWeight: activeTab === 'telegram' ? 'bold' : 'normal',
             cursor: 'pointer', transition: 'all 0.2s'
           }}
         >
-          Google Drive
+          Telegram Backup
         </button>
         <button 
           onClick={() => setActiveTab('ftp')}
@@ -223,18 +203,18 @@ const Backup = () => {
             </div>
           )}
 
-          {/* TAB: GOOGLE DRIVE */}
-          {activeTab === 'gdrive' && (
+          {/* TAB: TELEGRAM */}
+          {activeTab === 'telegram' && (
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                 <h2 style={{ color: 'white', margin: 0, fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span className="material-symbols-rounded" style={{ color: '#10b981' }}>add_to_drive</span>
-                  Google Drive Setup
+                  <span className="material-symbols-rounded" style={{ color: '#38bdf8' }}>send</span>
+                  Telegram Auto-Backup
                 </h2>
                 <button 
-                  onClick={triggerGdriveBackup}
+                  onClick={triggerTelegramBackup}
                   style={{
-                    background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.2)',
+                    background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.2)',
                     padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
                     fontWeight: 'bold', fontSize: '0.85rem'
                   }}
@@ -243,88 +223,47 @@ const Backup = () => {
                 </button>
               </div>
 
-              {(!serviceEmail || serviceEmail === 'File kredensial tidak valid' || isEditingCredentials) ? (
-                <div style={{ background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
-                  <h3 style={{ color: '#ef4444', margin: '0 0 10px 0', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span className="material-symbols-rounded">warning</span> {serviceEmail === 'File kredensial tidak valid' ? 'File Kredensial Rusak / Tidak Valid' : 'Kredensial Belum Dikonfigurasi'}
-                  </h3>
-                  <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '1rem', lineHeight: '1.5' }}>
-                    Sistem memerlukan isi teks dari file `service-account.json` Google Cloud. Buka file JSON tersebut di Notepad, <b>Copy</b> semua isinya, lalu <b>Paste</b> di kotak bawah ini:
-                  </p>
-                  <textarea 
-                    value={jsonCredentials}
-                    onChange={(e) => setJsonCredentials(e.target.value)}
-                    placeholder="Paste isi service-account.json di sini..."
-                    style={{
-                      width: '100%', height: '150px', background: 'rgba(0,0,0,0.2)', border: '1px solid #23252a',
-                      borderRadius: '8px', padding: '1rem', color: '#10b981', fontFamily: 'monospace', fontSize: '0.85rem',
-                      resize: 'vertical', marginBottom: '1rem'
-                    }}
-                  />
-                  <div style={{ display: 'flex', gap: '10px' }}>
-                    <button onClick={saveJsonCredentials} style={{ background: '#10b981', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
-                      Simpan Kredensial
-                    </button>
-                    {isEditingCredentials && (
-                      <button onClick={() => setIsEditingCredentials(false)} style={{ background: 'transparent', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.2)', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>
-                        Batal
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div style={{ background: 'rgba(16, 185, 129, 0.05)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '12px', padding: '1.2rem', marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ background: 'rgba(16, 185, 129, 0.1)', padding: '10px', borderRadius: '50%' }}>
-                      <span className="material-symbols-rounded" style={{ color: '#10b981' }}>check_circle</span>
-                    </div>
-                    <div>
-                      <h4 style={{ color: 'white', margin: '0 0 4px 0', fontSize: '0.95rem' }}>Service Account Aktif</h4>
-                      <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem', fontFamily: 'monospace' }}>{serviceEmail}</span>
-                    </div>
-                  </div>
-                  <button 
-                    onClick={() => setIsEditingCredentials(true)}
-                    style={{ background: 'transparent', color: 'rgba(255,255,255,0.6)', border: '1px solid rgba(255,255,255,0.2)', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '4px' }}
-                  >
-                    <span className="material-symbols-rounded" style={{ fontSize: '14px' }}>edit</span> Ubah
-                  </button>
-                </div>
-              )}
+              <div style={{ background: 'rgba(56, 189, 248, 0.05)', border: '1px solid rgba(56, 189, 248, 0.2)', borderRadius: '12px', padding: '1.5rem', marginBottom: '1.5rem' }}>
+                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', marginBottom: '1rem', lineHeight: '1.5' }}>
+                  Setiap jam yang ditentukan, bot Telegram akan mengirimkan file <code>backup.sql</code> langsung ke chat Anda. 
+                  Anda bisa mendapatkan <b>Bot Token</b> dari <a href="https://t.me/BotFather" target="_blank" rel="noreferrer" style={{color:'#38bdf8'}}>@BotFather</a> dan <b>Chat ID</b> dengan mengirim pesan ke <a href="https://t.me/userinfobot" target="_blank" rel="noreferrer" style={{color:'#38bdf8'}}>@userinfobot</a>.
+                </p>
+              </div>
 
-              <form onSubmit={saveGdriveSettings}>
+              <form onSubmit={saveTelegramSettings}>
                 <div style={{ marginBottom: '1rem' }}>
-                  <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem', marginBottom: '6px' }}>Folder ID (Opsional)</label>
-                  <input type="text" value={gdriveSettings.folder_id} onChange={e => setGdriveSettings({...gdriveSettings, folder_id: e.target.value})} style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #23252a', background: 'rgba(0,0,0,0.2)', color: 'white' }} placeholder="Kosongkan untuk direktori root" />
+                  <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem', marginBottom: '6px' }}>Bot Token</label>
+                  <input type="text" value={telegramSettings.bot_token} onChange={e => setTelegramSettings({...telegramSettings, bot_token: e.target.value})} style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #23252a', background: 'rgba(0,0,0,0.2)', color: 'white' }} placeholder="123456789:ABCdefGHIjklmnoPQRstUVwxyz" />
+                </div>
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem', marginBottom: '6px' }}>Chat ID</label>
+                  <input type="text" value={telegramSettings.chat_id} onChange={e => setTelegramSettings({...telegramSettings, chat_id: e.target.value})} style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #23252a', background: 'rgba(0,0,0,0.2)', color: 'white' }} placeholder="12345678" />
                 </div>
                 <div style={{ marginBottom: '1.5rem' }}>
                   <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem', marginBottom: '6px' }}>Jam Backup Harian (Waktu Server)</label>
                   <input 
                     type="time" 
-                    value={parseCronToTime(gdriveSettings.cron_time)} 
-                    onChange={e => setGdriveSettings({...gdriveSettings, cron_time: parseTimeToCron(e.target.value)})} 
+                    value={parseCronToTime(telegramSettings.cron_time)} 
+                    onChange={e => setTelegramSettings({...telegramSettings, cron_time: parseTimeToCron(e.target.value)})} 
                     style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #23252a', background: 'rgba(0,0,0,0.2)', color: 'white' }} 
                   />
-                  <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginTop: '6px' }}>
-                    Data akan dibackup dan diunggah ke Google Drive setiap hari pada jam tersebut.
-                  </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' }}>
                   <div 
-                    onClick={() => setGdriveSettings({...gdriveSettings, is_enabled: gdriveSettings.is_enabled ? 0 : 1})}
+                    onClick={() => setTelegramSettings({...telegramSettings, is_enabled: telegramSettings.is_enabled ? 0 : 1})}
                     style={{
-                      width: '44px', height: '24px', borderRadius: '12px', background: gdriveSettings.is_enabled ? '#10b981' : '#374151',
+                      width: '44px', height: '24px', borderRadius: '12px', background: telegramSettings.is_enabled ? '#38bdf8' : '#374151',
                       position: 'relative', cursor: 'pointer', transition: 'background 0.3s'
                     }}
                   >
                     <div style={{
                       width: '18px', height: '18px', borderRadius: '50%', background: 'white', position: 'absolute', top: '3px',
-                      left: gdriveSettings.is_enabled ? '23px' : '3px', transition: 'left 0.3s'
+                      left: telegramSettings.is_enabled ? '23px' : '3px', transition: 'left 0.3s'
                     }}></div>
                   </div>
                   <span style={{ color: 'white', fontSize: '0.9rem' }}>Aktifkan Jadwal Otomatis</span>
                 </div>
-                <button type="submit" style={{ background: '#10b981', color: 'white', border: 'none', padding: '10px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>Simpan Pengaturan</button>
+                <button type="submit" style={{ background: '#38bdf8', color: 'white', border: 'none', padding: '10px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>Simpan Pengaturan</button>
               </form>
             </div>
           )}
@@ -441,8 +380,8 @@ const Backup = () => {
                     </div>
                     <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', display: 'flex', justifyContent: 'space-between' }}>
                       <span>Size: {log.file_size}</span>
-                      <span style={{ color: log.file_name.includes('ftp') ? '#f59e0b' : '#10b981' }}>
-                        {log.file_name.includes('ftp') ? 'FTP' : 'GDrive'}
+                      <span style={{ color: log.file_name.includes('ftp') ? '#f59e0b' : '#38bdf8' }}>
+                        {log.file_name.includes('ftp') ? 'FTP' : 'Telegram'}
                       </span>
                     </div>
                   </div>

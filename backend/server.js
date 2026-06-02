@@ -195,16 +195,17 @@ const upgradePool = async (pool, name) => {
 
     // 4. Create Backup Tables
     await pool.query(`
-      CREATE TABLE IF NOT EXISTS gdrive_settings (
+      CREATE TABLE IF NOT EXISTS telegram_backup_settings (
         id INT NOT NULL PRIMARY KEY DEFAULT 1,
-        folder_id VARCHAR(255) DEFAULT '',
+        bot_token VARCHAR(128) DEFAULT '',
+        chat_id VARCHAR(64) DEFAULT '',
         cron_time VARCHAR(64) DEFAULT '0 2 * * *',
         is_enabled TINYINT(1) DEFAULT 0
       ) ENGINE=InnoDB;
     `);
     await pool.query(`
-      INSERT IGNORE INTO gdrive_settings (id, folder_id, cron_time, is_enabled)
-      VALUES (1, '', '0 2 * * *', 0)
+      INSERT IGNORE INTO telegram_backup_settings (id, bot_token, chat_id, cron_time, is_enabled)
+      VALUES (1, '', '', '0 2 * * *', 0)
     `);
     
     await pool.query(`
@@ -235,7 +236,7 @@ const upgradePool = async (pool, name) => {
     `);
     await pool.query(
       'INSERT IGNORE INTO role_menu_access (role, menu_id, is_allowed) VALUES (?, ?, ?)',
-      ['superadmin', 'gdrive_backup', 1]
+      ['superadmin', 'telegram_backup', 1]
     );
 
     console.log(`[DB UPGRADE] Completed schema verification on ${name}.`);
@@ -541,35 +542,35 @@ if (process.env.ENABLE_TELEGRAM_BOT_LISTENER === 'true') {
 }
 
 // =============================================
-// BACKUP CRON JOBS (GDRIVE & FTP)
+// BACKUP CRON JOBS (TELEGRAM & FTP)
 // =============================================
 const cron = require('node-cron');
-const { performBackup: performGDriveBackup } = require('./utils/gdriveBackupService');
+const { performBackup: performTelegramBackup } = require('./utils/telegramBackupService');
 const { performFTPBackup } = require('./utils/ftpBackupService');
 
-let gdriveBackupTask = null;
+let telegramBackupTask = null;
 let ftpBackupTask = null;
 
 const scheduleBackups = async () => {
   try {
     // We use db.query directly to avoid connection leaks
-    const [gSettings] = await db.query('SELECT * FROM gdrive_settings WHERE id = 1');
+    const [tSettings] = await db.query('SELECT * FROM telegram_backup_settings WHERE id = 1');
     const [fSettings] = await db.query('SELECT * FROM ftp_settings WHERE id = 1');
 
-    // --- GDRIVE SCHEDULE ---
-    if (gdriveBackupTask) {
-      gdriveBackupTask.stop();
-      gdriveBackupTask = null;
+    // --- TELEGRAM SCHEDULE ---
+    if (telegramBackupTask) {
+      telegramBackupTask.stop();
+      telegramBackupTask = null;
     }
-    if (gSettings.length > 0 && gSettings[0].is_enabled) {
-      const gCron = gSettings[0].cron_time || '0 2 * * *';
-      console.log(`[Backup] Scheduling GDrive daily backup at: ${gCron}`);
-      gdriveBackupTask = cron.schedule(gCron, async () => {
-        console.log('[Backup] Executing scheduled GDrive backup...');
+    if (tSettings.length > 0 && tSettings[0].is_enabled) {
+      const tCron = tSettings[0].cron_time || '0 2 * * *';
+      console.log(`[Backup] Scheduling Telegram daily backup at: ${tCron}`);
+      telegramBackupTask = cron.schedule(tCron, async () => {
+        console.log('[Backup] Executing scheduled Telegram backup...');
         try {
-          await performGDriveBackup();
+          await performTelegramBackup();
         } catch (error) {
-          console.error('[Backup] Scheduled GDrive backup failed:', error.message);
+          console.error('[Backup] Scheduled Telegram backup failed:', error.message);
         }
       });
     }

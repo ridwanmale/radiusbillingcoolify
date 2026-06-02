@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 const fs = require('fs');
-const { getServiceAccountEmail, performBackup, SERVICE_ACCOUNT_FILE } = require('../utils/gdriveBackupService');
+const { performBackup: performTelegramBackup } = require('../utils/telegramBackupService');
 const { performFTPBackup } = require('../utils/ftpBackupService');
 const { generateLocalBackup } = require('../utils/localBackupService');
 
@@ -11,11 +11,9 @@ const { generateLocalBackup } = require('../utils/localBackupService');
 // ==========================================
 router.get('/', async (req, res) => {
   try {
-    const serviceEmail = await getServiceAccountEmail();
-    
-    // GDrive Settings
-    const [gSettings] = await db.query('SELECT * FROM gdrive_settings WHERE id = 1');
-    let gdriveSettings = gSettings.length > 0 ? gSettings[0] : { folder_id: '', cron_time: '0 2 * * *', is_enabled: 0 };
+    // Telegram Settings
+    const [tSettings] = await db.query('SELECT * FROM telegram_backup_settings WHERE id = 1');
+    let telegramSettings = tSettings.length > 0 ? tSettings[0] : { bot_token: '', chat_id: '', cron_time: '0 2 * * *', is_enabled: 0 };
     
     // FTP Settings
     const [fSettings] = await db.query('SELECT * FROM ftp_settings WHERE id = 1');
@@ -25,8 +23,7 @@ router.get('/', async (req, res) => {
     const [logs] = await db.query('SELECT * FROM backup_logs ORDER BY id DESC LIMIT 1');
 
     res.json({
-      serviceEmail,
-      gdriveSettings,
+      telegramSettings,
       ftpSettings,
       lastBackup: logs.length > 0 ? logs[0] : null
     });
@@ -36,22 +33,23 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Update GDrive Settings
-router.post('/gdrive/settings', async (req, res) => {
+// Update Telegram Settings
+router.post('/telegram/settings', async (req, res) => {
   try {
-    const { folder_id, cron_time, is_enabled } = req.body;
+    const { bot_token, chat_id, cron_time, is_enabled } = req.body;
     await db.query(`
-      INSERT INTO gdrive_settings (id, folder_id, cron_time, is_enabled)
-      VALUES (1, ?, ?, ?)
+      INSERT INTO telegram_backup_settings (id, bot_token, chat_id, cron_time, is_enabled)
+      VALUES (1, ?, ?, ?, ?)
       ON DUPLICATE KEY UPDATE 
-      folder_id = VALUES(folder_id), 
+      bot_token = VALUES(bot_token), 
+      chat_id = VALUES(chat_id),
       cron_time = VALUES(cron_time), 
       is_enabled = VALUES(is_enabled)
-    `, [folder_id || '', cron_time || '0 2 * * *', is_enabled ? 1 : 0]);
-    res.json({ message: 'GDrive settings saved successfully' });
+    `, [bot_token || '', chat_id || '', cron_time || '0 2 * * *', is_enabled ? 1 : 0]);
+    res.json({ message: 'Telegram settings saved successfully' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Failed to save GDrive settings' });
+    res.status(500).json({ message: 'Failed to save Telegram settings' });
   }
 });
 
@@ -78,37 +76,14 @@ router.post('/ftp/settings', async (req, res) => {
   }
 });
 
-// Save GDrive Service Account JSON
-router.post('/gdrive/credentials', (req, res) => {
+// Trigger Telegram Backup
+router.post('/telegram/trigger', async (req, res) => {
   try {
-    const { credentials } = req.body;
-    if (!credentials) {
-      return res.status(400).json({ message: 'Credentials content is empty' });
-    }
-    // Validate JSON format
-    JSON.parse(credentials);
-    
-    // Save to file
-    fs.writeFileSync(SERVICE_ACCOUNT_FILE, credentials, 'utf8');
-    res.json({ message: 'Service Account credentials saved successfully' });
-  } catch (error) {
-    console.error('Invalid credentials format:', error.message);
-    res.status(400).json({ message: 'Format JSON tidak valid. Pastikan Anda mengkopi seluruh isi file service-account.json' });
-  }
-});
-
-// ==========================================
-// TRIGGERS
-// ==========================================
-
-// Trigger GDrive Backup
-router.post('/gdrive/trigger', async (req, res) => {
-  try {
-    const result = await performBackup();
-    res.json({ message: 'Google Drive backup completed successfully', result });
+    const result = await performTelegramBackup();
+    res.json({ message: 'Telegram backup completed successfully', result });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: error.message || 'GDrive backup failed' });
+    res.status(500).json({ message: error.message || 'Telegram backup failed' });
   }
 });
 
