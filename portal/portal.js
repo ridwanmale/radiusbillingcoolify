@@ -1,5 +1,5 @@
-// Konfigurasi API
-const API_URL = `http://${window.location.hostname}:5000/api`;
+// Konfigurasi API (Menggunakan port 8088 karena Nginx Web Proxy meneruskannya ke Backend port 5000)
+const API_URL = `http://${window.location.hostname}:8088/api`;
 let portalSettings = {};
 let selectedPackage = null;
 let pollingInterval = null;
