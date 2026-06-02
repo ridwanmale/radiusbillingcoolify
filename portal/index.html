@@ -106,33 +106,34 @@
         </div>
 
         <!-- VIEW: Success -->
-        <div id="view-success" class="hidden" style="max-width: 450px; margin: 0 auto;">
-            <div style="background: #0f1011; border: 1px solid #23252a; border-radius: 16px; padding: 48px 32px; text-align: center; box-shadow: 0 4px 24px rgba(0,0,0,0.4);">
+        <!-- VIEW: Success -->
+        <div id="view-success" class="hidden" style="max-width: 450px; width: 100%; margin: 0 auto; padding: 0 16px; box-sizing: border-box;">
+            <div style="background: #0f1011; border: 1px solid #23252a; border-radius: 16px; padding: 32px 20px; text-align: center; box-shadow: 0 4px 24px rgba(0,0,0,0.4); width: 100%; box-sizing: border-box;">
                 
-                <div style="width: 56px; height: 56px; border: 1px solid #27a644; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; background: rgba(39, 166, 68, 0.1);">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#27a644" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                <div style="width: 48px; height: 48px; border: 1px solid #27a644; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; background: rgba(39, 166, 68, 0.1);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#27a644" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                 </div>
                 
-                <h2 style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 28px; letter-spacing: -0.6px; color: #f7f8f8; margin: 0 0 12px;">Payment Successful</h2>
-                <p style="color: #8a8f98; font-size: 15px; margin-bottom: 32px; line-height: 1.5;">Voucher is active. Copy the code below and login to start browsing.</p>
+                <h2 style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: clamp(20px, 6vw, 24px); letter-spacing: -0.6px; color: #f7f8f8; margin: 0 0 8px;">Pembayaran Berhasil</h2>
+                <p style="color: #8a8f98; font-size: clamp(13px, 4vw, 14px); margin-bottom: 24px; line-height: 1.5; padding: 0 10px;">Voucher Anda sudah aktif. Silakan salin kode di bawah ini lalu login untuk mulai internetan.</p>
                 
-                <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #23252a;">
-                    <div style="font-size: 13px; color: #62666d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; font-weight: 500;">Order ID</div>
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-                        <code id="success-order-id" style="font-family: 'SF Mono', ui-monospace, monospace; color: #d0d6e0; font-size: 14px;">-</code>
-                        <button onclick="copyToClipboard(document.getElementById('success-order-id').innerText)" style="background: none; border: none; color: #8a8f98; cursor: pointer; padding: 4px; border-radius: 4px;" title="Copy Order ID" onmouseover="this.style.color='#f7f8f8'" onmouseout="this.style.color='#8a8f98'">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #23252a;">
+                    <div style="font-size: 11px; color: #62666d; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; font-weight: 500;">ORDER ID</div>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+                        <code id="success-order-id" style="font-family: 'SF Mono', ui-monospace, monospace; color: #d0d6e0; font-size: 13px;">-</code>
+                        <button onclick="copyToClipboard(document.getElementById('success-order-id').innerText)" style="background: none; border: none; color: #8a8f98; cursor: pointer; padding: 4px; border-radius: 4px; display: flex; align-items: center;" title="Salin Order ID" onmouseover="this.style.color='#f7f8f8'" onmouseout="this.style.color='#8a8f98'">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
                         </button>
                     </div>
                 </div>
 
-                <div style="background: #010102; border: 1px solid #34343a; padding: 24px; border-radius: 12px; margin-bottom: 32px;">
-                    <div style="font-size: 13px; color: #27a644; font-weight: 500; margin-bottom: 12px; letter-spacing: 0.5px; text-transform: uppercase;">Voucher Code</div>
-                    <div id="success-code" style="font-family: 'SF Mono', ui-monospace, monospace; font-size: 32px; font-weight: 600; color: #f7f8f8; letter-spacing: 2px; word-break: break-all;">-</div>
+                <div style="background: #010102; border: 1px solid #34343a; padding: 16px; border-radius: 12px; margin-bottom: 24px; width: 100%; box-sizing: border-box; overflow: hidden;">
+                    <div style="font-size: 11px; color: #27a644; font-weight: 500; margin-bottom: 8px; letter-spacing: 0.5px; text-transform: uppercase;">KODE VOUCHER</div>
+                    <div id="success-code" style="font-family: 'SF Mono', ui-monospace, monospace; font-size: clamp(24px, 8vw, 32px); font-weight: 600; color: #f7f8f8; letter-spacing: 1px; word-break: break-all; width: 100%;">-</div>
                 </div>
                 
-                <button id="btn-login-otomatis" onclick="handleAutoLogin()" style="width: 100%; background: #5e6ad2; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: 500; font-size: 15px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#828fff'" onmouseout="this.style.background='#5e6ad2'">
-                    Login to Hotspot
+                <button id="btn-login-otomatis" onclick="handleAutoLogin()" style="width: 100%; background: #5e6ad2; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 500; font-size: 14px; cursor: pointer; transition: background 0.2s; box-sizing: border-box;" onmouseover="this.style.background='#828fff'" onmouseout="this.style.background='#5e6ad2'">
+                    Login ke Hotspot
                 </button>
             </div>
         </div>
