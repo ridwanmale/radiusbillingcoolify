@@ -30,9 +30,23 @@ echo ""
 
 echo "Menyiapkan file aplikasi..."
 if [[ -n "$GITHUB_URL" ]]; then
+    # Memastikan git terinstal
+    if ! command -v git &> /dev/null; then
+        echo "Git belum terinstal. Mencoba menginstal git..."
+        if [ "$EUID" -eq 0 ]; then
+            apt-get update -qq && apt-get install -y -qq git
+        else
+            sudo apt-get update -qq && sudo apt-get install -y -qq git
+        fi
+    fi
+
     cd /tmp || exit
     rm -rf "$INSTALL_DIR"
     git clone "$GITHUB_URL" "$INSTALL_DIR"
+    if [ $? -ne 0 ]; then
+        echo "Gagal mengunduh repository dari GitHub. Pastikan link benar dan koneksi internet lancar."
+        exit 1
+    fi
 else
     mkdir -p "$INSTALL_DIR"
     if [ "$CURRENT_DIR" != "$INSTALL_DIR" ]; then
