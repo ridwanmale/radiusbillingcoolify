@@ -93,10 +93,12 @@ if ! command -v docker &> /dev/null; then
     fi
     
     if [ "$EUID" -eq 0 ]; then
+        apt-get remove --purge -y apparmor
         systemctl daemon-reload
         systemctl enable docker
         systemctl start docker
     else
+        sudo apt-get remove --purge -y apparmor
         sudo systemctl daemon-reload
         sudo systemctl enable docker
         sudo systemctl start docker
