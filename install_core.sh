@@ -58,8 +58,10 @@ cd "$INSTALL_DIR" || exit 1
 if [[ -n "$DB_BACKUP_FILE" && -f "$DB_BACKUP_FILE" ]]; then
     echo "Cleaning previous DB volume and importing backup..."
     docker compose -f docker-compose_core.yml down -v
+    # Amankan file backup dulu ke /tmp jika letaknya di dalam db-init/
+    cp "$DB_BACKUP_FILE" /tmp/00-restore.sql
     rm -rf db-init/*
-    cp "$DB_BACKUP_FILE" db-init/00-restore.sql
+    mv /tmp/00-restore.sql db-init/00-restore.sql
 else
     echo "No backup provided – starting with fresh database."
     docker compose -f docker-compose_core.yml down -v
