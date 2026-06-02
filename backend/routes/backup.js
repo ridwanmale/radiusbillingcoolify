@@ -5,6 +5,7 @@ const fs = require('fs');
 const { performBackup: performTelegramBackup } = require('../utils/telegramBackupService');
 const { performFTPBackup } = require('../utils/ftpBackupService');
 const { generateLocalBackup } = require('../utils/localBackupService');
+const { scheduleBackups } = require('../utils/backupScheduler');
 
 // ==========================================
 // INFO & SETTINGS
@@ -46,6 +47,10 @@ router.post('/telegram/settings', async (req, res) => {
       cron_time = VALUES(cron_time), 
       is_enabled = VALUES(is_enabled)
     `, [bot_token || '', chat_id || '', cron_time || '0 2 * * *', is_enabled ? 1 : 0]);
+    
+    // Reload schedules immediately
+    await scheduleBackups();
+    
     res.json({ message: 'Telegram settings saved successfully' });
   } catch (error) {
     console.error(error);
@@ -69,6 +74,10 @@ router.post('/ftp/settings', async (req, res) => {
       cron_time = VALUES(cron_time), 
       is_enabled = VALUES(is_enabled)
     `, [host || '', port || 21, username || '', password || '', remote_path || '/', cron_time || '0 2 * * *', is_enabled ? 1 : 0]);
+    
+    // Reload schedules immediately
+    await scheduleBackups();
+    
     res.json({ message: 'FTP settings saved successfully' });
   } catch (error) {
     console.error(error);

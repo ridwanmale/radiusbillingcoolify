@@ -541,67 +541,8 @@ if (process.env.ENABLE_TELEGRAM_BOT_LISTENER === 'true') {
   console.log('[Telegram Bot] Listener disabled (ENABLE_TELEGRAM_BOT_LISTENER is not true).');
 }
 
-// =============================================
-// BACKUP CRON JOBS (TELEGRAM & FTP)
-// =============================================
-const cron = require('node-cron');
-const { performBackup: performTelegramBackup } = require('./utils/telegramBackupService');
-const { performFTPBackup } = require('./utils/ftpBackupService');
+const { scheduleBackups } = require('./utils/backupScheduler');
 
-let telegramBackupTask = null;
-let ftpBackupTask = null;
-
-const scheduleBackups = async () => {
-  try {
-    // We use db.query directly to avoid connection leaks
-    const [tSettings] = await db.query('SELECT * FROM telegram_backup_settings WHERE id = 1');
-    const [fSettings] = await db.query('SELECT * FROM ftp_settings WHERE id = 1');
-
-    // --- TELEGRAM SCHEDULE ---
-    if (telegramBackupTask) {
-      telegramBackupTask.stop();
-      telegramBackupTask = null;
-    }
-    if (tSettings.length > 0 && tSettings[0].is_enabled) {
-      const tCron = tSettings[0].cron_time || '0 2 * * *';
-      console.log(`[Backup] Scheduling Telegram daily backup at: ${tCron}`);
-      telegramBackupTask = cron.schedule(tCron, async () => {
-        console.log('[Backup] Executing scheduled Telegram backup...');
-        try {
-          await performTelegramBackup();
-        } catch (error) {
-          console.error('[Backup] Scheduled Telegram backup failed:', error.message);
-        }
-      }, {
-        timezone: "Asia/Jakarta"
-      });
-    }
-
-    // --- FTP SCHEDULE ---
-    if (ftpBackupTask) {
-      ftpBackupTask.stop();
-      ftpBackupTask = null;
-    }
-    if (fSettings.length > 0 && fSettings[0].is_enabled) {
-      const fCron = fSettings[0].cron_time || '0 2 * * *';
-      console.log(`[Backup] Scheduling FTP daily backup at: ${fCron}`);
-      ftpBackupTask = cron.schedule(fCron, async () => {
-        console.log('[Backup] Executing scheduled FTP backup...');
-        try {
-          await performFTPBackup();
-        } catch (error) {
-          console.error('[Backup] Scheduled FTP backup failed:', error.message);
-        }
-      }, {
-        timezone: "Asia/Jakarta"
-      });
-    }
-
-  } catch (err) {
-    // If tables don't exist yet, it will fail silently
-  }
-};
-
-// Check for schedule on startup and every 5 minutes to see if settings changed
+// Check for schedule on startup and every 5 minutes as fallback
 scheduleBackups();
 setInterval(scheduleBackups, 5 * 60 * 1000);
