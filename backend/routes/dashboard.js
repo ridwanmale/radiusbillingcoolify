@@ -181,24 +181,69 @@ router.post('/kick', async (req, res) => {
       if (nasInfo && nasInfo.length > 0) {
         const { nasipaddress, secret, acctsessionid, framedipaddress } = nasInfo[0];
         
-        // Perintah radclient yang lebih lengkap (Username + Session ID + IP)
         let attributes = `User-Name=${user}`;
         if (acctsessionid) attributes += `,Acct-Session-Id=${acctsessionid}`;
         if (framedipaddress) attributes += `,Framed-IP-Address=${framedipaddress}`;
 
-        const cmd = `echo "${attributes}" | radclient -x ${nasipaddress}:3799 disconnect ${secret}`;
-        
-        await new Promise((resolve) => {
-          exec(cmd, (error, stdout, stderr) => {
-            if (error) {
-              console.error(`Kick Error ${user}:`, stderr || error.message);
-              results.push({ username: user, status: 'Failed', error: stderr || error.message });
-            } else {
-              results.push({ username: user, status: 'Sent' });
-            }
-            resolve();
+        const dbHost = process.env.DB_HOST || '127.0.0.1';
+        const isRemote = dbHost !== '127.0.0.1' && dbHost !== 'localhost';
+
+        if (isRemote) {
+          // Send request to Core Server's webhook to execute kick locally on the Core Server
+          const http = require('http');
+          const postData = JSON.stringify({ nasipaddress, secret, attributes });
+          
+          await new Promise((resolve) => {
+            const req = http.request({
+              hostname: dbHost,
+              port: 8080,
+              path: '/kick',
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(postData)
+              },
+              timeout: 5000
+            }, (res) => {
+              if (res.statusCode >= 200 && res.statusCode < 300) {
+                results.push({ username: user, status: 'Sent via Remote Proxy' });
+              } else {
+                results.push({ username: user, status: 'Failed', error: `Core Server webhook returned status ${res.statusCode}` });
+              }
+              resolve();
+            });
+
+            req.on('error', (e) => {
+              console.error(`Kick Error Remote ${user}:`, e.message);
+              results.push({ username: user, status: 'Failed', error: 'Remote webhook error: ' + e.message });
+              resolve();
+            });
+
+            req.on('timeout', () => {
+              req.destroy();
+              console.error(`Kick Error Remote ${user}: Timeout`);
+              results.push({ username: user, status: 'Failed', error: 'Remote webhook timeout' });
+              resolve();
+            });
+
+            req.write(postData);
+            req.end();
           });
-        });
+        } else {
+          // Local execution (for Single VPS setup)
+          const cmd = `echo "${attributes}" | radclient -x ${nasipaddress}:3799 disconnect ${secret}`;
+          await new Promise((resolve) => {
+            exec(cmd, (error, stdout, stderr) => {
+              if (error) {
+                console.error(`Kick Error ${user}:`, stderr || error.message);
+                results.push({ username: user, status: 'Failed', error: stderr || error.message });
+              } else {
+                results.push({ username: user, status: 'Sent' });
+              }
+              resolve();
+            });
+          });
+        }
       } else {
         results.push({ username: user, status: 'Not Online' });
       }

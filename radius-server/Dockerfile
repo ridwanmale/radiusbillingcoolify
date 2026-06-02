@@ -6,7 +6,8 @@ RUN apk update && apk add --no-cache \
     freeradius-mysql \
     freeradius-utils \
     mariadb-client \
-    netcat-openbsd
+    netcat-openbsd \
+    python3
 
 # Enable SQL module
 RUN ln -sf /etc/raddb/mods-available/sql /etc/raddb/mods-enabled/sql
@@ -23,6 +24,7 @@ RUN sed -i '/^DEFAULT/a \	Reply-Message =* ANY,' /etc/raddb/mods-config/attr_fil
 COPY clients.conf /etc/raddb/clients.conf
 COPY sql.conf /etc/raddb/mods-available/sql
 COPY default /etc/raddb/sites-available/default
+COPY webhook.py /webhook.py
 COPY entrypoint.sh /entrypoint.sh
 
 # Set permissions
