@@ -230,10 +230,7 @@ const upgradePool = async (pool, name) => {
 // Database migration check running on both Primary (LXC 1) and Backup (LXC 3) Pools
 const initDbUpgrades = async () => {
   console.log('[DB UPGRADE] Starting database schema migrations...');
-  await upgradePool(db.primaryPool, 'Primary Database (LXC 1)');
-  if (db.backupPool) {
-    await upgradePool(db.backupPool, 'Backup Database (LXC 3)');
-  }
+  await upgradePool(db, 'Radius Database');
   console.log('[DB UPGRADE] Finished database schema migrations check.');
 };
 initDbUpgrades();
@@ -536,9 +533,7 @@ let gdriveBackupTask = null;
 
 const scheduleGDriveBackup = async () => {
   try {
-    const connection = await db.getConnection();
-    const [settings] = await connection.query('SELECT * FROM gdrive_settings WHERE id = 1');
-    connection.release();
+    const [settings] = await db.query('SELECT * FROM gdrive_settings WHERE id = 1');
 
     if (gdriveBackupTask) {
       gdriveBackupTask.stop();
