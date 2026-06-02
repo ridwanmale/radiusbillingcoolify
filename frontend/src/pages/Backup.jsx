@@ -22,8 +22,12 @@ const Backup = () => {
       setLoading(true);
       const res = await axios.get('/api/backup');
       setServiceEmail(res.data.serviceEmail);
-      if (res.data.gdriveSettings) setGdriveSettings(res.data.gdriveSettings);
-      if (res.data.ftpSettings) setFtpSettings(res.data.ftpSettings);
+      if (res.data.gdriveSettings) {
+        setGdriveSettings(res.data.gdriveSettings);
+      }
+      if (res.data.ftpSettings) {
+        setFtpSettings(res.data.ftpSettings);
+      }
       setLastBackup(res.data.lastBackup);
 
       const logsRes = await axios.get('/api/backup/logs');
@@ -33,6 +37,25 @@ const Backup = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Helper to convert cron (e.g. "0 2 * * *") to HH:mm (e.g. "02:00")
+  const parseCronToTime = (cronString) => {
+    if (!cronString) return '02:00';
+    const parts = cronString.split(' ');
+    if (parts.length >= 2) {
+      const min = parts[0].padStart(2, '0');
+      const hour = parts[1].padStart(2, '0');
+      return `${hour}:${min}`;
+    }
+    return '02:00';
+  };
+
+  // Helper to convert HH:mm to cron
+  const parseTimeToCron = (timeString) => {
+    if (!timeString) return '0 2 * * *';
+    const [h, m] = timeString.split(':');
+    return `${parseInt(m)} ${parseInt(h)} * * *`;
   };
 
   const saveGdriveSettings = async (e) => {
@@ -258,9 +281,16 @@ const Backup = () => {
                   <input type="text" value={gdriveSettings.folder_id} onChange={e => setGdriveSettings({...gdriveSettings, folder_id: e.target.value})} style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #23252a', background: 'rgba(0,0,0,0.2)', color: 'white' }} placeholder="Kosongkan untuk direktori root" />
                 </div>
                 <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem', marginBottom: '6px' }}>Jadwal Cron</label>
-                  <input type="text" value={gdriveSettings.cron_time} onChange={e => setGdriveSettings({...gdriveSettings, cron_time: e.target.value})} style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #23252a', background: 'rgba(0,0,0,0.2)', color: 'white' }} placeholder="0 2 * * *" />
-                  <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginTop: '6px' }}>Format cron (contoh: <code>0 2 * * *</code> untuk setiap jam 2 pagi)</p>
+                  <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem', marginBottom: '6px' }}>Jam Backup Harian (Waktu Server)</label>
+                  <input 
+                    type="time" 
+                    value={parseCronToTime(gdriveSettings.cron_time)} 
+                    onChange={e => setGdriveSettings({...gdriveSettings, cron_time: parseTimeToCron(e.target.value)})} 
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #23252a', background: 'rgba(0,0,0,0.2)', color: 'white' }} 
+                  />
+                  <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginTop: '6px' }}>
+                    Data akan dibackup dan diunggah ke Google Drive setiap hari pada jam tersebut.
+                  </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' }}>
                   <div 
@@ -331,8 +361,16 @@ const Backup = () => {
                 </div>
                 
                 <div style={{ marginBottom: '1.5rem' }}>
-                  <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem', marginBottom: '6px' }}>Jadwal Cron</label>
-                  <input type="text" value={ftpSettings.cron_time} onChange={e => setFtpSettings({...ftpSettings, cron_time: e.target.value})} style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #23252a', background: 'rgba(0,0,0,0.2)', color: 'white' }} placeholder="0 2 * * *" />
+                  <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem', marginBottom: '6px' }}>Jam Backup Harian (Waktu Server)</label>
+                  <input 
+                    type="time" 
+                    value={parseCronToTime(ftpSettings.cron_time)} 
+                    onChange={e => setFtpSettings({...ftpSettings, cron_time: parseTimeToCron(e.target.value)})} 
+                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #23252a', background: 'rgba(0,0,0,0.2)', color: 'white' }} 
+                  />
+                  <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginTop: '6px' }}>
+                    Data akan dibackup dan dikirim ke server FTP setiap hari pada jam tersebut.
+                  </p>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' }}>
