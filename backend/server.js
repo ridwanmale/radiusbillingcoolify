@@ -38,7 +38,7 @@ const paymentMethodsRoutes = require('./routes/payment_methods');
 const paymentDetectionRoutes = require('./routes/payment_detections');
 const voucherTypesRoutes = require('./routes/voucher_types');
 const mikrotikScriptRoutes = require('./routes/mikrotik_scripts');
-const gdriveBackupRoutes = require('./routes/gdriveBackup');
+const backupRoutes = require('./routes/backup');
 
 
 // API Routes (Dahulukan API)
@@ -66,7 +66,7 @@ app.use('/api/payment-methods', paymentMethodsRoutes);
 app.use('/api/payment-detections', paymentDetectionRoutes);
 app.use('/api/voucher-types', voucherTypesRoutes);
 app.use('/api/mikrotik-scripts', mikrotikScriptRoutes);
-app.use('/api/gdrive-backup', gdriveBackupRoutes);
+app.use('/api/backup', backupRoutes);
 
 
 // Health check endpoint
@@ -193,7 +193,7 @@ const upgradePool = async (pool, name) => {
       console.log(`[DB UPGRADE] Column code_length successfully added on ${name}.`);
     }
 
-    // 4. Create GDrive Backup Tables
+    // 4. Create Backup Tables
     await pool.query(`
       CREATE TABLE IF NOT EXISTS gdrive_settings (
         id INT NOT NULL PRIMARY KEY DEFAULT 1,
@@ -205,6 +205,23 @@ const upgradePool = async (pool, name) => {
     await pool.query(`
       INSERT IGNORE INTO gdrive_settings (id, folder_id, cron_time, is_enabled)
       VALUES (1, '', '0 2 * * *', 0)
+    `);
+    
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS ftp_settings (
+        id INT NOT NULL PRIMARY KEY DEFAULT 1,
+        host VARCHAR(255) DEFAULT '',
+        port INT DEFAULT 21,
+        username VARCHAR(255) DEFAULT '',
+        password VARCHAR(255) DEFAULT '',
+        remote_path VARCHAR(255) DEFAULT '/',
+        cron_time VARCHAR(64) DEFAULT '0 2 * * *',
+        is_enabled TINYINT(1) DEFAULT 0
+      ) ENGINE=InnoDB;
+    `);
+    await pool.query(`
+      INSERT IGNORE INTO ftp_settings (id, host, port, username, password, remote_path, cron_time, is_enabled)
+      VALUES (1, '', 21, '', '', '/', '0 2 * * *', 0)
     `);
     await pool.query(`
       CREATE TABLE IF NOT EXISTS backup_logs (
@@ -524,41 +541,62 @@ if (process.env.ENABLE_TELEGRAM_BOT_LISTENER === 'true') {
 }
 
 // =============================================
-// GDRIVE BACKUP CRON JOB
+// BACKUP CRON JOBS (GDRIVE & FTP)
 // =============================================
 const cron = require('node-cron');
-const { performBackup } = require('./utils/gdriveBackupService');
+const { performBackup: performGDriveBackup } = require('./utils/gdriveBackupService');
+const { performFTPBackup } = require('./utils/ftpBackupService');
 
 let gdriveBackupTask = null;
+let ftpBackupTask = null;
 
-const scheduleGDriveBackup = async () => {
+const scheduleBackups = async () => {
   try {
-    const [settings] = await db.query('SELECT * FROM gdrive_settings WHERE id = 1');
+    // We use db.query directly to avoid connection leaks
+    const [gSettings] = await db.query('SELECT * FROM gdrive_settings WHERE id = 1');
+    const [fSettings] = await db.query('SELECT * FROM ftp_settings WHERE id = 1');
 
+    // --- GDRIVE SCHEDULE ---
     if (gdriveBackupTask) {
       gdriveBackupTask.stop();
       gdriveBackupTask = null;
     }
-
-    if (settings.length > 0 && settings[0].is_enabled) {
-      const cronTime = settings[0].cron_time || '0 2 * * *';
-      console.log(`[GDrive Backup] Scheduling daily backup at: ${cronTime}`);
-      gdriveBackupTask = cron.schedule(cronTime, async () => {
-        console.log('[GDrive Backup] Executing scheduled backup...');
+    if (gSettings.length > 0 && gSettings[0].is_enabled) {
+      const gCron = gSettings[0].cron_time || '0 2 * * *';
+      console.log(`[Backup] Scheduling GDrive daily backup at: ${gCron}`);
+      gdriveBackupTask = cron.schedule(gCron, async () => {
+        console.log('[Backup] Executing scheduled GDrive backup...');
         try {
-          await performBackup();
-          console.log('[GDrive Backup] Scheduled backup completed successfully.');
+          await performGDriveBackup();
         } catch (error) {
-          console.error('[GDrive Backup] Scheduled backup failed:', error.message);
+          console.error('[Backup] Scheduled GDrive backup failed:', error.message);
         }
       });
     }
+
+    // --- FTP SCHEDULE ---
+    if (ftpBackupTask) {
+      ftpBackupTask.stop();
+      ftpBackupTask = null;
+    }
+    if (fSettings.length > 0 && fSettings[0].is_enabled) {
+      const fCron = fSettings[0].cron_time || '0 2 * * *';
+      console.log(`[Backup] Scheduling FTP daily backup at: ${fCron}`);
+      ftpBackupTask = cron.schedule(fCron, async () => {
+        console.log('[Backup] Executing scheduled FTP backup...');
+        try {
+          await performFTPBackup();
+        } catch (error) {
+          console.error('[Backup] Scheduled FTP backup failed:', error.message);
+        }
+      });
+    }
+
   } catch (err) {
-    // If table doesn't exist yet, it will fail silently here, which is fine before init
-    // console.error('[GDrive Backup] Failed to schedule cron job:', err.message);
+    // If tables don't exist yet, it will fail silently
   }
 };
 
 // Check for schedule on startup and every 5 minutes to see if settings changed
-scheduleGDriveBackup();
-setInterval(scheduleGDriveBackup, 5 * 60 * 1000);
+scheduleBackups();
+setInterval(scheduleBackups, 5 * 60 * 1000);

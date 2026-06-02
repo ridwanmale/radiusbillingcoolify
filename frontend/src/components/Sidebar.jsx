@@ -339,7 +339,7 @@ const Sidebar = ({ onLogout, user, appSettings, onCloseMobile }) => {
 
             <div className="nav-item-dropdown">
               <button 
-                className={`nav-link dropdown-toggle ${isGroupActive(['/settings-telegram', '/admin-users', '/settings', '/gdrive-backup']) ? 'active' : ''}`}
+                className={`nav-link dropdown-toggle ${isGroupActive(['/settings-telegram', '/admin-users', '/settings', '/backup']) ? 'active' : ''}`}
                 onClick={() => toggleMenu('adminGroup')}
                 style={{ borderRadius: '12px', marginBottom: '4px', width: '100%' }}
               >
@@ -367,8 +367,8 @@ const Sidebar = ({ onLogout, user, appSettings, onCloseMobile }) => {
                    </Link>
                 )}
                 {isAllowed('gdrive_backup') && (
-                  <Link to="/gdrive-backup" className={`nav-link nested-link ${isPathActive('/gdrive-backup') ? 'active' : ''}`}>
-                     Backup GDrive
+                  <Link to="/backup" className={`nav-link nested-link ${isPathActive('/backup') ? 'active' : ''}`}>
+                     Backup System
                   </Link>
                 )}
                 <Link to="/audit-trail" className={`nav-link nested-link ${isPathActive('/audit-trail') ? 'active' : ''}`}>

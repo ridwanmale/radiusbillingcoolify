@@ -188,4 +188,5 @@ async function performBackup() {
 module.exports = {
   getServiceAccountEmail,
   performBackup,
+  SERVICE_ACCOUNT_FILE
 };

@@ -46,8 +46,7 @@ import OnlineStoreCenter from './pages/OnlineStoreCenter';
 import PppoeIsolirDesign from './pages/pppoe/IsolirDesign';
 import PaymentBridgeCenter from './pages/PaymentBridgeCenter';
 import MikrotikScriptTemplate from './pages/MikrotikScriptTemplate';
-import GdriveBackup from './pages/GdriveBackup';
-
+import Backup from './pages/Backup';
 
 
 
@@ -161,7 +160,7 @@ const App = () => {
                 <Route path="/admin-users" element={<AdminUsers user={user} />} />
                 <Route path="/audit-trail" element={<AuditTrail user={user} />} />
                 <Route path="/settings" element={<AppSettings user={user} />} />
-                <Route path="/gdrive-backup" element={<GdriveBackup user={user} />} />
+                <Route path="/backup" element={<Backup user={user} />} />
                 <Route path="/settings-telegram" element={<SettingTelegram user={user} />} />
                 <Route path="/setting-midtrans" element={<SettingMidtrans user={user} />} />
                 <Route path="/setting-duitku" element={<SettingDuitku user={user} />} />
