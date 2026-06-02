@@ -47,8 +47,11 @@ async function performFTPBackup() {
 
     // 3. Upload to FTP
     console.log(`[FTP Backup] Uploading ${fileName} to ${ftpConfig.host}...`);
-    const client = new ftp.Client();
+    const client = new ftp.Client(15000); // 15 seconds timeout
     client.ftp.verbose = false;
+    
+    // Force IPv4 to prevent EPSV issues with Mikrotik
+    client.ftp.ipFamily = 4;
     
     await client.access({
       host: ftpConfig.host,
@@ -56,6 +59,11 @@ async function performFTPBackup() {
       user: ftpConfig.username,
       password: ftpConfig.password,
       secure: false
+    });
+
+    // Mikrotik doesn't like some commands, make sure we handle it gently
+    client.trackProgress(info => {
+        console.log(`[FTP Backup] Progress: ${info.bytes} bytes`);
     });
 
     const remotePath = ftpConfig.remote_path || '/';
