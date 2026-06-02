@@ -194,7 +194,7 @@ const GdriveBackup = ({ user }) => {
             <div>
               <h3 style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: '600' }}>Service Account Belum Dikonfigurasi</h3>
               <p style={{ margin: 0, fontSize: '13px', color: '#fca5a5', lineHeight: '1.5' }}>
-                Sistem tidak menemukan file kredensial Google Drive Anda. Silakan ikuti panduan di dokumentasi untuk mengunduh <code>service-account.json</code> dari Google Cloud, lalu letakkan di folder <code>backend/config/</code> pada server Anda.
+                Sistem tidak menemukan file kredensial Google Drive Anda.
               </p>
             </div>
           </div>
