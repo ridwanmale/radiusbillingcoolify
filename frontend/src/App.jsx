@@ -14,7 +14,7 @@ import RekapVoucher from './pages/RekapVoucher';
 import NasMikrotik from './pages/NasMikrotik';
 import TripayVendor from './pages/TripayVendor';
 import Transaksi from './pages/Transaksi';
-import MetodePembayaran from './pages/MetodePembayaran';
+
 import SettingTripayGlobal from './pages/SettingTripayGlobal';
 import TemplateVoucher from './pages/TemplateVoucher';
 import PrintPage from './pages/PrintPage';
@@ -153,7 +153,7 @@ const App = () => {
                 <Route path="/nas" element={<NasMikrotik user={user} />} />
                 <Route path="/vendor/tripay" element={<TripayVendor user={user} />} />
                 <Route path="/transaksi" element={<Transaksi user={user} />} />
-                <Route path="/metode-pembayaran" element={<MetodePembayaran user={user} />} />
+
                 <Route path="/setting-tripay" element={<SettingTripayGlobal user={user} />} />
                 <Route path="/template-voucher" element={<TemplateVoucher user={user} />} />
                 <Route path="/admin-users" element={<AdminUsers user={user} />} />

@@ -19,9 +19,11 @@ RUN sed -i 's/^[[:space:]]*#[[:space:]]*sql\([[:space:]]*\)$/	sql\1/g' /etc/radd
 COPY clients.conf /etc/raddb/clients.conf
 COPY sql.conf /etc/raddb/mods-available/sql
 COPY default /etc/raddb/sites-available/default
+COPY entrypoint.sh /entrypoint.sh
 
 # Set permissions
 RUN chown -R radius:radius /etc/raddb
+RUN chmod +x /entrypoint.sh
 
-# Run FreeRADIUS in foreground with logging to stdout
-CMD ["radiusd", "-f", "-l", "stdout"]
+# Run via entrypoint to support webhook reloads
+CMD ["/entrypoint.sh"]

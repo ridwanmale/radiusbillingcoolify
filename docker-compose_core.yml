@@ -9,8 +9,7 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-radius}
       MYSQL_USER: ${MYSQL_USER:-radius}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:?}
-      TZ: Asia/Jakarta
-    command: ["mysqld", "--default-time-zone=+07:00", "--log_bin_trust_function_creators=1"]
+    command: ["mysqld", "--default-time-zone=+07:00", "--log_bin_trust_function_creators=1", "--default-authentication-plugin=mysql_native_password"]
     ports:
       - "3306:3306" # Dibuka agar Web Server bisa connect
     privileged: true
@@ -25,7 +24,10 @@ services:
       dockerfile: Dockerfile
     environment:
       TZ: Asia/Jakarta
+      MYSQL_USER: ${MYSQL_USER:-radius}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?}
     ports:
+      - "8080:8080" # Webhook port for radius reload
       - "1812:1812/udp"
       - "1813:1813/udp"
       - "1814:1812/udp"
