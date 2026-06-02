@@ -21,6 +21,11 @@ read -p "Masukkan path direktori instalasi (tekan Enter untuk default: /opt/radi
 INSTALL_DIR=${INSTALL_DIR:-/opt/radiusbilling-core}
 INSTALL_DIR=${INSTALL_DIR%/}
 
+# Konversi DB_BACKUP_FILE ke absolute path agar tidak error setelah cd
+if [[ -n "$DB_BACKUP_FILE" && "$DB_BACKUP_FILE" != /* ]]; then
+    DB_BACKUP_FILE="$CURRENT_DIR/$DB_BACKUP_FILE"
+fi
+
 while [[ -z "$MYSQL_ROOT_PASSWORD" ]]; do
     read -p "Masukkan MySQL Root Password: " MYSQL_ROOT_PASSWORD
 done
