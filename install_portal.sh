@@ -20,9 +20,15 @@ INSTALL_DIR=${INSTALL_DIR:-/opt/radiusbilling-portal}
 INSTALL_DIR=${INSTALL_DIR%/}
 
 read -p "Masukkan URL Web Admin Anda (Contoh: https://admin.domain.com atau http://192.168.1.10:8088): " INPUT_WEB_ADMIN_URL
-WEB_ADMIN_URL=${INPUT_WEB_ADMIN_URL:-http://127.0.0.1:8088}
-# Bersihkan slash di akhir URL jika ada
-WEB_ADMIN_URL=${WEB_ADMIN_URL%/}
+
+if [[ -z "$INPUT_WEB_ADMIN_URL" ]]; then
+    # Jika dikosongkan, kita gunakan template dinamis berbasis window.location.hostname 
+    # agar bisa berjalan otomatis jika diinstal di VPS yang sama dengan web admin tanpa domain.
+    WEB_ADMIN_URL='http://${window.location.hostname}:8088'
+else
+    # Bersihkan slash di akhir URL jika ada
+    WEB_ADMIN_URL=${INPUT_WEB_ADMIN_URL%/}
+fi
 
 # Meminta port dari pengguna
 read -p "Masukkan port yang ingin digunakan untuk portal ini [Default: 8089]: " INPUT_PORT
@@ -65,7 +71,7 @@ fi
 cd "$INSTALL_DIR" || exit 1
 
 echo "Menginjeksi URL Web Admin ke dalam portal.js..."
-sed -i "s|const API_URL.*|const API_URL = '${WEB_ADMIN_URL}/api';|g" portal/portal.js
+sed -i "s|const API_URL.*|const API_URL = \`${WEB_ADMIN_URL}/api\`;|g" portal/portal.js
 
 # Export port sebagai environment variable untuk docker-compose
 export PORTAL_PORT=$PORTAL_PORT

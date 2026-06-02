@@ -115,7 +115,7 @@ cd "$INSTALL_DIR" || { echo "Gagal masuk ke direktori $INSTALL_DIR"; exit 1; }
 
 if [[ -n "$WEB_ADMIN_URL" ]]; then
     echo "Menginjeksi URL Web Admin ke dalam portal.js..."
-    sed -i "s|const API_URL.*|const API_URL = '${WEB_ADMIN_URL}/api';|g" portal/portal.js
+    sed -i "s|const API_URL.*|const API_URL = \`${WEB_ADMIN_URL}/api\`;|g" portal/portal.js
 fi
 
 # Memproses file backup database jika diinputkan
