@@ -229,11 +229,6 @@ const Sidebar = ({ onLogout, user, appSettings, onCloseMobile }) => {
                    Monitoring Online
                 </Link>
               )}
-              {isAllowed('pppoe_history') && (
-                <Link to="/pppoe/history" className={`nav-link nested-link ${isPathActive('/pppoe/history') ? 'active' : ''}`}>
-                   Riwayat Koneksi
-                </Link>
-              )}
               
               {/* Nested Billing Group */}
               {isAllowed('pppoe_billing') && (

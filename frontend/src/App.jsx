@@ -37,7 +37,6 @@ import PppoePackages from './pages/pppoe/Packages';
 import PppoeCustomers from './pages/pppoe/Customers';
 import PppoeMonitoring from './pages/pppoe/Monitoring';
 import PppoeInvoices from './pages/pppoe/Invoices';
-import PppoeHistory from './pages/pppoe/History';
 import PppoeCycles from './pages/pppoe/Cycles';
 import PppoeIsolirList from './pages/pppoe/IsolirList';
 import PppoePayments from './pages/pppoe/Payments';
@@ -176,7 +175,6 @@ const App = () => {
                 <Route path="/pppoe/packages" element={<PppoePackages user={user} />} />
                 <Route path="/pppoe/customers" element={<PppoeCustomers user={user} />} />
                 <Route path="/pppoe/monitoring" element={<PppoeMonitoring user={user} />} />
-                <Route path="/pppoe/history" element={<PppoeHistory user={user} />} />
                 <Route path="/pppoe/billing/invoices" element={<PppoeInvoices user={user} />} />
                 <Route path="/pppoe/billing/payments" element={<PppoePayments user={user} />} />
                 <Route path="/pppoe/billing/cycles" element={<PppoeCycles user={user} />} />
