@@ -147,7 +147,7 @@ async function performBackup() {
 
     console.log(`Starting mysqldump to ${filePath}...`);
     // NOTE: In production, consider using a safer way to pass password, but for standard mysqldump:
-    const dumpCmd = \`mysqldump -h \${dbHost} -u \${dbUser} -p\${dbPass} \${dbName} > \${filePath}\`;
+    const dumpCmd = `mysqldump -h ${dbHost} -u ${dbUser} -p${dbPass} ${dbName} > "${filePath}"`;
     
     await execAsync(dumpCmd);
     
