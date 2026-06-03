@@ -288,6 +288,16 @@ const upgradePool = async (pool, name) => {
       ) ENGINE=InnoDB;
     `);
 
+    // 9. Create Permanent Blacklist UUID Table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS blacklist_uuid (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        device_id VARCHAR(128) NOT NULL UNIQUE,
+        reason VARCHAR(255),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB;
+    `);
+
     await pool.query(
       'INSERT IGNORE INTO role_menu_access (role, menu_id, is_allowed) VALUES (?, ?, ?)',
       ['superadmin', 'telegram_backup', 1]
