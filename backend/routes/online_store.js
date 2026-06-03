@@ -164,6 +164,18 @@ router.post('/settings', async (req, res) => {
     const success_message_html = req.body.success_message_html !== undefined ? req.body.success_message_html : existing.success_message_html;
     const outside_network_message_html = req.body.outside_network_message_html !== undefined ? req.body.outside_network_message_html : existing.outside_network_message_html;
 
+    let auto_cleanup_enabled = existing.auto_cleanup_enabled;
+    if (req.body.auto_cleanup_enabled !== undefined) {
+      auto_cleanup_enabled = req.body.auto_cleanup_enabled ? 1 : 0;
+    }
+    const auto_cleanup_hours = req.body.auto_cleanup_hours !== undefined ? req.body.auto_cleanup_hours : existing.auto_cleanup_hours;
+
+    let spam_protection_enabled = existing.spam_protection_enabled;
+    if (req.body.spam_protection_enabled !== undefined) {
+      spam_protection_enabled = req.body.spam_protection_enabled ? 1 : 0;
+    }
+    const spam_max_pending = req.body.spam_max_pending !== undefined ? req.body.spam_max_pending : existing.spam_max_pending;
+
     // Konversi is_active ke boolean/tinyint
     let is_active = existing.is_active;
     if (req.body.is_active !== undefined) {
@@ -222,7 +234,8 @@ router.post('/settings', async (req, res) => {
           enable_schedule = ?, open_time = ?, close_time = ?,
           duitku_merchant_code = ?, duitku_api_key = ?, duitku_is_sandbox = ?,
           tripay_api_key = ?, tripay_private_key = ?, tripay_merchant_code = ?, tripay_is_sandbox = ?,
-          enable_payment_bridge = ?, enable_midtrans = ?, enable_duitku = ?, enable_tripay = ?, success_message_html = ?, outside_network_message_html = ?
+          enable_payment_bridge = ?, enable_midtrans = ?, enable_duitku = ?, enable_tripay = ?, success_message_html = ?, outside_network_message_html = ?,
+          auto_cleanup_enabled = ?, auto_cleanup_hours = ?, spam_protection_enabled = ?, spam_max_pending = ?
       WHERE id = 1
     `, [
       portal_title, portal_description, primary_color, qris_static_string,
@@ -230,7 +243,8 @@ router.post('/settings', async (req, res) => {
       enable_schedule, open_time, close_time,
       duitku_merchant_code, duitku_api_key, duitku_is_sandbox,
       tripay_api_key, tripay_private_key, tripay_merchant_code, tripay_is_sandbox,
-      enable_payment_bridge, enable_midtrans, enable_duitku, enable_tripay, success_message_html, outside_network_message_html
+      enable_payment_bridge, enable_midtrans, enable_duitku, enable_tripay, success_message_html, outside_network_message_html,
+      auto_cleanup_enabled, auto_cleanup_hours, spam_protection_enabled, spam_max_pending
     ]);
 
     // 4. Update settings (dns_name) jika hotspot_login_url dikirimkan
