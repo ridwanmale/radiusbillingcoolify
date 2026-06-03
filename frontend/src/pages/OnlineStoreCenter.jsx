@@ -33,6 +33,7 @@ const OnlineStoreCenter = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [qrisList, setQrisList] = useState([{ name: 'QRIS Utama', payload: '' }]);
   const [isQrisModalOpen, setIsQrisModalOpen] = useState(false);
+  const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false);
   const [editingQrisIndex, setEditingQrisIndex] = useState(-1);
   const [tempQris, setTempQris] = useState({ name: '', payload: '' });
 
@@ -361,56 +362,11 @@ const OnlineStoreCenter = () => {
                   Keamanan & Anti Spam
                 </h3>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
-                  <div className="form-group">
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'white', fontWeight: '600' }}>
-                      <input 
-                        type="checkbox" 
-                        checked={settings.auto_cleanup_enabled} 
-                        onChange={e => setSettings({...settings, auto_cleanup_enabled: e.target.checked})} 
-                        style={{ width: '18px', height: '18px', accentColor: '#10b981' }}
-                      />
-                      Aktifkan Auto-Cleanup
-                    </label>
-                    <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '5px 0 0 26px' }}>Otomatis menghapus transaksi PENDING untuk menghindari penumpukan data.</p>
-                  </div>
-                  {settings.auto_cleanup_enabled && (
-                    <div className="form-group">
-                      <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Hapus transaksi lebih tua dari (Jam)</label>
-                      <input 
-                        type="number" 
-                        className="form-input-premium" 
-                        value={settings.auto_cleanup_hours || 24} 
-                        onChange={e => setSettings({...settings, auto_cleanup_hours: parseInt(e.target.value)})} 
-                      />
-                    </div>
-                  )}
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '30px' }}>
-                  <div className="form-group">
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'white', fontWeight: '600' }}>
-                      <input 
-                        type="checkbox" 
-                        checked={settings.spam_protection_enabled} 
-                        onChange={e => setSettings({...settings, spam_protection_enabled: e.target.checked})} 
-                        style={{ width: '18px', height: '18px', accentColor: '#ef4444' }}
-                      />
-                      Aktifkan Proteksi Spam (Rate Limit)
-                    </label>
-                    <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '5px 0 0 26px' }}>Memblokir perangkat yang membuat banyak transaksi PENDING berturut-turut.</p>
-                  </div>
-                  {settings.spam_protection_enabled && (
-                    <div className="form-group">
-                      <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Batas Maksimal Transaksi PENDING</label>
-                      <input 
-                        type="number" 
-                        className="form-input-premium" 
-                        value={settings.spam_max_pending || 3} 
-                        onChange={e => setSettings({...settings, spam_max_pending: parseInt(e.target.value)})} 
-                      />
-                    </div>
-                  )}
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+                  <button type="button" onClick={() => setIsSecurityModalOpen(true)} className="btn-primary-premium" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '10px 15px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.2s' }}>
+                    <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>settings</span>
+                    Pengaturan Keamanan
+                  </button>
                 </div>
 
                 <h4 style={{ margin: '0 0 15px 0', fontSize: '1rem', color: '#fca5a5' }}>Daftar Perangkat Terblokir</h4>
@@ -501,6 +457,75 @@ const OnlineStoreCenter = () => {
                 setIsQrisModalOpen(false);
               }} style={{ flex: 1, padding: '12px', background: '#38bdf8', color: '#0a0a0c', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: '800' }}>Simpan</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL KEAMANAN */}
+      {isSecurityModalOpen && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', backdropFilter: 'blur(5px)' }}>
+          <div className="glass-card fade-in" style={{ width: '100%', maxWidth: '600px', padding: '25px', background: '#1e1e24', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <h3 style={{ margin: '0 0 20px 0', fontSize: '1.2rem', fontWeight: '800', color: 'white', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '10px' }}>
+              <span className="material-symbols-rounded" style={{ color: '#ef4444' }}>shield</span>
+              Pengaturan Keamanan & Anti Spam
+            </h3>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+              <div className="form-group">
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'white', fontWeight: '600' }}>
+                  <input 
+                    type="checkbox" 
+                    checked={settings.auto_cleanup_enabled} 
+                    onChange={e => setSettings({...settings, auto_cleanup_enabled: e.target.checked})} 
+                    style={{ width: '18px', height: '18px', accentColor: '#10b981' }}
+                  />
+                  Aktifkan Auto-Cleanup
+                </label>
+                <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '5px 0 0 26px' }}>Otomatis menghapus transaksi PENDING untuk menghindari penumpukan data.</p>
+              </div>
+              {settings.auto_cleanup_enabled && (
+                <div className="form-group">
+                  <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Hapus transaksi lebih tua dari (Jam)</label>
+                  <input 
+                    type="number" 
+                    className="form-input-premium" 
+                    value={settings.auto_cleanup_hours || 24} 
+                    onChange={e => setSettings({...settings, auto_cleanup_hours: parseInt(e.target.value)})} 
+                  />
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '30px' }}>
+              <div className="form-group">
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'white', fontWeight: '600' }}>
+                  <input 
+                    type="checkbox" 
+                    checked={settings.spam_protection_enabled} 
+                    onChange={e => setSettings({...settings, spam_protection_enabled: e.target.checked})} 
+                    style={{ width: '18px', height: '18px', accentColor: '#ef4444' }}
+                  />
+                  Aktifkan Proteksi Spam (Rate Limit)
+                </label>
+                <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '5px 0 0 26px' }}>Memblokir perangkat yang membuat banyak transaksi PENDING berturut-turut.</p>
+              </div>
+              {settings.spam_protection_enabled && (
+                <div className="form-group">
+                  <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Batas Maksimal Transaksi PENDING</label>
+                  <input 
+                    type="number" 
+                    className="form-input-premium" 
+                    value={settings.spam_max_pending || 3} 
+                    onChange={e => setSettings({...settings, spam_max_pending: parseInt(e.target.value)})} 
+                  />
+                </div>
+              )}
+            </div>
+            
+            <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+              <button type="button" onClick={() => setIsSecurityModalOpen(false)} style={{ flex: 1, padding: '12px', background: '#38bdf8', color: '#0a0a0c', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: '800' }}>Terapkan & Tutup</button>
+            </div>
+            <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '15px', textAlign: 'center' }}>* Pastikan menekan tombol "Simpan Konfigurasi" di bagian bawah layar utama untuk menyimpan permanen.</p>
           </div>
         </div>
       )}
