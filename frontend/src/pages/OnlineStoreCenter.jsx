@@ -106,7 +106,7 @@ const OnlineStoreCenter = () => {
 
               <div className="form-group" style={{ marginBottom: '20px' }}>
                 <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Pesan Sukses (Setelah Pembayaran)</label>
-                <div style={{ background: 'white', borderRadius: '8px', color: 'black' }}>
+                <div className="quill-dark">
                   <ReactQuill 
                     theme="snow" 
                     value={settings.success_message_html || ''} 
@@ -126,7 +126,7 @@ const OnlineStoreCenter = () => {
 
               <div className="form-group" style={{ marginBottom: '20px' }}>
                 <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Pesan Luar Jaringan (HTML)</label>
-                <div style={{ background: 'white', borderRadius: '8px', color: 'black' }}>
+                <div className="quill-dark">
                   <ReactQuill 
                     theme="snow" 
                     value={settings.outside_network_message_html || ''} 
@@ -280,6 +280,13 @@ const OnlineStoreCenter = () => {
 
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .spin { animation: spin 1s linear infinite; }
+
+        .quill-dark .ql-toolbar { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.1); border-top-left-radius: 8px; border-top-right-radius: 8px; }
+        .quill-dark .ql-toolbar .ql-stroke { stroke: #94a3b8; }
+        .quill-dark .ql-toolbar .ql-fill { fill: #94a3b8; }
+        .quill-dark .ql-toolbar .ql-picker { color: #94a3b8; }
+        .quill-dark .ql-toolbar button:hover .ql-stroke { stroke: white; }
+        .quill-dark .ql-container { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; color: white; min-height: 100px; font-size: 0.9rem; }
       `}} />
     </div>
   );
