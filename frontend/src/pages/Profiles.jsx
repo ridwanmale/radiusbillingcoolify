@@ -398,6 +398,7 @@ const Profiles = () => {
                   <th style={{ textAlign: 'center' }}>SHARED</th>
                   <th>MASA AKTIF</th>
                   <th>HARGA JUAL</th>
+                  <th style={{ textAlign: 'center' }}>RENTANG KODE UNIK</th>
                   <th style={{ textAlign: 'center' }}>STATUS</th>
                   <th style={{ textAlign: 'center' }}>AKSI</th>
                 </tr>
@@ -428,6 +429,12 @@ const Profiles = () => {
                       )}
                       
                       <td style={{ fontWeight: 'bold' }}>{formatRupiah(p.harga)}</td>
+                      
+                      {activeTab === 'online' && (
+                        <td style={{ textAlign: 'center', fontFamily: 'monospace' }}>
+                          <span style={{ color: 'var(--text-secondary)' }}>{p.unique_code_min || 1} - {p.unique_code_max || 200}</span>
+                        </td>
+                      )}
                       
                       <td style={{ textAlign: 'center' }}>
                         <span className="badge" style={{ background: p.status === 'Aktif' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)', color: p.status === 'Aktif' ? '#10b981' : '#ef4444' }}>
