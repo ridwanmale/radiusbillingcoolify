@@ -262,7 +262,21 @@ async function handlePayment(method) {
 // --- Dynamic QR Logic ---
 function generateDynamicQR(amount) {
     if (!portalSettings?.qris_static_string) return;
-    let payload = portalSettings.qris_static_string.trim();
+    
+    let qrisList = [];
+    try {
+        qrisList = JSON.parse(portalSettings.qris_static_string);
+    } catch (e) {
+        qrisList = [{ payload: portalSettings.qris_static_string }];
+    }
+
+    if (!Array.isArray(qrisList) || qrisList.length === 0) return;
+    qrisList = qrisList.filter(q => q && q.payload && q.payload.trim() !== '');
+    if (qrisList.length === 0) return;
+
+    const randomIndex = Math.floor(Math.random() * qrisList.length);
+    const selectedQris = qrisList[randomIndex];
+    let payload = selectedQris.payload.trim();
     
     if (payload.indexOf("5303360") === -1 || payload.indexOf("5802ID") === -1) {
         qrString = payload;
