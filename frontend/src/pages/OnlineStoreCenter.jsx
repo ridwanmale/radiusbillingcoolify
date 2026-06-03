@@ -513,14 +513,26 @@ const OnlineStoreCenter = () => {
                 <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '5px 0 0 26px' }}>Memblokir perangkat yang membuat banyak transaksi PENDING berturut-turut.</p>
               </div>
               {settings.spam_protection_enabled && (
-                <div className="form-group">
-                  <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Batas Maksimal Transaksi PENDING</label>
-                  <input 
-                    type="number" 
-                    className="form-input-premium" 
-                    value={settings.spam_max_pending || 3} 
-                    onChange={e => setSettings({...settings, spam_max_pending: parseInt(e.target.value)})} 
-                  />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                  <div className="form-group">
+                    <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Batas Maksimal Transaksi PENDING</label>
+                    <input 
+                      type="number" 
+                      className="form-input-premium" 
+                      value={settings.spam_max_pending || 3} 
+                      onChange={e => setSettings({...settings, spam_max_pending: parseInt(e.target.value)})} 
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Auto Unblock Setelah (Menit)</label>
+                    <input 
+                      type="number" 
+                      className="form-input-premium" 
+                      value={settings.spam_auto_unblock_minutes ?? 60} 
+                      onChange={e => setSettings({...settings, spam_auto_unblock_minutes: parseInt(e.target.value)})} 
+                    />
+                    <p style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '5px' }}>Isi 0 jika tidak ingin membuka blokir otomatis.</p>
+                  </div>
                 </div>
               )}
             </div>

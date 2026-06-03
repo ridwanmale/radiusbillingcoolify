@@ -175,6 +175,7 @@ router.post('/settings', async (req, res) => {
       spam_protection_enabled = req.body.spam_protection_enabled ? 1 : 0;
     }
     const spam_max_pending = req.body.spam_max_pending !== undefined ? req.body.spam_max_pending : existing.spam_max_pending;
+    const spam_auto_unblock_minutes = req.body.spam_auto_unblock_minutes !== undefined ? req.body.spam_auto_unblock_minutes : existing.spam_auto_unblock_minutes;
 
     // Konversi is_active ke boolean/tinyint
     let is_active = existing.is_active;
