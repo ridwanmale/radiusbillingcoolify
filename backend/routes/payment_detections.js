@@ -210,4 +210,27 @@ router.post('/logs/bulk-delete', async (req, res) => {
   }
 });
 
+// Admin API: Toggle device status
+router.post('/devices/:id/toggle', async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  try {
+    await db.query('UPDATE merchant_devices SET status = ? WHERE id = ?', [status, id]);
+    res.json({ success: true, message: `Device status updated to ${status}` });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Admin API: Delete device
+router.delete('/devices/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await db.query('DELETE FROM merchant_devices WHERE id = ?', [id]);
+    res.json({ success: true, message: 'Device deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;

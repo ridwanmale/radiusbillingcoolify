@@ -63,6 +63,8 @@ const PaymentBridgeCenter = () => {
 
   // --- STATE FOR DEVICES ---
   const [devices, setDevices] = useState([]);
+  const [showAddDeviceModal, setShowAddDeviceModal] = useState(false);
+  const [newDeviceName, setNewDeviceName] = useState('');
 
   // --- STATE FOR MIDTRANS SETTINGS ---
   const [midtransSettings, setMidtransSettings] = useState({
@@ -290,6 +292,25 @@ const PaymentBridgeCenter = () => {
       fetchData();
     } catch (err) {
       toast.error('Gagal mengubah status');
+    }
+  };
+
+  const handleAddDevice = async () => {
+    if (!newDeviceName.trim()) return toast.warning('Nama perangkat tidak boleh kosong');
+    const device_id = 'dev_' + Math.random().toString(36).substring(2, 10);
+    const api_token = 'tok_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    try {
+      await axios.post('/api/payment-detections/devices', {
+        device_name: newDeviceName,
+        device_id,
+        api_token
+      });
+      toast.success('Perangkat berhasil ditambahkan');
+      setNewDeviceName('');
+      setShowAddDeviceModal(false);
+      fetchData();
+    } catch (err) {
+      toast.error('Gagal menambah perangkat');
     }
   };
 
@@ -632,6 +653,26 @@ const PaymentBridgeCenter = () => {
       {/* TAB CONTENT: DEVICES */}
       {activeTab === 'devices' && (
         <div className="fade-in">
+          <div className="glass-card" style={{ padding: '20px', marginBottom: '20px', background: 'rgba(56, 189, 248, 0.05)', border: '1px solid rgba(56, 189, 248, 0.2)' }}>
+            <h3 style={{ margin: '0 0 10px 0', color: '#38bdf8', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span className="material-symbols-rounded">webhook</span> Webhook Endpoint
+            </h3>
+            <p style={{ margin: '0 0 15px 0', fontSize: '0.85rem', color: '#cbd5e1' }}>
+              Gunakan URL ini di aplikasi listener (seperti MacroDroid atau Tasker) untuk mengirimkan notifikasi pembayaran (Method: POST).
+            </p>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <code style={{ flex: 1, padding: '12px', background: 'rgba(0,0,0,0.3)', borderRadius: '8px', color: '#fbbf24', wordBreak: 'break-all' }}>
+                {window.location.origin}/api/payment-detections/shopeepay-notification
+              </code>
+              <button onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/api/payment-detections/shopeepay-notification`); toast.info('Endpoint disalin!'); }} className="btn-glass" style={{ padding: '10px', borderRadius: '8px' }}>
+                <span className="material-symbols-rounded">content_copy</span>
+              </button>
+            </div>
+            <p style={{ margin: '10px 0 0 0', fontSize: '0.8rem', color: '#94a3b8' }}>
+              * Jangan lupa tambahkan header <code>Authorization: Bearer [API_TOKEN_PERANGKAT]</code>
+            </p>
+          </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '20px' }}>
             {devices.map(device => (
               <div key={device.id} className="glass-card device-card" style={{ padding: '25px', position: 'relative' }}>
@@ -684,9 +725,50 @@ const PaymentBridgeCenter = () => {
             ))}
 
             {/* ADD DEVICE PLACEHOLDER (OPTIONAL) */}
-            <div className="glass-card" style={{ border: '2px dashed rgba(255,255,255,0.1)', background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px', cursor: 'pointer' }}>
+            <div onClick={() => setShowAddDeviceModal(true)} className="glass-card" style={{ border: '2px dashed rgba(255,255,255,0.1)', background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px', cursor: 'pointer' }}>
               <span className="material-symbols-rounded" style={{ fontSize: '48px', color: 'rgba(255,255,255,0.1)', marginBottom: '10px' }}>add_circle</span>
-              <div style={{ color: 'rgba(255,255,255,0.3)', fontWeight: '700' }}>Tambah Perangkat Baru dari App</div>
+              <div style={{ color: 'rgba(255,255,255,0.3)', fontWeight: '700' }}>Tambah Perangkat Baru</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showAddDeviceModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div className="glass-card" style={{ width: '100%', maxWidth: '400px', padding: '30px', animation: 'scaleUp 0.3s ease-out' }}>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: '900', marginBottom: '15px', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span className="material-symbols-rounded">add_circle</span>
+              Tambah Perangkat
+            </h2>
+            <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '25px', lineHeight: '1.5' }}>
+              Tambahkan perangkat listener (HP Android) baru untuk mendapatkan API Token.
+            </p>
+            
+            <div style={{ marginBottom: '25px' }}>
+              <label style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '700', marginBottom: '10px', display: 'block' }}>NAMA PERANGKAT (MISAL: HP ADMIN 1)</label>
+              <input 
+                type="text" 
+                value={newDeviceName} 
+                onChange={(e) => setNewDeviceName(e.target.value)}
+                placeholder="Contoh: HP Samsung M20"
+                style={{ width: '100%', padding: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: 'white', outline: 'none', fontSize: '1rem' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button 
+                onClick={() => setShowAddDeviceModal(false)}
+                style={{ flex: 1, padding: '12px', background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: '12px', color: 'white', fontWeight: '700', cursor: 'pointer' }}
+              >
+                Batal
+              </button>
+              <button 
+                onClick={handleAddDevice}
+                className="btn-success-premium"
+                style={{ flex: 2, padding: '12px', borderRadius: '12px', color: 'white', fontWeight: '800', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)' }}
+              >
+                Simpan Perangkat
+              </button>
             </div>
           </div>
         </div>
