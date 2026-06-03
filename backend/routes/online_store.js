@@ -111,6 +111,9 @@ router.post('/settings', async (req, res) => {
     const qris_static_string = req.body.qris_static_string !== undefined ? req.body.qris_static_string : existing.qris_static_string;
     const notification_token = req.body.notification_token !== undefined ? req.body.notification_token : existing.notification_token;
     
+    const success_message_html = req.body.success_message_html !== undefined ? req.body.success_message_html : existing.success_message_html;
+    const outside_network_message_html = req.body.outside_network_message_html !== undefined ? req.body.outside_network_message_html : existing.outside_network_message_html;
+
     // Konversi is_active ke boolean/tinyint
     let is_active = existing.is_active;
     if (req.body.is_active !== undefined) {
@@ -161,25 +164,23 @@ router.post('/settings', async (req, res) => {
       enable_tripay = req.body.enable_tripay ? 1 : 0;
     }
 
-    const success_message_html = req.body.success_message_html !== undefined ? req.body.success_message_html : existing.success_message_html;
-
     // 3. Update tabel portal_settings
     await db.query(`
       UPDATE portal_settings 
       SET portal_title = ?, portal_description = ?, primary_color = ?, qris_static_string = ?,
           notification_token = ?, is_active = ?,
+          enable_schedule = ?, open_time = ?, close_time = ?,
           duitku_merchant_code = ?, duitku_api_key = ?, duitku_is_sandbox = ?,
           tripay_api_key = ?, tripay_private_key = ?, tripay_merchant_code = ?, tripay_is_sandbox = ?,
-          enable_payment_bridge = ?, enable_midtrans = ?, enable_duitku = ?, enable_tripay = ?,
-          enable_schedule = ?, open_time = ?, close_time = ?, success_message_html = ?
+          enable_payment_bridge = ?, enable_midtrans = ?, enable_duitku = ?, enable_tripay = ?, success_message_html = ?, outside_network_message_html = ?
       WHERE id = 1
     `, [
       portal_title, portal_description, primary_color, qris_static_string,
       notification_token, is_active,
+      enable_schedule, open_time, close_time,
       duitku_merchant_code, duitku_api_key, duitku_is_sandbox,
       tripay_api_key, tripay_private_key, tripay_merchant_code, tripay_is_sandbox,
-      enable_payment_bridge, enable_midtrans, enable_duitku, enable_tripay,
-      enable_schedule, open_time, close_time, success_message_html
+      enable_payment_bridge, enable_midtrans, enable_duitku, enable_tripay, success_message_html, outside_network_message_html
     ]);
 
     // 4. Update settings (dns_name) jika hotspot_login_url dikirimkan

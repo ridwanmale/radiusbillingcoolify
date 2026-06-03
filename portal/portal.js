@@ -494,6 +494,9 @@ function showSuccess() {
 
     if (!isLocalNetwork()) {
         document.getElementById('outside-network-warning').classList.remove('hidden');
+        if (portalSettings?.outside_network_message_html) {
+            document.getElementById('outside-network-message-custom').innerHTML = portalSettings.outside_network_message_html;
+        }
     } else {
         document.getElementById('outside-network-warning').classList.add('hidden');
     }

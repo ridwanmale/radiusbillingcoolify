@@ -123,6 +123,27 @@ const OnlineStoreCenter = () => {
                 </div>
                 <p style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '5px' }}>Pesan ini akan ditampilkan di halaman voucher setelah pembeli berhasil membayar.</p>
               </div>
+
+              <div className="form-group" style={{ marginBottom: '20px' }}>
+                <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Pesan Luar Jaringan (HTML)</label>
+                <div style={{ background: 'white', borderRadius: '8px', color: 'black' }}>
+                  <ReactQuill 
+                    theme="snow" 
+                    value={settings.outside_network_message_html || ''} 
+                    onChange={val => setSettings({...settings, outside_network_message_html: val})} 
+                    modules={{
+                      toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'align': [] }],
+                        ['clean']
+                      ]
+                    }}
+                  />
+                </div>
+                <p style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '5px' }}>Pesan ini ditampilkan menggantikan teks peringatan default jika pelanggan terdeteksi berada di luar jaringan Wi-Fi Hotspot.</p>
+              </div>
+
               <div className="form-group">
                 <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>IP MikroTik / DNS Hotspot</label>
                 <input type="text" className="form-input-premium" placeholder="Contoh: 10.5.50.1 atau wifi.hotspot" value={settings.hotspot_login_url} onChange={e => setSettings({...settings, hotspot_login_url: e.target.value})} />

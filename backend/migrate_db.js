@@ -10,6 +10,14 @@ async function migrate() {
         } else {
             console.log('success_message_html column already exists');
         }
+
+        const [networkColumns] = await db.query(`SHOW COLUMNS FROM portal_settings LIKE 'outside_network_message_html'`);
+        if (networkColumns.length === 0) {
+            await db.query(`ALTER TABLE portal_settings ADD COLUMN outside_network_message_html TEXT;`);
+            console.log('Added outside_network_message_html column to portal_settings');
+        } else {
+            console.log('outside_network_message_html column already exists');
+        }
     } catch (error) {
         console.error('Migration error:', error);
     }
