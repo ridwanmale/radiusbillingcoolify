@@ -259,7 +259,7 @@ router.post('/settings', async (req, res) => {
           duitku_merchant_code = ?, duitku_api_key = ?, duitku_is_sandbox = ?,
           tripay_api_key = ?, tripay_private_key = ?, tripay_merchant_code = ?, tripay_is_sandbox = ?,
           enable_payment_bridge = ?, enable_midtrans = ?, enable_duitku = ?, enable_tripay = ?, success_message_html = ?, outside_network_message_html = ?,
-          auto_cleanup_enabled = ?, auto_cleanup_hours = ?, spam_protection_enabled = ?, spam_max_pending = ?
+          auto_cleanup_enabled = ?, auto_cleanup_hours = ?, spam_protection_enabled = ?, spam_max_pending = ?, spam_auto_unblock_minutes = ?
       WHERE id = 1
     `, [
       portal_title, portal_description, primary_color, qris_static_string,
@@ -268,7 +268,7 @@ router.post('/settings', async (req, res) => {
       duitku_merchant_code, duitku_api_key, duitku_is_sandbox,
       tripay_api_key, tripay_private_key, tripay_merchant_code, tripay_is_sandbox,
       enable_payment_bridge, enable_midtrans, enable_duitku, enable_tripay, success_message_html, outside_network_message_html,
-      auto_cleanup_enabled, auto_cleanup_hours, spam_protection_enabled, spam_max_pending
+      auto_cleanup_enabled, auto_cleanup_hours, spam_protection_enabled, spam_max_pending, spam_auto_unblock_minutes
     ]);
 
     // 4. Update settings (dns_name) jika hotspot_login_url dikirimkan
