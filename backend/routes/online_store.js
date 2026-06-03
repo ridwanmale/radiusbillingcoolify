@@ -860,6 +860,31 @@ router.get('/search-by-amount/:amount', async (req, res) => {
   }
 });
 
+
+
+// 5. GET Spam Blocklist
+router.get('/spam-blocklist', async (req, res) => {
+  try {
+    const [rows] = await db.query('SELECT * FROM spam_blocklist ORDER BY blocked_at DESC');
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 6. DELETE Spam Blocklist
+router.delete('/spam-blocklist/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.query('DELETE FROM spam_blocklist WHERE id = ?', [id]);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+
 // 11. Cek Status Transaksi (Untuk Polling di Portal)
 router.get('/:order_id', async (req, res) => {
   const { order_id } = req.params;
@@ -1008,26 +1033,4 @@ const handlePPPoEOnlinePaymentSuccess = async (orderId, amount) => {
     connection.release();
   }
 };
-
-
-// 5. GET Spam Blocklist
-router.get('/spam-blocklist', async (req, res) => {
-  try {
-    const [rows] = await db.query('SELECT * FROM spam_blocklist ORDER BY blocked_at DESC');
-    res.json(rows);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// 6. DELETE Spam Blocklist
-router.delete('/spam-blocklist/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    await db.query('DELETE FROM spam_blocklist WHERE id = ?', [id]);
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
 module.exports = router;
