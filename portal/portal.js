@@ -13,6 +13,16 @@ let timeLeft = 300;
 let isProcessing = false;
 let qrString = '';
 
+// --- Device ID for Anti Spam ---
+function getDeviceId() {
+    let devId = localStorage.getItem('device_id');
+    if (!devId) {
+        devId = 'device-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now();
+        localStorage.setItem('device_id', devId);
+    }
+    return devId;
+}
+
 // --- Format Utilities ---
 function formatRupiah(number) {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
@@ -216,7 +226,7 @@ async function handlePayment(method) {
 
     try {
         let endpoint = '';
-        let payload = { package_id: selectedPkg.groupname, amount: selectedPkg.harga, customer_name: 'Customer' };
+        let payload = { package_id: selectedPkg.groupname, amount: selectedPkg.harga, customer_name: 'Customer', device_id: getDeviceId() };
         
         if (method === 'duitku') {
             endpoint = '/online-store/duitku/create-invoice';
@@ -236,8 +246,17 @@ async function handlePayment(method) {
             body: JSON.stringify(payload)
         });
         
-        if (!res.ok) throw new Error("Server mengembalikan error");
         const data = await res.json();
+        
+        if (!res.ok) {
+            if (res.status === 403 && data.blocked) {
+                isProcessing = false;
+                document.getElementById('checkout-btn').innerHTML = `Bayar ${formatRupiah(selectedPkg.harga)}`;
+                showToast(data.error || 'Akses diblokir (Spam).', 'error');
+                return;
+            }
+            throw new Error(data.error || "Server mengembalikan error");
+        }
 
         if (data.payment_url) {
             window.location.href = data.payment_url;

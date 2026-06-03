@@ -22,8 +22,13 @@ const OnlineStoreCenter = () => {
     enable_schedule: false,
     open_time: '08:00',
     close_time: '22:00',
-    success_message_html: ''
+    success_message_html: '',
+    auto_cleanup_enabled: true,
+    auto_cleanup_hours: 24,
+    spam_protection_enabled: true,
+    spam_max_pending: 3
   });
+  const [spamBlocklist, setSpamBlocklist] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
   const [qrisList, setQrisList] = useState([{ name: 'QRIS Utama', payload: '' }]);
   const [isQrisModalOpen, setIsQrisModalOpen] = useState(false);
@@ -71,10 +76,24 @@ const OnlineStoreCenter = () => {
       const stringified = JSON.stringify(qrisList.filter(q => q.payload.trim() !== ''));
       await axios.post('/api/online-store/settings', { ...settings, qris_static_string: stringified });
       toast.success('Pengaturan disimpan!');
+      const resBlocklist = await fetch('/api/online-store/spam-blocklist');
+      const blocklistData = await resBlocklist.json();
+      setSpamBlocklist(Array.isArray(blocklistData) ? blocklistData : []);
+
     } catch (err) {
       toast.error('Gagal menyimpan pengaturan');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleUnlock = async (id) => {
+    try {
+      await axios.delete(`/api/online-store/spam-blocklist/${id}`);
+      toast.success('Blokir berhasil dibuka!');
+      fetchData();
+    } catch (err) {
+      toast.error('Gagal membuka blokir');
     }
   };
 
@@ -265,6 +284,96 @@ const OnlineStoreCenter = () => {
                 </div>
                 
                 <p style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '12px' }}>* Sistem akan menyuntikkan nominal otomatis. Jika ada lebih dari 1 QRIS, sistem akan merotasinya secara acak ke pembeli.</p>
+              </div>
+
+              {/* SECTION: KEAMANAN & SPAM */}
+              <div className="glass-card fade-in" style={{ padding: '25px', background: '#1e1e24', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '20px' }}>
+                <h3 style={{ margin: '0 0 20px 0', fontSize: '1.2rem', fontWeight: '800', color: 'white', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '10px' }}>
+                  <span className="material-symbols-rounded" style={{ color: '#ef4444' }}>shield</span>
+                  Keamanan & Anti Spam
+                </h3>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+                  <div className="form-group">
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'white', fontWeight: '600' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={settings.auto_cleanup_enabled} 
+                        onChange={e => setSettings({...settings, auto_cleanup_enabled: e.target.checked})} 
+                        style={{ width: '18px', height: '18px', accentColor: '#10b981' }}
+                      />
+                      Aktifkan Auto-Cleanup
+                    </label>
+                    <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '5px 0 0 26px' }}>Otomatis menghapus transaksi PENDING untuk menghindari penumpukan data.</p>
+                  </div>
+                  {settings.auto_cleanup_enabled && (
+                    <div className="form-group">
+                      <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Hapus transaksi lebih tua dari (Jam)</label>
+                      <input 
+                        type="number" 
+                        className="form-input-premium" 
+                        value={settings.auto_cleanup_hours || 24} 
+                        onChange={e => setSettings({...settings, auto_cleanup_hours: parseInt(e.target.value)})} 
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '30px' }}>
+                  <div className="form-group">
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'white', fontWeight: '600' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={settings.spam_protection_enabled} 
+                        onChange={e => setSettings({...settings, spam_protection_enabled: e.target.checked})} 
+                        style={{ width: '18px', height: '18px', accentColor: '#ef4444' }}
+                      />
+                      Aktifkan Proteksi Spam (Rate Limit)
+                    </label>
+                    <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '5px 0 0 26px' }}>Memblokir perangkat yang membuat banyak transaksi PENDING berturut-turut.</p>
+                  </div>
+                  {settings.spam_protection_enabled && (
+                    <div className="form-group">
+                      <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Batas Maksimal Transaksi PENDING</label>
+                      <input 
+                        type="number" 
+                        className="form-input-premium" 
+                        value={settings.spam_max_pending || 3} 
+                        onChange={e => setSettings({...settings, spam_max_pending: parseInt(e.target.value)})} 
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <h4 style={{ margin: '0 0 15px 0', fontSize: '1rem', color: '#fca5a5' }}>Daftar Perangkat Terblokir</h4>
+                <div style={{ background: 'rgba(0,0,0,0.2)', borderRadius: '10px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+                    <thead style={{ background: 'rgba(255,255,255,0.05)', color: '#94a3b8' }}>
+                      <tr>
+                        <th style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>IP Address</th>
+                        <th style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Device ID</th>
+                        <th style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Waktu Blokir</th>
+                        <th style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {spamBlocklist.length === 0 ? (
+                        <tr><td colSpan="4" style={{ padding: '20px', textAlign: 'center', color: '#64748b' }}>Belum ada perangkat yang terblokir.</td></tr>
+                      ) : (
+                        spamBlocklist.map(b => (
+                          <tr key={b.id}>
+                            <td style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.05)', color: 'white' }}>{b.ip_address || '-'}</td>
+                            <td style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.05)', color: '#94a3b8', fontFamily: 'monospace' }}>{b.device_id || '-'}</td>
+                            <td style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.05)', color: '#94a3b8' }}>{new Date(b.blocked_at).toLocaleString('id-ID')}</td>
+                            <td style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.05)', textAlign: 'center' }}>
+                              <button type="button" onClick={() => handleUnlock(b.id)} className="btn-success-premium" style={{ padding: '6px 12px', fontSize: '0.75rem', borderRadius: '6px' }}>Unlock</button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
               <button type="submit" disabled={isSaving} className="btn-success-premium" style={{ width: '100%', padding: '15px', borderRadius: '12px', fontSize: '1rem', fontWeight: '800' }}>

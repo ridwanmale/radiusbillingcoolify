@@ -66,6 +66,56 @@ const checkStoreOpen = async (req, res, next) => {
   }
 };
 
+const checkSpamProtection = async (req, res, next) => {
+  try {
+    const [settingsRows] = await db.query('SELECT spam_protection_enabled, spam_max_pending FROM portal_settings WHERE id = 1');
+    const settings = settingsRows[0];
+    if (!settings || !settings.spam_protection_enabled) return next();
+
+    const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    const device_id = req.body.device_id || '';
+
+    // 1. Check if already blocked
+    let blockCheckQuery = 'SELECT id, reason FROM spam_blocklist WHERE ip_address = ?';
+    let blockCheckParams = [ip_address];
+    if (device_id) {
+      blockCheckQuery += ' OR device_id = ?';
+      blockCheckParams.push(device_id);
+    }
+    const [blockedRows] = await db.query(blockCheckQuery, blockCheckParams);
+    
+    if (blockedRows.length > 0) {
+      return res.status(403).json({ error: 'Akses Anda diblokir karena terlalu banyak membuat transaksi yang belum dibayar. Hubungi Admin.', blocked: true });
+    }
+
+    // 2. Count pending transactions
+    let pendingCountQuery = 'SELECT COUNT(id) as count FROM jurnal_keuangan WHERE status = "PENDING" AND (ip_address = ?';
+    let pendingCountParams = [ip_address];
+    if (device_id) {
+      pendingCountQuery += ' OR device_id = ?)';
+      pendingCountParams.push(device_id);
+    } else {
+      pendingCountQuery += ')';
+    }
+    
+    const [pendingRows] = await db.query(pendingCountQuery, pendingCountParams);
+    const maxPending = settings.spam_max_pending || 3;
+    
+    if (pendingRows[0].count >= maxPending) {
+      // Auto-block
+      await db.query('INSERT INTO spam_blocklist (ip_address, device_id, reason) VALUES (?, ?, ?)', 
+        [ip_address, device_id, `Mencapai batas ${maxPending} transaksi PENDING`]
+      );
+      return res.status(403).json({ error: 'Anda terlalu banyak membuat transaksi tertunda. Akses diblokir. Silakan hubungi Admin.', blocked: true });
+    }
+
+    next();
+  } catch (err) {
+    console.error('Spam Check Error:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
 
 // 1. Ambil Pengaturan Portal
 router.get('/settings', async (req, res) => {
@@ -196,8 +246,9 @@ router.post('/settings', async (req, res) => {
 });
 
 // 2a. Request Pembayaran Duitku
-router.post('/duitku/create-invoice', checkStoreOpen, async (req, res) => {
-  const { package_id, amount, customer_name, payment_method, customer_email, customer_phone } = req.body;
+router.post('/duitku/create-invoice', checkStoreOpen, checkSpamProtection, async (req, res) => {
+  const { package_id, amount, customer_name, payment_method, customer_email, customer_phone, device_id } = req.body;
+  const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   const order_id = 'INV-' + Date.now();
   
   try {
@@ -251,9 +302,9 @@ router.post('/duitku/create-invoice', checkStoreOpen, async (req, res) => {
     if (data.paymentUrl) {
       // Simpan transaksi ke DB
       await db.query(`
-        INSERT INTO jurnal_keuangan (order_id, package_id, amount, unique_code, total_amount, customer_name, status)
-        VALUES (?, ?, ?, ?, ?, ?, 'PENDING')
-      `, [order_id, package_id, amount, 0, amount, customer_name]);
+        INSERT INTO jurnal_keuangan (order_id, package_id, amount, unique_code, total_amount, customer_name, status, ip_address, device_id)
+        VALUES (?, ?, ?, ?, ?, ?, 'PENDING', ?, ?)
+      `, [order_id, package_id, amount, 0, amount, customer_name, ip_address, device_id || null]);
 
       res.json({ payment_url: data.paymentUrl, order_id });
     } else {
@@ -269,8 +320,9 @@ router.post('/duitku/create-invoice', checkStoreOpen, async (req, res) => {
 const { generateOnlineVoucherCode, registerVoucherToRadius } = require('../utils/voucher');
 
 // 2b. Request Pembayaran Tripay
-router.post('/tripay/create-transaction', checkStoreOpen, async (req, res) => {
-  const { package_id, amount, customer_name, method } = req.body;
+router.post('/tripay/create-transaction', checkStoreOpen, checkSpamProtection, async (req, res) => {
+  const { package_id, amount, customer_name, method, device_id } = req.body;
+  const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   const merchant_ref = 'INV-' + Date.now();
   
   try {
@@ -319,13 +371,13 @@ router.post('/tripay/create-transaction', checkStoreOpen, async (req, res) => {
 
     const data = await response.json();
     if (data.success) {
-      // Simpan transaksi ke DB
+      // Simpan status pending ke database
       await db.query(`
-        INSERT INTO jurnal_keuangan (order_id, package_id, amount, unique_code, total_amount, customer_name, status)
-        VALUES (?, ?, ?, ?, ?, ?, 'PENDING')
-      `, [merchant_ref, package_id, amount, 0, amount, customer_name]);
+        INSERT INTO jurnal_keuangan (order_id, package_id, amount, unique_code, total_amount, customer_name, status, ip_address, device_id)
+        VALUES (?, ?, ?, ?, ?, ?, 'PENDING', ?, ?)
+      `, [merchant_ref, package_id, amount, 0, amount, customer_name || 'Customer Portal', ip_address, device_id || null]);
 
-      res.json({ payment_url: data.data.checkout_url, order_id: merchant_ref });
+      res.json({ checkout_url: data.data.checkout_url, order_id: merchant_ref });
     } else {
       res.status(400).json({ error: data.message || 'Gagal membuat transaksi Tripay' });
     }
@@ -337,8 +389,9 @@ router.post('/tripay/create-transaction', checkStoreOpen, async (req, res) => {
 });
 
 // 2e. Request Pembayaran Midtrans
-router.post('/midtrans/create-transaction', checkStoreOpen, async (req, res) => {
-  const { package_id, amount, customer_name } = req.body;
+router.post('/midtrans/create-transaction', checkStoreOpen, checkSpamProtection, async (req, res) => {
+  const { package_id, amount, customer_name, device_id } = req.body;
+  const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   const order_id = 'INV-' + Date.now();
 
   try {
@@ -397,9 +450,9 @@ router.post('/midtrans/create-transaction', checkStoreOpen, async (req, res) => 
     const data = await response.json();
     if (response.ok && data.redirect_url) {
       await db.query(`
-        INSERT INTO jurnal_keuangan (order_id, package_id, amount, unique_code, total_amount, customer_name, status)
-        VALUES (?, ?, ?, ?, ?, ?, 'PENDING')
-      `, [order_id, package_id, amount, 0, amount, customer_name || 'Customer Portal']);
+        INSERT INTO jurnal_keuangan (order_id, package_id, amount, unique_code, total_amount, customer_name, status, ip_address, device_id)
+        VALUES (?, ?, ?, ?, ?, ?, 'PENDING', ?, ?)
+      `, [order_id, package_id, amount, 0, amount, customer_name || 'Customer Portal', ip_address, device_id || null]);
 
       res.json({ payment_url: data.redirect_url, order_id });
     } else {
@@ -482,8 +535,9 @@ router.post('/midtrans/callback', async (req, res) => {
 });
 
 // 2c. Create Manual QRIS Transaction
-router.post('/create-transaction', checkStoreOpen, async (req, res) => {
-  const { package_id, amount, customer_name } = req.body;
+router.post('/create-transaction', checkStoreOpen, checkSpamProtection, async (req, res) => {
+  const { package_id, amount, customer_name, device_id } = req.body;
+  const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   const order_id = 'QR-' + Date.now();
   
   try {
@@ -506,9 +560,9 @@ router.post('/create-transaction', checkStoreOpen, async (req, res) => {
     const total_amount = parseInt(amount) + unique_code;
 
     await db.query(`
-      INSERT INTO jurnal_keuangan (order_id, package_id, amount, unique_code, total_amount, customer_name, status)
-      VALUES (?, ?, ?, ?, ?, ?, 'PENDING')
-    `, [order_id, package_id, amount, unique_code, total_amount, customer_name || 'Customer Portal']);
+      INSERT INTO jurnal_keuangan (order_id, package_id, amount, unique_code, total_amount, customer_name, status, ip_address, device_id)
+      VALUES (?, ?, ?, ?, ?, ?, 'PENDING', ?, ?)
+    `, [order_id, package_id, amount, unique_code, total_amount, customer_name || 'Customer Portal', ip_address, device_id || null]);
 
     res.json({ order_id, total_amount, unique_code });
   } catch (error) {
@@ -941,4 +995,25 @@ const handlePPPoEOnlinePaymentSuccess = async (orderId, amount) => {
   }
 };
 
+
+// 5. GET Spam Blocklist
+router.get('/spam-blocklist', async (req, res) => {
+  try {
+    const [rows] = await db.query('SELECT * FROM spam_blocklist ORDER BY blocked_at DESC');
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 6. DELETE Spam Blocklist
+router.delete('/spam-blocklist/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.query('DELETE FROM spam_blocklist WHERE id = ?', [id]);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 module.exports = router;

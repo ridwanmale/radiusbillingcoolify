@@ -147,7 +147,11 @@ const upgradePool = async (pool, name) => {
       'enable_tripay': 'BOOLEAN DEFAULT FALSE',
       'enable_schedule': 'BOOLEAN DEFAULT FALSE',
       'open_time': 'VARCHAR(5) DEFAULT "08:00"',
-      'close_time': 'VARCHAR(5) DEFAULT "22:00"'
+      'close_time': 'VARCHAR(5) DEFAULT "22:00"',
+      'auto_cleanup_enabled': 'BOOLEAN DEFAULT TRUE',
+      'auto_cleanup_hours': 'INT DEFAULT 24',
+      'spam_protection_enabled': 'BOOLEAN DEFAULT TRUE',
+      'spam_max_pending': 'INT DEFAULT 3'
     };
 
     for (const [col, definition] of Object.entries(columnsToAdd)) {
@@ -175,6 +179,27 @@ const upgradePool = async (pool, name) => {
     if (!settingsColNames.includes('voucher_auto_delete_interval')) {
       await pool.query('ALTER TABLE settings ADD COLUMN voucher_auto_delete_interval VARCHAR(32) DEFAULT \'1_month\'');
       console.log(`[DB UPGRADE] Column voucher_auto_delete_interval successfully added on ${name}.`);
+    }
+
+    // Upgrade jurnal_keuangan table
+    const [jkCols] = await pool.query('SHOW COLUMNS FROM jurnal_keuangan');
+    const jkColNames = jkCols.map(c => c.Field);
+
+    if (!jkColNames.includes('total_amount')) {
+      await pool.query('ALTER TABLE jurnal_keuangan ADD COLUMN total_amount DECIMAL(10,2) DEFAULT 0');
+      console.log(`[DB UPGRADE] Column total_amount successfully added to jurnal_keuangan on ${name}.`);
+    }
+    if (!jkColNames.includes('unique_code')) {
+      await pool.query('ALTER TABLE jurnal_keuangan ADD COLUMN unique_code INT DEFAULT 0');
+      console.log(`[DB UPGRADE] Column unique_code successfully added to jurnal_keuangan on ${name}.`);
+    }
+    if (!jkColNames.includes('ip_address')) {
+      await pool.query('ALTER TABLE jurnal_keuangan ADD COLUMN ip_address VARCHAR(45) DEFAULT NULL');
+      console.log(`[DB UPGRADE] Column ip_address successfully added to jurnal_keuangan on ${name}.`);
+    }
+    if (!jkColNames.includes('device_id')) {
+      await pool.query('ALTER TABLE jurnal_keuangan ADD COLUMN device_id VARCHAR(128) DEFAULT NULL');
+      console.log(`[DB UPGRADE] Column device_id successfully added to jurnal_keuangan on ${name}.`);
     }
 
     // 3. Upgrade profiles_metadata table
@@ -242,6 +267,26 @@ const upgradePool = async (pool, name) => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       ) ENGINE=InnoDB;
     `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS auto_isolir_logs (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(64) NOT NULL,
+        isolir_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        reason VARCHAR(255)
+      ) ENGINE=InnoDB;
+    `);
+
+    // 8. Create Spam Blocklist Table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS spam_blocklist (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        ip_address VARCHAR(45),
+        device_id VARCHAR(128),
+        blocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        reason VARCHAR(255)
+      ) ENGINE=InnoDB;
+    `);
+
     await pool.query(
       'INSERT IGNORE INTO role_menu_access (role, menu_id, is_allowed) VALUES (?, ?, ?)',
       ['superadmin', 'telegram_backup', 1]
@@ -322,15 +367,19 @@ const cleanupJobs = async () => {
       console.error('[Auto-Delete Cleanup Error]:', autoDelErr.message);
     }
 
-    // 2. Bersihkan Transaksi Pending > 3 Hari
-    const [delTrx] = await connection.query(`
-      DELETE FROM jurnal_keuangan 
-      WHERE status = 'PENDING' 
-      AND created_at < DATE_SUB(NOW(), INTERVAL 3 DAY)
-    `);
-    if (delTrx.affectedRows > 0) {
-      console.log(`[Cleanup] Berhasil menghapus ${delTrx.affectedRows} transaksi pending lama.`);
-    }
+      // 2. Bersihkan Transaksi Pending sesuai pengaturan portal_settings
+      const [pSettings] = await connection.query('SELECT auto_cleanup_enabled, auto_cleanup_hours FROM portal_settings WHERE id = 1');
+      if (pSettings.length > 0 && pSettings[0].auto_cleanup_enabled) {
+        const cleanupHours = parseInt(pSettings[0].auto_cleanup_hours) || 24;
+        const [delTrx] = await connection.query(`
+          DELETE FROM jurnal_keuangan 
+          WHERE status = 'PENDING' 
+          AND created_at < DATE_SUB(NOW(), INTERVAL ? HOUR)
+        `, [cleanupHours]);
+        if (delTrx.affectedRows > 0) {
+          console.log(`[Cleanup] Berhasil menghapus ${delTrx.affectedRows} transaksi pending lama (>${cleanupHours} jam).`);
+        }
+      }
 
   } catch (err) {
     console.error('[Cleanup] Error during execution:', err.message);
