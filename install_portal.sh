@@ -15,8 +15,14 @@ CURRENT_DIR=$(pwd)
 read -p "Masukkan link GitHub repositori (Kosongkan untuk default ridwanmale): " GITHUB_URL
 GITHUB_URL=${GITHUB_URL:-https://github.com/ridwanmale/radiusbillingcoolify.git}
 
-read -p "Masukkan path direktori instalasi (tekan Enter untuk default: /opt/radiusbilling-portal): " INSTALL_DIR
-INSTALL_DIR=${INSTALL_DIR:-/opt/radiusbilling-portal}
+# Jika dijalankan di dalam repositori, jadikan direktori saat ini sebagai default
+DEFAULT_INSTALL_DIR="/opt/radiusbilling-portal"
+if [ -f "$CURRENT_DIR/docker-compose_portalonlinevoucher.yml" ]; then
+    DEFAULT_INSTALL_DIR="$CURRENT_DIR"
+fi
+
+read -p "Masukkan path direktori instalasi (tekan Enter untuk default: $DEFAULT_INSTALL_DIR): " INSTALL_DIR
+INSTALL_DIR=${INSTALL_DIR:-$DEFAULT_INSTALL_DIR}
 INSTALL_DIR=${INSTALL_DIR%/}
 
 echo ""
@@ -76,6 +82,10 @@ cd "$INSTALL_DIR" || exit 1
 
 echo "Menginjeksi URL Web Admin ke dalam portal.js..."
 sed -i "s|const API_URL.*|const API_URL = \`${WEB_ADMIN_URL}/api\`;|g" portal/portal.js
+
+echo "Menambahkan versi unik untuk menghindari masalah Cache Browser/Cloudflare..."
+CACHE_BUSTER=$(date +%s)
+sed -i -E "s/portal\.js\?v=[0-9]+/portal.js?v=$CACHE_BUSTER/g" portal/index.html
 
 # Export port sebagai environment variable untuk docker-compose
 export PORTAL_PORT=$PORTAL_PORT
