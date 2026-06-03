@@ -419,7 +419,7 @@ const cleanupJobs = async () => {
     if (connection) connection.release();
   }
 };
-setInterval(() => cleanupJobs().catch(err => console.error('[Cleanup Interval] Error:', err.message)), 5 * 60 * 1000); // Jalankan setiap 5 menit
+setInterval(() => cleanupJobs().catch(err => console.error('[Cleanup Interval] Error:', err.message)), 1 * 60 * 1000); // Jalankan setiap 1 menit
 
 // =============================================
 // PPPoE BILLING JOBS: Auto Generate Invoice & Auto Isolir
