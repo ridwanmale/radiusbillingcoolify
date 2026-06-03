@@ -19,6 +19,10 @@ read -p "Masukkan path direktori instalasi (tekan Enter untuk default: /opt/radi
 INSTALL_DIR=${INSTALL_DIR:-/opt/radiusbilling-portal}
 INSTALL_DIR=${INSTALL_DIR%/}
 
+echo ""
+echo "PENTING: Jika portal ini nanti diakses menggunakan HTTPS (gembok hijau),"
+echo "maka Web Admin API WAJIB menggunakan awalan https:// juga."
+echo "----------------------------------------------------------------------"
 read -p "Masukkan URL Web Admin Anda (Contoh: https://admin.domain.com atau http://192.168.1.10:8088): " INPUT_WEB_ADMIN_URL
 
 if [[ -z "$INPUT_WEB_ADMIN_URL" ]]; then

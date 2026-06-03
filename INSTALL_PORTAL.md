@@ -20,36 +20,32 @@ Sebelum melakukan instalasi, pastikan hal-hal berikut sudah terpenuhi:
 Proses instalasi sangat mudah karena sudah menggunakan script interaktif.
 
 1. **Login ke VPS / Server Anda** melalui terminal atau SSH.
-2. **Download Script Instalasi dari GitHub:**
+2. **Download dan Jalankan Script Instalasi:**
    ```bash
-   wget https://raw.githubusercontent.com/<USERNAME_GITHUB_ANDA>/radiusbillingcoolify/main/install_portal.sh
+   wget https://raw.githubusercontent.com/ridwanmale/radiusbillingcoolify/main/install_portal.sh
    chmod +x install_portal.sh
+   sudo ./install_portal.sh
    ```
-   *(Catatan: Ganti `<USERNAME_GITHUB_ANDA>` dengan username GitHub Anda, atau sesuaikan dengan link repository Anda).*
-
-## Topologi 2 VPS (Core Server & Web Admin + Portal)
-Jika Anda menggunakan topologi 2 VPS (VPS 1 untuk Core Server, VPS 2 untuk Web Admin dan Portal sekaligus), maka di **VPS 2**, Anda **wajib menjalankan 2 script secara berurutan**:
-1. Jalankan `install_web.sh` terlebih dahulu.
-2. Setelah selesai, jalankan `install_portal.sh` (berada di direktori yang sama atau kloning dari Github lagi).
-
-Saat `install_portal.sh` meminta **URL Web Admin API**, Anda cukup menekan `Enter` (dikosongkan), maka sistem akan cerdas menghubungkan portal ke web admin di VPS yang sama secara otomatis.
-
-3. **Jalankan script instalasi:**
-```bash
-sudo ./install_portal.sh
-```
-
-4. **Ikuti panduan di layar:**
+3. **Ikuti panduan di layar:**
    - **Link GitHub:** Tekan `Enter` untuk menggunakan repositori default.
    - **Path Instalasi:** Tekan `Enter` untuk default (`/opt/radiusbilling-portal`).
-   - **URL Web Admin API:** Masukkan URL lengkap Web Admin Anda. 
-     - *Contoh Jika Pakai Cloudflare/Domain:* `https://admin.domainanda.com`
-     - *Contoh Jika IP Lokal:* `http://192.168.1.10:8088`
-     - *(Catatan Khusus Topologi 2 VPS: Jika Anda menjalankan install_portal.sh di VPS yang sama dengan Web Admin, Anda cukup menekan `Enter` (mengosongkan isian ini), dan sistem akan secara cerdas mengenali IP lokalnya).*
+   - **URL Web Admin API:** Masukkan URL lengkap Web Admin Anda.
+     - *Contoh Jika Pakai Cloudflare/Domain (HTTPS):* `https://admin.domainanda.com`
+     - *Contoh Jika IP Lokal (HTTP):* `http://192.168.1.10:8088`
+     > **PENTING (HTTPS / Mixed Content):** Jika nantinya portal ini diakses oleh pelanggan menggunakan HTTPS (contoh: `https://beli.domain.com`), maka Web Admin Anda **wajib** menggunakan alamat HTTPS juga (contoh: `https://admin.domain.com`). Jika Anda memasukkan alamat `http://` biasa, browser pelanggan akan memblokir proses pembelian (Error Mixed Content).
    - **Port:** Tekan `Enter` untuk menggunakan port default `8089`.
 
-5. **Tunggu proses instalasi selesai.**
-   Script akan otomatis mendownload file, menyuntikkan URL API yang Anda masukkan, mengkonfigurasi Docker, dan menjalankan container.nya di latar belakang.
+4. **Tunggu proses instalasi selesai.**
+   Script akan otomatis mendownload file, menyuntikkan URL API yang Anda masukkan, mengkonfigurasi Docker, dan menjalankan container-nya di latar belakang.
+
+---
+
+## 📝 Topologi 2 VPS (Core Server & Web Admin + Portal)
+Jika Anda menggunakan topologi 2 VPS (VPS 1 untuk Core Server, VPS 2 untuk Web Admin dan Portal sekaligus), maka di **VPS 2**, Anda **wajib menjalankan 2 script secara berurutan**:
+1. Jalankan `install_web.sh` terlebih dahulu untuk menginstal Web Admin.
+2. Setelah selesai, jalankan `install_portal.sh` untuk menginstal Portal Pembelian.
+
+Saat `install_portal.sh` meminta **URL Web Admin API**, Anda cukup menekan `Enter` (dikosongkan), maka sistem akan cerdas menghubungkan portal ke web admin di VPS yang sama secara otomatis. Pastikan mengakses portal dan web admin sesuai konfigurasi domain yang sama.
 
 ---
 

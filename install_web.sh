@@ -88,7 +88,16 @@ ENABLE_TELEGRAM_BOT_LISTENER=true
 EOF
 
 echo "Membangun dan menjalankan aplikasi Docker (WEB)..."
-docker compose -f docker-compose_web.yml up -d --build
+DOCKER_CMD="docker-compose"
+if ! command -v docker-compose &> /dev/null; then
+    if docker compose version &> /dev/null; then
+        DOCKER_CMD="docker compose"
+    else
+        echo "Error: docker-compose atau docker compose tidak ditemukan."
+        exit 1
+    fi
+fi
+$DOCKER_CMD -f docker-compose_web.yml up -d --build
 
 echo ""
 echo "========================================================"
