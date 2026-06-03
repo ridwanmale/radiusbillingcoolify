@@ -402,9 +402,11 @@ const OnlineStoreCenter = () => {
               </div>
 
 
-              <button type="submit" disabled={isSaving} className="btn-success-premium" style={{ width: '100%', padding: '15px', borderRadius: '12px', fontSize: '1rem', fontWeight: '800' }}>
-                {isSaving ? 'Menyimpan...' : 'Simpan Konfigurasi'}
-              </button>
+              {activeTab === 'pengaturan' && (
+                <button type="submit" disabled={isSaving} className="btn-success-premium" style={{ width: '100%', padding: '15px', borderRadius: '12px', fontSize: '1rem', fontWeight: '800' }}>
+                  {isSaving ? 'Menyimpan...' : 'Simpan Konfigurasi'}
+                </button>
+              )}
         </form>
       </div>
 
@@ -523,9 +525,9 @@ const OnlineStoreCenter = () => {
             </div>
             
             <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-              <button type="button" onClick={() => setIsSecurityModalOpen(false)} style={{ flex: 1, padding: '12px', background: '#38bdf8', color: '#0a0a0c', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: '800' }}>Terapkan & Tutup</button>
+              <button type="button" onClick={() => setIsSecurityModalOpen(false)} style={{ flex: 1, padding: '12px', background: 'rgba(255,255,255,0.05)', color: 'white', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: '700' }}>Batal</button>
+              <button type="button" onClick={(e) => { setIsSecurityModalOpen(false); handleSaveSettings(e); }} style={{ flex: 1, padding: '12px', background: '#38bdf8', color: '#0a0a0c', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: '800' }}>Simpan Pengaturan</button>
             </div>
-            <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '15px', textAlign: 'center' }}>* Pastikan menekan tombol "Simpan Konfigurasi" di bagian bawah layar utama untuk menyimpan permanen.</p>
           </div>
         </div>
       )}
