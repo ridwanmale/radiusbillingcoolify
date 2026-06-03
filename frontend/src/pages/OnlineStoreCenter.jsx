@@ -325,6 +325,33 @@ const OnlineStoreCenter = () => {
                 
                 <p style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '12px' }}>* Sistem akan menyuntikkan nominal otomatis. Jika ada lebih dari 1 QRIS, sistem akan merotasinya secara acak ke pembeli.</p>
               </div>
+            </div>
+
+            {/* PREVIEW / TIPS */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
+              <div className="glass-card" style={{ padding: '25px', border: '1px solid rgba(56, 189, 248, 0.2)' }}>
+                <h3 style={{ fontSize: '1rem', fontWeight: '800', marginBottom: '15px', color: '#38bdf8' }}>Status Integrasi</h3>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px' }}>
+                  <span className="material-symbols-rounded" style={{ color: '#10b981' }}>check_circle</span>
+                  <span style={{ fontSize: '0.9rem' }}>Payment Bridge Aktif</span>
+                </div>
+                <p style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: '1.5' }}>
+                  Otomatisasi pembayaran kini dikelola sepenuhnya melalui <strong>Payment Bridge Center</strong>. Pastikan perangkat Android Anda terhubung dan berstatus online untuk memproses transaksi secara otomatis.
+                </p>
+              </div>
+
+              <div className="glass-card" style={{ padding: '25px' }}>
+                <h3 style={{ fontSize: '0.9rem', fontWeight: '800', marginBottom: '10px' }}>Petunjuk Cepat</h3>
+                <ul style={{ fontSize: '0.8rem', color: '#94a3b8', paddingLeft: '18px', lineHeight: '1.6' }}>
+                  <li>Judul Portal akan muncul di halaman depan pelanggan.</li>
+                  <li>Warna Utama akan menyesuaikan tombol & aksen portal.</li>
+                  <li>Sistem menggunakan kode unik 1-200 untuk validasi otomatis.</li>
+                  <li>Pastikan string QRIS memiliki tag 5802ID untuk nominal otomatis.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
 
               <div style={{ display: activeTab === 'keamanan' ? 'block' : 'none' }}>
               {/* SECTION: KEAMANAN & SPAM */}
@@ -418,35 +445,10 @@ const OnlineStoreCenter = () => {
               </div>
               </div>
 
+
               <button type="submit" disabled={isSaving} className="btn-success-premium" style={{ width: '100%', padding: '15px', borderRadius: '12px', fontSize: '1rem', fontWeight: '800' }}>
                 {isSaving ? 'Menyimpan...' : 'Simpan Konfigurasi'}
               </button>
-            </div>
-
-            {/* PREVIEW / TIPS */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
-              <div className="glass-card" style={{ padding: '25px', border: '1px solid rgba(56, 189, 248, 0.2)' }}>
-                <h3 style={{ fontSize: '1rem', fontWeight: '800', marginBottom: '15px', color: '#38bdf8' }}>Status Integrasi</h3>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px' }}>
-                  <span className="material-symbols-rounded" style={{ color: '#10b981' }}>check_circle</span>
-                  <span style={{ fontSize: '0.9rem' }}>Payment Bridge Aktif</span>
-                </div>
-                <p style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: '1.5' }}>
-                  Otomatisasi pembayaran kini dikelola sepenuhnya melalui <strong>Payment Bridge Center</strong>. Pastikan perangkat Android Anda terhubung dan berstatus online untuk memproses transaksi secara otomatis.
-                </p>
-              </div>
-
-              <div className="glass-card" style={{ padding: '25px' }}>
-                <h3 style={{ fontSize: '0.9rem', fontWeight: '800', marginBottom: '10px' }}>Petunjuk Cepat</h3>
-                <ul style={{ fontSize: '0.8rem', color: '#94a3b8', paddingLeft: '18px', lineHeight: '1.6' }}>
-                  <li>Judul Portal akan muncul di halaman depan pelanggan.</li>
-                  <li>Warna Utama akan menyesuaikan tombol & aksen portal.</li>
-                  <li>Sistem menggunakan kode unik 1-200 untuk validasi otomatis.</li>
-                  <li>Pastikan string QRIS memiliki tag 5802ID untuk nominal otomatis.</li>
-                </ul>
-              </div>
-            </div>
-          </div>
         </form>
       </div>
 
