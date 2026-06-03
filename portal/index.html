@@ -5,15 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Online Payment</title>
     <style>
+        @import url('https://rsms.me/inter/inter.css');
         :root {
-            --primary: #6366f1;
-            --secondary: #3b82f6;
-            --background: #0a0a0c;
-            --card-bg: rgba(255, 255, 255, 0.05);
-            --border: rgba(255, 255, 255, 0.1);
-            --text: #ffffff;
-            --text-muted: #94a3b8;
-            --success: #10b981;
+            --primary: #5e6ad2;
+            --primary-hover: #828fff;
+            --primary-focus: #5e69d1;
+            --background: #010102;
+            --card-bg: #0f1011;
+            --card-bg-featured: #141516;
+            --border: #23252a;
+            --border-strong: #34343a;
+            --text: #f7f8f8;
+            --text-muted: #d0d6e0;
+            --text-subtle: #8a8f98;
+            --success: #27a644;
             --danger: #ef4444;
             --warning: #f59e0b;
         }
@@ -25,69 +30,79 @@
             margin: 0;
             padding: 0;
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
         }
 
         .container {
-            padding: 20px;
+            padding: 24px;
             max-width: 1000px;
             margin: 0 auto;
         }
 
         .glass-card {
             background: var(--card-bg);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border-radius: 28px;
+            border-radius: 12px;
             border: 1px solid var(--border);
-            padding: 25px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            border: none;
-            transition: all 0.2s;
+            background: var(--primary);
+            color: #ffffff;
+            border: 1px solid var(--primary);
+            transition: all 0.2s ease;
             cursor: pointer;
-            padding: 16px;
-            border-radius: 14px;
-            font-weight: 900;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 500;
             width: 100%;
-            font-size: 1rem;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        .btn-primary:active { transform: scale(0.98); }
-        .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
+        .btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+        .btn-primary:active { background: var(--primary-focus); transform: scale(0.98); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .payment-method-btn {
-            width: 100%; display: flex; align-items: center; gap: 15px; padding: 14px;
-            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 20px; color: white; cursor: pointer; transition: all 0.2s;
+            width: 100%; display: flex; align-items: center; gap: 15px; padding: 16px;
+            background: var(--background); border: 1px solid var(--border);
+            border-radius: 12px; color: var(--text); cursor: pointer; transition: all 0.2s;
         }
+        .payment-method-btn:hover { background: var(--card-bg-featured); border-color: var(--border-strong); }
         
         .payment-icon-wrapper {
-            width: 50px; height: 50px; border-radius: 15px; display: flex;
+            width: 40px; height: 40px; border-radius: 8px; display: flex;
             align-items: center; justify-content: center; flex-shrink: 0;
+            background: var(--card-bg); border: 1px solid var(--border);
         }
 
         .hidden { display: none !important; }
 
+        h1, h2, h3 { font-weight: 600; letter-spacing: -0.02em; margin: 0; }
+        p { line-height: 1.5; color: var(--text-subtle); margin: 0; }
+
         /* Toast Styles */
         .custom-toast {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            z-index: 10000; min-width: 280px; padding: 20px 30px; border-radius: 24px;
-            backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
-            animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: fixed; top: 32px; left: 50%; transform: translateX(-50%);
+            z-index: 10000; min-width: 320px; padding: 16px 20px; border-radius: 8px;
+            background: var(--card-bg); border: 1px solid var(--border);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.5);
+            animation: toastIn 0.3s ease-out;
             display: none;
         }
-        .toast-content { display: flex; flex-direction: column; align-items: center; gap: 15px; text-align: center; }
-        .toast-content span { font-size: 1.1rem; font-weight: 900; }
-        .toast-error { background: rgba(220, 38, 38, 0.9); color: white; border-color: rgba(255,255,255,0.3); box-shadow: 0 0 30px rgba(220, 38, 38, 0.4); }
-        .toast-success { background: rgba(16, 185, 129, 0.9); color: white; box-shadow: 0 0 30px rgba(16, 185, 129, 0.4); }
-        .toast-info { background: rgba(30, 64, 175, 0.9); color: white; box-shadow: 0 0 30px rgba(30, 64, 175, 0.4); }
-        .toast-warning { background: rgba(245, 158, 11, 0.9); color: white; box-shadow: 0 0 30px rgba(245, 158, 11, 0.4); }
+        .toast-content { display: flex; align-items: center; gap: 12px; text-align: left; }
+        .toast-content span { font-size: 14px; font-weight: 500; color: var(--text); flex: 1; }
+        .toast-error { border-left: 4px solid var(--danger); }
+        .toast-success { border-left: 4px solid var(--success); }
+        .toast-info { border-left: 4px solid var(--primary); }
+        .toast-warning { border-left: 4px solid var(--warning); }
 
-        @keyframes toastIn { from { opacity: 0; transform: translate(-50%, -40%) scale(0.9); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+        @keyframes toastIn { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
         /* Loading Overlay */
         #loading-overlay {
@@ -95,9 +110,9 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         .spinner {
-            width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.1);
+            width: 32px; height: 32px; border: 3px solid var(--border);
             border-left-color: var(--primary); border-radius: 50%;
-            animation: spin 1s linear infinite; margin-bottom: 20px;
+            animation: spin 1s linear infinite; margin-bottom: 16px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
