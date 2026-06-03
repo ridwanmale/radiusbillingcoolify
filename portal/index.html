@@ -68,6 +68,25 @@
         .btn-primary:active { background: var(--primary-focus); transform: scale(0.98); }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
+        .btn-secondary {
+            background: var(--card-bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            width: 100%;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-secondary:hover { background: var(--card-bg-featured); border-color: var(--text-subtle); }
+        .btn-secondary:active { transform: scale(0.98); }
+
         .payment-method-btn {
             width: 100%; display: flex; align-items: center; gap: 15px; padding: 16px;
             background: var(--background); border: 1px solid var(--border);
