@@ -247,7 +247,9 @@ const OnlineStoreCenter = () => {
                         </div>
                         <div style={{ overflow: 'hidden' }}>
                           <div style={{ fontWeight: '800', fontSize: '0.9rem', color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{qris.name || 'QRIS Tanpa Nama'}</div>
-                          <div style={{ fontSize: '0.7rem', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{qris.payload || 'Payload kosong'}</div>
+                          <div style={{ fontSize: '0.7rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                            <span className="material-symbols-rounded" style={{ fontSize: '12px' }}>lock</span> Data Tersimpan
+                          </div>
                         </div>
                       </div>
                       <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
