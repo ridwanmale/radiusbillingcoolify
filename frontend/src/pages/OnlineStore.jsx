@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const OnlineStore = () => {
   const [settings, setSettings] = useState({
@@ -11,7 +13,8 @@ const OnlineStore = () => {
     is_active: true,
     enable_schedule: false,
     open_time: '08:00',
-    close_time: '22:00'
+    close_time: '22:00',
+    success_message_html: ''
   });
   const [transactions, setTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -136,6 +139,28 @@ const OnlineStore = () => {
                         <option value="0">Tutup (Maintenance)</option>
                     </select>
                 </div>
+            </div>
+
+            <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+              <label className="form-label">Pesan Sukses (Setelah Pembayaran)</label>
+              <div style={{ background: 'white', borderRadius: '8px', color: 'black' }}>
+                <ReactQuill 
+                  theme="snow" 
+                  value={settings.success_message_html || ''} 
+                  onChange={val => setSettings({...settings, success_message_html: val})} 
+                  modules={{
+                    toolbar: [
+                      ['bold', 'italic', 'underline', 'strike'],
+                      [{ 'color': [] }, { 'background': [] }],
+                      [{ 'align': [] }],
+                      ['clean']
+                    ]
+                  }}
+                />
+              </div>
+              <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '8px' }}>
+                Pesan ini akan ditampilkan di halaman voucher setelah pembeli berhasil membayar.
+              </p>
             </div>
 
             <div style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '1.5rem', borderRadius: '15px', border: '1px solid rgba(255, 255, 255, 0.05)', marginBottom: '1.5rem' }}>
