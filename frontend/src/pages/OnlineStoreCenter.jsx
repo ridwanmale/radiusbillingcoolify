@@ -26,6 +26,9 @@ const OnlineStoreCenter = () => {
   });
   const [isSaving, setIsSaving] = useState(false);
   const [qrisList, setQrisList] = useState([{ name: 'QRIS Utama', payload: '' }]);
+  const [isQrisModalOpen, setIsQrisModalOpen] = useState(false);
+  const [editingQrisIndex, setEditingQrisIndex] = useState(-1);
+  const [tempQris, setTempQris] = useState({ name: '', payload: '' });
 
   // --- DATA FETCHING ---
   const fetchData = async () => {
@@ -232,37 +235,36 @@ const OnlineStoreCenter = () => {
               <div className="form-group" style={{ marginBottom: '30px' }}>
                 <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span>Data QRIS Statis (Multi QRIS / Rotasi)</span>
-                  <button type="button" onClick={() => setQrisList([...qrisList, { name: `QRIS ${qrisList.length + 1}`, payload: '' }])} style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '5px 10px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.7rem', fontWeight: 'bold', transition: 'all 0.2s' }}>+ Tambah QRIS</button>
+                  <button type="button" onClick={() => { setEditingQrisIndex(-1); setTempQris({ name: '', payload: '' }); setIsQrisModalOpen(true); }} style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '5px 10px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.7rem', fontWeight: 'bold', transition: 'all 0.2s' }}>+ Tambah QRIS</button>
                 </label>
                 
-                {qrisList.map((qris, index) => (
-                  <div key={index} style={{ background: 'rgba(255,255,255,0.02)', padding: '15px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '15px', position: 'relative' }}>
-                    {qrisList.length > 1 && (
-                      <button type="button" onClick={() => { const newList = [...qrisList]; newList.splice(index, 1); setQrisList(newList); }} style={{ position: 'absolute', top: '15px', right: '15px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '6px', color: '#ef4444', cursor: 'pointer', padding: '4px', display: 'flex' }} title="Hapus QRIS ini">
-                        <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>delete</span>
-                      </button>
-                    )}
-                    <div style={{ marginBottom: '10px', paddingRight: '35px' }}>
-                      <input 
-                        type="text" 
-                        className="form-input-premium" 
-                        style={{ padding: '10px 12px', fontSize: '0.85rem', marginBottom: '10px', background: 'rgba(0,0,0,0.2)' }} 
-                        placeholder="Nama QRIS (Misal: DANA Utama, GoPay, dll)"
-                        value={qris.name} 
-                        onChange={e => { const newList = [...qrisList]; newList[index].name = e.target.value; setQrisList(newList); }} 
-                      />
-                      <textarea 
-                        className="form-input-premium" 
-                        style={{ height: '70px', fontSize: '0.75rem', fontFamily: 'monospace', background: 'rgba(0,0,0,0.2)' }} 
-                        placeholder="Masukkan string payload QRIS (000201...)"
-                        value={qris.payload} 
-                        onChange={e => { const newList = [...qrisList]; newList[index].payload = e.target.value; setQrisList(newList); }} 
-                      />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {qrisList.map((qris, index) => (
+                    <div key={index} style={{ background: 'rgba(255,255,255,0.02)', padding: '12px 15px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, overflow: 'hidden' }}>
+                        <div style={{ width: '35px', height: '35px', background: 'rgba(56, 189, 248, 0.1)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <span className="material-symbols-rounded" style={{ color: '#38bdf8', fontSize: '18px' }}>qr_code_2</span>
+                        </div>
+                        <div style={{ overflow: 'hidden' }}>
+                          <div style={{ fontWeight: '800', fontSize: '0.9rem', color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{qris.name || 'QRIS Tanpa Nama'}</div>
+                          <div style={{ fontSize: '0.7rem', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{qris.payload || 'Payload kosong'}</div>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+                        <button type="button" onClick={() => { setEditingQrisIndex(index); setTempQris({ ...qris }); setIsQrisModalOpen(true); }} style={{ background: 'rgba(251, 191, 36, 0.1)', border: '1px solid rgba(251, 191, 36, 0.2)', borderRadius: '6px', color: '#fbbf24', cursor: 'pointer', padding: '6px', display: 'flex' }} title="Edit QRIS">
+                          <span className="material-symbols-rounded" style={{ fontSize: '16px' }}>edit</span>
+                        </button>
+                        {qrisList.length > 1 && (
+                          <button type="button" onClick={() => { const newList = [...qrisList]; newList.splice(index, 1); setQrisList(newList); }} style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '6px', color: '#ef4444', cursor: 'pointer', padding: '6px', display: 'flex' }} title="Hapus QRIS ini">
+                            <span className="material-symbols-rounded" style={{ fontSize: '16px' }}>delete</span>
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
                 
-                <p style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '8px' }}>* Sistem akan menyuntikkan nominal otomatis. Jika ada lebih dari 1 QRIS, sistem akan merotasinya secara acak ke pembeli.</p>
+                <p style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '12px' }}>* Sistem akan menyuntikkan nominal otomatis. Jika ada lebih dari 1 QRIS, sistem akan merotasinya secara acak ke pembeli.</p>
               </div>
 
               <button type="submit" disabled={isSaving} className="btn-success-premium" style={{ width: '100%', padding: '15px', borderRadius: '12px', fontSize: '1rem', fontWeight: '800' }}>
@@ -296,6 +298,59 @@ const OnlineStoreCenter = () => {
           </div>
         </form>
       </div>
+
+      {/* MODAL QRIS */}
+      {isQrisModalOpen && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', backdropFilter: 'blur(5px)' }}>
+          <div className="glass-card fade-in" style={{ width: '100%', maxWidth: '450px', padding: '25px', background: '#1e1e24', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <h3 style={{ margin: '0 0 20px 0', fontSize: '1.2rem', fontWeight: '800', color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span className="material-symbols-rounded" style={{ color: '#38bdf8' }}>qr_code_2</span>
+              {editingQrisIndex >= 0 ? 'Edit QRIS' : 'Tambah QRIS Baru'}
+            </h3>
+            
+            <div className="form-group" style={{ marginBottom: '15px' }}>
+              <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Nama Pengenal</label>
+              <input 
+                type="text" 
+                className="form-input-premium" 
+                placeholder="Misal: DANA Utama, GoPay"
+                value={tempQris.name} 
+                onChange={e => setTempQris({...tempQris, name: e.target.value})} 
+                autoFocus
+              />
+            </div>
+            
+            <div className="form-group" style={{ marginBottom: '25px' }}>
+              <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>String Payload (000201...)</label>
+              <textarea 
+                className="form-input-premium" 
+                style={{ height: '100px', fontSize: '0.75rem', fontFamily: 'monospace' }} 
+                placeholder="Paste string QRIS Anda di sini..."
+                value={tempQris.payload} 
+                onChange={e => setTempQris({...tempQris, payload: e.target.value})} 
+              />
+            </div>
+            
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button type="button" onClick={() => setIsQrisModalOpen(false)} style={{ flex: 1, padding: '12px', background: 'rgba(255,255,255,0.05)', color: 'white', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: '700' }}>Batal</button>
+              <button type="button" onClick={() => {
+                if (!tempQris.name || !tempQris.payload) {
+                  toast.error('Nama dan Payload harus diisi!');
+                  return;
+                }
+                const newList = [...qrisList];
+                if (editingQrisIndex >= 0) {
+                  newList[editingQrisIndex] = tempQris;
+                } else {
+                  newList.push(tempQris);
+                }
+                setQrisList(newList);
+                setIsQrisModalOpen(false);
+              }} style={{ flex: 1, padding: '12px', background: '#38bdf8', color: '#0a0a0c', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: '800' }}>Simpan</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style dangerouslySetInnerHTML={{ __html: `
         .online-store-center { animation: fadeIn 0.5s ease-out; }
