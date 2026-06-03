@@ -59,6 +59,14 @@ const OnlineStoreCenter = () => {
     } catch (error) {
       console.error('Fetch error:', error);
       toast.error('Gagal mengambil data');
+    }
+
+    try {
+      const resBlocklist = await fetch('/api/online-store/spam-blocklist');
+      const blocklistData = await resBlocklist.json();
+      setSpamBlocklist(Array.isArray(blocklistData) ? blocklistData : []);
+    } catch (err) {
+      console.error('Failed to fetch blocklist', err);
     } finally {
       setLoading(false);
     }

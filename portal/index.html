@@ -107,21 +107,21 @@
 
         /* Toast Styles */
         .custom-toast {
-            position: fixed; top: 32px; left: 50%; transform: translateX(-50%);
-            z-index: 10000; min-width: 320px; padding: 16px 20px; border-radius: 8px;
-            background: var(--card-bg); border: 1px solid var(--border);
-            box-shadow: 0 12px 24px rgba(0,0,0,0.5);
-            animation: toastIn 0.3s ease-out;
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 10000; min-width: 320px; padding: 20px 24px; border-radius: 12px;
+            background: #ffffff; border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            animation: toastIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: none;
         }
-        .toast-content { display: flex; align-items: center; gap: 12px; text-align: left; }
-        .toast-content span { font-size: 14px; font-weight: 500; color: var(--text); flex: 1; }
-        .toast-error { border-left: 4px solid var(--danger); }
-        .toast-success { border-left: 4px solid var(--success); }
-        .toast-info { border-left: 4px solid var(--primary); }
-        .toast-warning { border-left: 4px solid var(--warning); }
+        .toast-content { display: flex; align-items: center; gap: 16px; text-align: left; }
+        .toast-content span { font-size: 16px; font-weight: 600; color: #1a1a1a; flex: 1; }
+        .toast-error { border-left: 6px solid #ef4444; }
+        .toast-success { border-left: 6px solid #10b981; }
+        .toast-info { border-left: 6px solid #3b82f6; }
+        .toast-warning { border-left: 6px solid #f59e0b; }
 
-        @keyframes toastIn { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+        @keyframes toastIn { from { opacity: 0; transform: translate(-50%, -30%); scale: 0.9; } to { opacity: 1; transform: translate(-50%, -50%); scale: 1; } }
 
         /* Loading Overlay */
         #loading-overlay {
