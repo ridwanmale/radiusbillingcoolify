@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ConfirmModal from '../components/ConfirmModal';
+import { formatDateTime } from '../utils/dateFormatter';
 
 const RekapVoucher = () => {
   const [rekapList, setRekapList] = useState([]);
@@ -87,7 +88,7 @@ const RekapVoucher = () => {
   const formatDate = (dateString) => {
     if (!dateString) return '-';
     const dDate = new Date(dateString);
-    return dDate.toLocaleString('id-ID', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(',', '').replace(/\./g, ':');
+    return formatDateTime(dDate);
   };
 
   // Filter and Pagination Logic

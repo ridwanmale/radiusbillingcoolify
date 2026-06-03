@@ -1,6 +1,7 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import ConfirmModal from '../components/ConfirmModal';
 import { toast } from 'react-toastify';
+import { formatDateTime } from '../utils/dateFormatter';
 
 const VoucherTerjual = () => {
   const [vouchers, setVouchers] = useState([]);
@@ -200,10 +201,7 @@ const VoucherTerjual = () => {
 
   const formatDate = (dateString) => {
     if (!dateString) return '-';
-    return new Date(dateString).toLocaleString('id-ID', { 
-      day: '2-digit', month: '2-digit', year: 'numeric', 
-      hour: '2-digit', minute: '2-digit', second: '2-digit'
-    }).replace(',', '').replace(/\./g, ':');
+    return formatDateTime(dateString);
   };
 
   const formatHMS = (seconds) => {
@@ -368,8 +366,8 @@ const VoucherTerjual = () => {
   };
 
   const getSortIcon = (key) => {
-    if (sortConfig.key !== key) return <span style={{ opacity: 0.3, fontSize: '0.7rem', marginLeft: '5px' }}>↕</span>;
-    return <span style={{ color: 'var(--accent-primary)', fontSize: '0.8rem', marginLeft: '5px' }}>{sortConfig.direction === 'asc' ? '▲' : '▼'}</span>;
+    if (sortConfig.key !== key) return <span style={{ opacity: 0.3, fontSize: '0.7rem', marginLeft: '5px' }}>?</span>;
+    return <span style={{ color: 'var(--accent-primary)', fontSize: '0.8rem', marginLeft: '5px' }}>{sortConfig.direction === 'asc' ? '?' : '?'}</span>;
   };
 
   const filteredVouchers = vouchers
@@ -609,7 +607,7 @@ const VoucherTerjual = () => {
               {profiles.map(p => <option key={p} value={p} style={{ background: '#1e1b1e' }}>{p}</option>)}
             </select>
             <select className="form-input" value={filterOutlet} onChange={e => setFilterOutlet(e.target.value)} style={{ width: '140px', background: 'rgba(255,255,255,0.05)', fontSize: '1rem' }}>
-              {filterOutlets.map(o => <option key={o} value={o} style={{ background: '#1e1b1e' }}>{o === 'Online Store' || o === 'Online' ? 'âš¡ ' + o : o}</option>)}
+              {filterOutlets.map(o => <option key={o} value={o} style={{ background: '#1e1b1e' }}>{o === 'Online Store' || o === 'Online' ? '⚡ ' + o : o}</option>)}
             </select>
             <input type="text" placeholder="Cari voucher..." value={searchQuery} onChange={(e) => {setSearchQuery(e.target.value); setCurrentPage(1);}} className="form-input" style={{ width: '180px', padding: '6px 12px', background: 'rgba(255,255,255,0.05)', fontSize: '1rem' }} />
           </div>

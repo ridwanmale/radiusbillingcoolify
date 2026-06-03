@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ConfirmModal from '../../components/ConfirmModal';
+import { formatDateTime } from '../../utils/dateFormatter';
 
 const PppoeMonitoring = ({ user }) => {
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -77,7 +78,7 @@ const PppoeMonitoring = ({ user }) => {
                   <td>{u.customer_name}</td>
                   <td>{u.router_name}</td>
                   <td>{u.framedipaddress}</td>
-                  <td>{new Date(u.acctstarttime).toLocaleString()}</td>
+                  <td>{formatDateTime(u.acctstarttime)}</td>
                   <td>
                     {/* Simplified Uptime calculation */}
                     {Math.floor((new Date() - new Date(u.acctstarttime)) / 60000)} menit

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ConfirmModal from '../components/ConfirmModal';
 import { useNavigate } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { formatDateTime } from '../utils/dateFormatter';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -92,12 +93,7 @@ const Dashboard = () => {
         <div style={{ textAlign: 'right', padding: '0.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid var(--border-color)', minWidth: '180px' }}>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '2px' }}>WAKTU SEKARANG (WIB)</div>
           <div style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--accent-primary)', letterSpacing: '0.5px' }}>
-            {currentTime.toLocaleString('id-ID', { 
-              weekday: 'long', 
-              day: 'numeric', 
-              month: 'long', 
-              year: 'numeric' 
-            })}
+            {formatDateTime(currentTime)}
           </div>
           <div style={{ fontSize: '1.2rem', fontWeight: '800', fontFamily: 'monospace' }}>
             {currentTime.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(/\./g, ':')}
@@ -278,7 +274,7 @@ const Dashboard = () => {
             <tbody>
               {logs.map((log) => (
                 <tr key={log.id}>
-                  <td style={{ fontSize: '0.8rem' }}>{new Date(log.created_at).toLocaleString('id-ID')}</td>
+                  <td style={{ fontSize: '0.8rem' }}>{formatDateTime(log.created_at)}</td>
                   <td>{log.admin_username || 'System'}</td>
                   <td>{log.action}</td>
                   <td>{log.details}</td>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { formatDateTime } from '../utils/dateFormatter';
 
 const Backup = () => {
   const [activeTab, setActiveTab] = useState('local');
@@ -372,7 +373,7 @@ const Backup = () => {
                         {log.status}
                       </span>
                       <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.7rem' }}>
-                        {new Date(log.created_at).toLocaleString('id-ID')}
+                        {formatDateTime(log.created_at)}
                       </span>
                     </div>
                     <div style={{ color: 'white', fontSize: '0.85rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={log.file_name}>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { formatDateTime } from '../utils/dateFormatter';
 
 const PaymentBridgeCenter = () => {
   const [activeTab, setActiveTab] = useState('transactions');
@@ -511,7 +512,7 @@ const PaymentBridgeCenter = () => {
                         style={{ cursor: 'pointer', transform: 'scale(1.2)' }}
                       />
                     </td>
-                    <td style={{ padding: '12px 20px', fontSize: '0.85rem', color: '#cbd5e1' }}>{new Date(trx.created_at).toLocaleString('id-ID')}</td>
+                    <td style={{ padding: '12px 20px', fontSize: '0.85rem', color: '#cbd5e1' }}>{formatDateTime(trx.created_at)}</td>
                     <td style={{ padding: '12px 20px', fontWeight: '700', color: '#38bdf8' }}>{trx.order_id}</td>
                     <td style={{ padding: '12px 20px' }}>{trx.package_id}</td>
                     <td style={{ padding: '12px 20px' }}>
@@ -602,7 +603,7 @@ const PaymentBridgeCenter = () => {
                         style={{ cursor: 'pointer', transform: 'scale(1.2)' }}
                       />
                     </td>
-                    <td style={{ padding: '12px 20px', fontSize: '0.85rem', color: '#cbd5e1' }}>{new Date(log.received_at).toLocaleString('id-ID')}</td>
+                    <td style={{ padding: '12px 20px', fontSize: '0.85rem', color: '#cbd5e1' }}>{formatDateTime(log.received_at)}</td>
                     <td style={{ padding: '12px 20px', fontWeight: '800', color: '#10b981' }}>Rp {Number(log.amount_detected).toLocaleString('id-ID', { minimumFractionDigits: 0 })}</td>
                     <td style={{ padding: '12px 20px', fontSize: '0.85rem', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {log.notification_text}
@@ -690,7 +691,7 @@ const PaymentBridgeCenter = () => {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
                     Terakhir Aktif:<br/>
-                    <span style={{ color: '#cbd5e1' }}>{device.last_seen_at ? new Date(device.last_seen_at).toLocaleString('id-ID') : 'Belum pernah'}</span>
+                    <span style={{ color: '#cbd5e1' }}>{device.last_seen_at ? formatDateTime(device.last_seen_at) : 'Belum pernah'}</span>
                   </div>
                   <div style={{ display: 'flex', gap: '10px' }}>
                     <button onClick={() => handleToggleDevice(device.id, device.status)} className="btn-glass" style={{ padding: '8px 15px', borderRadius: '8px', fontSize: '0.8rem', fontWeight: '700' }}>

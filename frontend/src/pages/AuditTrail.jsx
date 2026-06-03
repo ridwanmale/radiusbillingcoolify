@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { formatDateTime } from '../utils/dateFormatter';
 
 const AuditTrail = ({ user }) => {
   const [logs, setLogs] = useState([]);
@@ -197,14 +198,7 @@ const AuditTrail = ({ user }) => {
               filteredLogs.map(log => (
                 <tr key={log.id}>
                   <td style={{ fontSize: '0.8rem', opacity: 0.8 }}>
-                    {new Date(log.created_at).toLocaleString('id-ID', { 
-                      day: '2-digit', 
-                      month: 'short', 
-                      year: 'numeric', 
-                      hour: '2-digit', 
-                      minute: '2-digit', 
-                      second: '2-digit' 
-                    })}
+                    {formatDateTime(log.created_at)}
                   </td>
                   <td>
                     <span style={{ fontWeight: '700', color: 'var(--text-primary)' }}>
@@ -263,14 +257,7 @@ const AuditTrail = ({ user }) => {
                 <div>
                   <span style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-secondary)' }}>WAKTU</span>
                   <span style={{ fontWeight: '600', fontSize: '0.85rem' }}>
-                    {new Date(selectedLog.created_at).toLocaleString('id-ID', { 
-                      day: '2-digit', 
-                      month: 'long', 
-                      year: 'numeric', 
-                      hour: '2-digit', 
-                      minute: '2-digit', 
-                      second: '2-digit' 
-                    })}
+                    {formatDateTime(selectedLog.created_at)}
                   </span>
                 </div>
                 <div>

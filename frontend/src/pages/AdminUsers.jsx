@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ConfirmModal from '../components/ConfirmModal';
+import { formatDateTime } from '../utils/dateFormatter';
 
 const AdminUsers = ({ user }) => {
   const [users, setUsers] = useState([]);
@@ -145,7 +146,7 @@ const AdminUsers = ({ user }) => {
                   <td>
                     <span className="badge" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>{adminUser.role}</span>
                   </td>
-                  <td>{new Date(adminUser.created_at).toLocaleString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(',', '').replace(/\./g, ':')}</td>
+                  <td>{formatDateTime(adminUser.created_at)}</td>
                   <td style={{ textAlign: 'right', display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                     <button 
                       className="btn-icon" 

@@ -1,4 +1,5 @@
-﻿import React, { useState, useEffect } from 'react';
+import { formatDateTime } from '../utils/dateFormatter';
+import React, { useState, useEffect } from 'react';
 import PrintTemplate from '../components/PrintTemplate';
 import { toast } from 'react-toastify';
 import ConfirmModal from '../components/ConfirmModal';
@@ -258,6 +259,7 @@ const StockVoucher = ({ user }) => {
         const data = await res.json();
         if (res.ok) {
           toast.success(`Berhasil mengimport ${data.successCount} voucher`);
+
           setIsImportModalOpen(false);
           setImportFile(null);
           setImportProfile('');
@@ -329,32 +331,57 @@ const StockVoucher = ({ user }) => {
 
 
 
-    triggerConfirm(`Yakin ingin melakukan ${action} pada ${usernamesToProcess.length} voucher terpilih?`, async () => {
-      try {
-        const host = window.location.hostname;
-        const res = await fetch(`/api/vouchers/bulk`, {
+    triggerConfirm(`Yakin ingin melakukan ${action} pada ${usernamesToProcess.length} voucher terpilih?`, async () => {
+
+      try {
+
+        const host = window.location.hostname;
+
+        const res = await fetch(`/api/vouchers/bulk`, {
+
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            action, 
-            usernames: usernamesToProcess, 
-            value: extraValue,
-            admin_username: user?.username || 'admin'
-          })
-        });
-        if (res.ok) {
-          await fetchData();
-          if (!targetUsernames) setSelectedVouchers([]);
-          toast.success(`Berhasil melakukan ${action.replace('_', ' ')} pada ${usernamesToProcess.length} voucher!`);
-        } else {
-          const result = await res.json().catch(() => ({ error: 'Gagal membaca respon server (Bukan JSON)' }));
-          toast.error('Gagal: ' + (result.error || result.message || 'Terjadi kesalahan tidak dikenal'));
-        }
-      } catch (err) {
-        console.error(err);
-        toast.error('Gagal koneksi ke server: ' + err.message);
-      }
-    });
+          headers: { 'Content-Type': 'application/json' },
+
+          body: JSON.stringify({ 
+
+            action, 
+
+            usernames: usernamesToProcess, 
+
+            value: extraValue,
+
+            admin_username: user?.username || 'admin'
+
+          })
+
+        });
+
+        if (res.ok) {
+
+          await fetchData();
+
+          if (!targetUsernames) setSelectedVouchers([]);
+
+          toast.success(`Berhasil melakukan ${action.replace('_', ' ')} pada ${usernamesToProcess.length} voucher!`);
+
+        } else {
+
+          const result = await res.json().catch(() => ({ error: 'Gagal membaca respon server (Bukan JSON)' }));
+
+          toast.error('Gagal: ' + (result.error || result.message || 'Terjadi kesalahan tidak dikenal'));
+
+        }
+
+      } catch (err) {
+
+        console.error(err);
+
+        toast.error('Gagal koneksi ke server: ' + err.message);
+
+      }
+
+    });
+
     if (typeof eOrAction !== 'string') eOrAction.target.value = '';
     setActiveActionMenu(null);
   };
@@ -532,8 +559,8 @@ const StockVoucher = ({ user }) => {
   };
 
   const getSortIcon = (key) => {
-    if (sortConfig.key !== key) return <span style={{ opacity: 0.3, fontSize: '0.7rem', marginLeft: '5px' }}>↕</span>;
-    return <span style={{ color: 'var(--accent-primary)', fontSize: '0.8rem', marginLeft: '5px' }}>{sortConfig.direction === 'asc' ? '▲' : '▼'}</span>;
+    if (sortConfig.key !== key) return <span style={{ opacity: 0.3, fontSize: '0.7rem', marginLeft: '5px' }}>?</span>;
+    return <span style={{ color: 'var(--accent-primary)', fontSize: '0.8rem', marginLeft: '5px' }}>{sortConfig.direction === 'asc' ? '?' : '?'}</span>;
   };
 
   // FILTERING LOGIC
@@ -857,7 +884,7 @@ const StockVoucher = ({ user }) => {
                   ) : (
                     paginatedVouchers.map((v, i) => {
                       const dDate = new Date(v.created_at);
-                      const formattedDate = dDate.toLocaleString('id-ID', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(',', '').replace(/\./g, ':');
+                      const formattedDate = formatDateTime(dDate);
                       return (
                         <tr key={i} className="hoverable-row" style={{ verticalAlign: 'middle', opacity: v.status === 'Nonaktif' ? 0.6 : 1, background: v.status === 'Nonaktif' ? 'rgba(239, 68, 68, 0.02)' : 'transparent' }}>
                           <td style={{ textAlign: 'center' }}><input type="checkbox" checked={selectedVouchers.includes(v.voucher_code)} onChange={(e) => handleSelectOne(e, v.voucher_code)} /></td>

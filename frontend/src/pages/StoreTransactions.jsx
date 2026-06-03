@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ConfirmModal from '../components/ConfirmModal';
+import { formatDateTime } from '../utils/dateFormatter';
 
 const StoreTransactions = () => {
     const [transactions, setTransactions] = useState([]);
@@ -303,7 +304,7 @@ const StoreTransactions = () => {
                             ) : currentRows.map(trx => (
                                 <tr key={trx.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
                                     <td style={{ padding: '15px 20px' }}><input type="checkbox" checked={selectedIds.includes(trx.id)} onChange={() => toggleSelect(trx.id)} /></td>
-                                    <td style={{ padding: '15px 20px', color: '#cbd5e1', fontSize: '0.9rem' }}>{new Date(trx.created_at).toLocaleString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(',', '').replace(/\./g, ':')}</td>
+                                    <td style={{ padding: '15px 20px', color: '#cbd5e1', fontSize: '0.9rem' }}>{formatDateTime(trx.created_at)}</td>
                                     <td style={{ padding: '15px 20px', fontWeight: '700', color: '#38bdf8' }}>{trx.order_id}</td>
                                     <td style={{ padding: '15px 20px', color: 'white' }}>{trx.package_id}</td>
                                     <td style={{ padding: '15px 20px', fontWeight: '700', color: 'white' }}>Rp {trx.total_amount.toLocaleString('id-ID')}</td>

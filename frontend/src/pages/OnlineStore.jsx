@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import { formatDateTime } from '../utils/dateFormatter';
 
 const OnlineStore = () => {
   const [settings, setSettings] = useState({
@@ -337,7 +338,7 @@ const OnlineStore = () => {
                         transactions.map((t, i) => (
                             <tr key={i}>
                                 <td style={{ fontWeight: 'bold' }}>{t.order_id}</td>
-                                <td style={{ fontSize: '0.8rem' }}>{new Date(t.created_at).toLocaleString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(',', '').replace(/\./g, ':')}</td>
+                                <td style={{ fontSize: '0.8rem' }}>{formatDateTime(t.created_at)}</td>
                                 <td>{t.customer_name || 'Anonymous'}</td>
                                 <td>{formatRupiah(t.total_amount)}</td>
                                 <td>

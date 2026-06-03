@@ -3,6 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import { formatDateTime } from '../utils/dateFormatter';
 
 const OnlineStoreCenter = () => {
   const [loading, setLoading] = useState(false);
@@ -388,7 +389,7 @@ const OnlineStoreCenter = () => {
                           <tr key={b.id}>
                             <td style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.05)', color: 'white' }}>{b.ip_address || '-'}</td>
                             <td style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.05)', color: '#94a3b8', fontFamily: 'monospace' }}>{b.device_id || '-'}</td>
-                            <td style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.05)', color: '#94a3b8' }}>{new Date(b.blocked_at).toLocaleString('id-ID')}</td>
+                            <td style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.05)', color: '#94a3b8' }}>{formatDateTime(b.blocked_at)}</td>
                             <td style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.05)', textAlign: 'center' }}>
                               <button type="button" onClick={() => handleUnlock(b.id)} className="btn-success-premium" style={{ padding: '6px 12px', fontSize: '0.75rem', borderRadius: '6px' }}>Unlock</button>
                             </td>

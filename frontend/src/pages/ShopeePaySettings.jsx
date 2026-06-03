@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ConfirmModal from '../components/ConfirmModal';
+import { formatDateTime } from '../utils/dateFormatter';
 
 const ShopeePaySettings = () => {
   const [devices, setDevices] = useState([]);
@@ -288,7 +289,7 @@ const ShopeePaySettings = () => {
               color: 'var(--text-secondary)'
             }}>
               <span>Last Active</span>
-              <span>{device.last_seen_at ? new Date(device.last_seen_at).toLocaleString('id-ID') : 'Belum pernah aktif'}</span>
+              <span>{device.last_seen_at ? formatDateTime(device.last_seen_at) : 'Belum pernah aktif'}</span>
             </div>
           </div>
         ))}

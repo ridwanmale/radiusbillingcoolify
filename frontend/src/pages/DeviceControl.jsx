@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ConfirmModal from '../components/ConfirmModal';
+import { formatDateTime } from '../utils/dateFormatter';
 
 const DeviceControl = ({ user }) => {
   const [vouchers, setVouchers] = useState([]);
@@ -19,7 +20,7 @@ const DeviceControl = ({ user }) => {
     if (!dateStr || dateStr.startsWith('0000')) return '-';
     try {
       const d = new Date(dateStr);
-      return isNaN(d.getTime()) ? '-' : d.toLocaleString('id-ID');
+      return isNaN(d.getTime()) ? '-' : formatDateTime(d);
     } catch (e) {
       return '-';
     }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { formatDateTime } from '../utils/dateFormatter';
 
 const VoucherOnline = () => {
   const [sessions, setSessions] = useState([]);
@@ -47,10 +48,7 @@ const VoucherOnline = () => {
   const formatDate = (dateString) => {
     if (!dateString) return '-';
     const dDate = new Date(dateString);
-    return dDate.toLocaleString('id-ID', { 
-      day: '2-digit', month: '2-digit', year: 'numeric', 
-      hour: '2-digit', minute: '2-digit', second: '2-digit' 
-    }).replace(',', '').replace(/\./g, ':');
+    return formatDateTime(dDate);
   };
 
   const formatRupiah = (number) => {
