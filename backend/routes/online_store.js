@@ -876,6 +876,22 @@ router.get('/spam-blocklist', async (req, res) => {
 router.delete('/spam-blocklist/:id', async (req, res) => {
   try {
     const { id } = req.params;
+    
+    // Ambil info device untuk membersihkan PENDING transaksi
+    const [blockRows] = await db.query('SELECT ip_address, device_id FROM spam_blocklist WHERE id = ?', [id]);
+    if (blockRows.length > 0) {
+      const b = blockRows[0];
+      let delQuery = 'DELETE FROM jurnal_keuangan WHERE status = "PENDING" AND (ip_address = ?';
+      let delParams = [b.ip_address];
+      if (b.device_id) {
+        delQuery += ' OR device_id = ?)';
+        delParams.push(b.device_id);
+      } else {
+        delQuery += ')';
+      }
+      await db.query(delQuery, delParams);
+    }
+
     await db.query('DELETE FROM spam_blocklist WHERE id = ?', [id]);
     res.json({ success: true });
   } catch (error) {
