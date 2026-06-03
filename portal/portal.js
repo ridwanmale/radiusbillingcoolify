@@ -251,7 +251,6 @@ async function handlePayment(method) {
         if (!res.ok) {
             if (res.status === 403 && data.blocked) {
                 isProcessing = false;
-                document.getElementById('checkout-btn').innerHTML = `Bayar ${formatRupiah(selectedPkg.harga)}`;
                 showToast(data.error || 'Akses diblokir (Spam).', 'error');
                 return;
             }
