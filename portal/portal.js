@@ -116,6 +116,8 @@ async function fetchPortalData() {
 
         renderPackages();
         setupPaymentMethods();
+        
+        setStep('katalog');
 
         // Cek jika ada order_id dari URL
         const params = new URLSearchParams(window.location.search);
