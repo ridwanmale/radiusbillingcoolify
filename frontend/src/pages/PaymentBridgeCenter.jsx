@@ -53,8 +53,6 @@ const PaymentBridgeCenter = () => {
   const [trxSearch, setTrxSearch] = useState('');
   const [trxStatusFilter, setTrxStatusFilter] = useState('ALL');
   const [selectedTrxs, setSelectedTrxs] = useState([]);
-  const [showCleanupModal, setShowCleanupModal] = useState(false);
-  const [cleanupDays, setCleanupDays] = useState(3);
 
   // --- STATE FOR DETECTION LOGS ---
   const [logs, setLogs] = useState([]);
@@ -175,16 +173,6 @@ const PaymentBridgeCenter = () => {
     });
   };
 
-  const handleCleanup = async () => {
-    try {
-      const res = await axios.post('/api/online-store/admin/transactions/cleanup', { days: cleanupDays });
-      toast.success(res.data.message);
-      setShowCleanupModal(false);
-      fetchData();
-    } catch (err) {
-      toast.error('Gagal melakukan pembersihan');
-    }
-  };
 
   const toggleSelectAll = () => {
     if (selectedTrxs.length === filteredTrx.length) {
@@ -477,14 +465,6 @@ const PaymentBridgeCenter = () => {
               <option value="PAID" style={{ background: '#0a0a0c', color: 'white' }}>Paid</option>
             </select>
 
-            <button 
-              onClick={() => setShowCleanupModal(true)}
-              className="btn-glass"
-              style={{ padding: '12px 20px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px', color: '#fbbf24', borderColor: 'rgba(251, 191, 36, 0.3)' }}
-            >
-              <span className="material-symbols-rounded">auto_delete</span>
-              Auto Cleanup
-            </button>
 
             {selectedTrxs.length > 0 && (
               <button 

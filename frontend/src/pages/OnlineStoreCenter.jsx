@@ -29,6 +29,7 @@ const OnlineStoreCenter = () => {
     spam_max_pending: 3
   });
   const [spamBlocklist, setSpamBlocklist] = useState([]);
+  const [activeTab, setActiveTab] = useState('pengaturan');
   const [isSaving, setIsSaving] = useState(false);
   const [qrisList, setQrisList] = useState([{ name: 'QRIS Utama', payload: '' }]);
   const [isQrisModalOpen, setIsQrisModalOpen] = useState(false);
@@ -293,7 +294,9 @@ const OnlineStoreCenter = () => {
                 
                 <p style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '12px' }}>* Sistem akan menyuntikkan nominal otomatis. Jika ada lebih dari 1 QRIS, sistem akan merotasinya secara acak ke pembeli.</p>
               </div>
+              )}
 
+              {activeTab === 'keamanan' && (<>
               {/* SECTION: KEAMANAN & SPAM */}
               <div className="glass-card fade-in" style={{ padding: '25px', background: '#1e1e24', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '20px' }}>
                 <h3 style={{ margin: '0 0 20px 0', fontSize: '1.2rem', fontWeight: '800', color: 'white', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '10px' }}>
@@ -383,6 +386,7 @@ const OnlineStoreCenter = () => {
                   </table>
                 </div>
               </div>
+              </>)}
 
               <button type="submit" disabled={isSaving} className="btn-success-premium" style={{ width: '100%', padding: '15px', borderRadius: '12px', fontSize: '1rem', fontWeight: '800' }}>
                 {isSaving ? 'Menyimpan...' : 'Simpan Konfigurasi'}
