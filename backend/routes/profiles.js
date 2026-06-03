@@ -23,7 +23,9 @@ router.get('/', async (req, res) => {
         COALESCE(m.status, 'Aktif') as status,
         m.prefix,
         m.code_combination,
-        m.code_length
+        m.code_length,
+        COALESCE(m.unique_code_min, 1) as unique_code_min,
+        COALESCE(m.unique_code_max, 200) as unique_code_max
       FROM radgroupreply r
       LEFT JOIN profiles_metadata m ON r.groupname = m.groupname
       GROUP BY r.groupname
@@ -50,7 +52,9 @@ router.post('/', async (req, res) => {
       showInStore,
       prefix,
       codeCombination,
-      codeLength
+      codeLength,
+      uniqueCodeMin,
+      uniqueCodeMax
     } = req.body;
     
     if (!name) {
@@ -70,13 +74,13 @@ router.post('/', async (req, res) => {
   
       // 1. Insert/Update Metadata
       await connection.query(
-        `INSERT INTO profiles_metadata (groupname, warna, mikrotik_group, masa_aktif, satuan, harga, hpp, komisi, shared_users, show_in_store, prefix, code_combination, code_length) 
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `INSERT INTO profiles_metadata (groupname, warna, mikrotik_group, masa_aktif, satuan, harga, hpp, komisi, shared_users, show_in_store, prefix, code_combination, code_length, unique_code_min, unique_code_max) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON DUPLICATE KEY UPDATE 
          warna=VALUES(warna), mikrotik_group=VALUES(mikrotik_group), masa_aktif=VALUES(masa_aktif),
          satuan=VALUES(satuan), harga=VALUES(harga), hpp=VALUES(hpp), komisi=VALUES(komisi), shared_users=VALUES(shared_users),
-         show_in_store=VALUES(show_in_store), prefix=VALUES(prefix), code_combination=VALUES(code_combination), code_length=VALUES(code_length)`,
-        [name, warna || '#3b82f6', mikrotikGroup || '', masaAktif || 0, satuan || 'Jam', finalHarga, finalHpp, finalKomisi, finalShared, finalShowInStore, prefix || null, codeCombination || null, codeLength ? parseInt(codeLength) : null]
+         show_in_store=VALUES(show_in_store), prefix=VALUES(prefix), code_combination=VALUES(code_combination), code_length=VALUES(code_length), unique_code_min=VALUES(unique_code_min), unique_code_max=VALUES(unique_code_max)`,
+        [name, warna || '#3b82f6', mikrotikGroup || '', masaAktif || 0, satuan || 'Jam', finalHarga, finalHpp, finalKomisi, finalShared, finalShowInStore, prefix || null, codeCombination || null, codeLength ? parseInt(codeLength) : null, uniqueCodeMin !== undefined ? parseInt(uniqueCodeMin) : 1, uniqueCodeMax !== undefined ? parseInt(uniqueCodeMax) : 200]
       );
   
       // Clear old RADIUS attributes if updating

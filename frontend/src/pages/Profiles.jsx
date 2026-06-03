@@ -22,7 +22,9 @@ const Profiles = () => {
       showInStore: true,
       prefix: '',
       codeCombination: '',
-      codeLength: ''
+      codeLength: '',
+      uniqueCodeMin: 1,
+      uniqueCodeMax: 200
     };
   
     const [formData, setFormData] = useState(initialFormData);
@@ -99,7 +101,9 @@ const Profiles = () => {
       showInStore: p.show_in_store === 1 || p.show_in_store === true,
       prefix: p.prefix || '',
       codeCombination: p.code_combination || '',
-      codeLength: p.code_length || ''
+      codeLength: p.code_length || '',
+      uniqueCodeMin: p.unique_code_min || 1,
+      uniqueCodeMax: p.unique_code_max || 200
     });
     setIsModalOpen(true);
   };
@@ -126,7 +130,9 @@ const Profiles = () => {
         showInStore: formData.showInStore,
         prefix: formData.prefix || '',
         codeCombination: formData.codeCombination || '',
-        codeLength: formData.codeLength ? parseInt(formData.codeLength) : null
+        codeLength: formData.codeLength ? parseInt(formData.codeLength) : null,
+        uniqueCodeMin: formData.uniqueCodeMin ? parseInt(formData.uniqueCodeMin) : 1,
+        uniqueCodeMax: formData.uniqueCodeMax ? parseInt(formData.uniqueCodeMax) : 200
       };
 
       const host = window.location.hostname;
@@ -588,6 +594,18 @@ const Profiles = () => {
                       <option value="upalpha">Huruf Besar + Angka</option>
                       <option value="alphanumeric">Huruf Kecil + Angka</option>
                     </select>
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                  <div className="form-group">
+                    <label className="form-label">Kode Unik Minimal</label>
+                    <input type="number" name="uniqueCodeMin" className="form-input" value={formData.uniqueCodeMin} onChange={handleChange} min="1" max="999" placeholder="Contoh: 1" />
+                    <small style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', marginTop: '4px', display: 'block' }}>Angka nominal unik batas bawah (misal: 1)</small>
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Kode Unik Maksimal</label>
+                    <input type="number" name="uniqueCodeMax" className="form-input" value={formData.uniqueCodeMax} onChange={handleChange} min="1" max="999" placeholder="Contoh: 200" />
+                    <small style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', marginTop: '4px', display: 'block' }}>Angka nominal unik batas atas (misal: 200)</small>
                   </div>
                 </div>
               </>

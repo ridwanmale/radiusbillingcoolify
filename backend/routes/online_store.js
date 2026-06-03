@@ -487,8 +487,22 @@ router.post('/create-transaction', checkStoreOpen, async (req, res) => {
   const order_id = 'QR-' + Date.now();
   
   try {
-    // Tambahkan kode unik (1-200) untuk mempermudah matching otomatis
-    const unique_code = Math.floor(Math.random() * 200) + 1;
+    let minCode = 1;
+    let maxCode = 200;
+    
+    const [profileRows] = await db.query('SELECT unique_code_min, unique_code_max FROM profiles_metadata WHERE groupname = ?', [package_id]);
+    if (profileRows.length > 0) {
+      if (profileRows[0].unique_code_min !== null) minCode = profileRows[0].unique_code_min;
+      if (profileRows[0].unique_code_max !== null) maxCode = profileRows[0].unique_code_max;
+    }
+
+    if (minCode > maxCode) {
+      const temp = minCode;
+      minCode = maxCode;
+      maxCode = temp;
+    }
+
+    const unique_code = Math.floor(Math.random() * (maxCode - minCode + 1)) + minCode;
     const total_amount = parseInt(amount) + unique_code;
 
     await db.query(`

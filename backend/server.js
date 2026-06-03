@@ -192,6 +192,14 @@ const upgradePool = async (pool, name) => {
       await pool.query('ALTER TABLE profiles_metadata ADD COLUMN code_length INT DEFAULT NULL');
       console.log(`[DB UPGRADE] Column code_length successfully added on ${name}.`);
     }
+    if (!profColNames.includes('unique_code_min')) {
+      await pool.query('ALTER TABLE profiles_metadata ADD COLUMN unique_code_min INT DEFAULT 1');
+      console.log(`[DB UPGRADE] Column unique_code_min successfully added on ${name}.`);
+    }
+    if (!profColNames.includes('unique_code_max')) {
+      await pool.query('ALTER TABLE profiles_metadata ADD COLUMN unique_code_max INT DEFAULT 200');
+      console.log(`[DB UPGRADE] Column unique_code_max successfully added on ${name}.`);
+    }
 
     // 4. Create Backup Tables
     await pool.query(`
