@@ -25,6 +25,7 @@ const OnlineStoreCenter = () => {
     success_message_html: ''
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [qrisList, setQrisList] = useState([{ name: 'QRIS Utama', payload: '' }]);
 
   // --- DATA FETCHING ---
   const fetchData = async () => {
@@ -32,7 +33,21 @@ const OnlineStoreCenter = () => {
     try {
       const res = await fetch('/api/online-store/settings');
       const settingsRes = await res.json();
-      if (settingsRes) setSettings(settingsRes);
+      if (settingsRes) {
+        setSettings(settingsRes);
+        let initialQrisList = [];
+        try {
+          initialQrisList = JSON.parse(settingsRes.qris_static_string);
+          if (!Array.isArray(initialQrisList)) throw new Error('Not array');
+        } catch (e) {
+          if (settingsRes.qris_static_string) {
+            initialQrisList = settingsRes.qris_static_string.split('\n').filter(Boolean).map((p, i) => ({ name: `QRIS ${i+1}`, payload: p.trim() }));
+          } else {
+            initialQrisList = [{ name: 'QRIS Utama', payload: '' }];
+          }
+        }
+        setQrisList(initialQrisList);
+      }
     } catch (error) {
       console.error('Fetch error:', error);
       toast.error('Gagal mengambil data');
@@ -50,7 +65,8 @@ const OnlineStoreCenter = () => {
     e.preventDefault();
     setIsSaving(true);
     try {
-      await axios.post('/api/online-store/settings', settings);
+      const stringified = JSON.stringify(qrisList.filter(q => q.payload.trim() !== ''));
+      await axios.post('/api/online-store/settings', { ...settings, qris_static_string: stringified });
       toast.success('Pengaturan disimpan!');
     } catch (err) {
       toast.error('Gagal menyimpan pengaturan');
@@ -214,15 +230,39 @@ const OnlineStoreCenter = () => {
               </div>
 
               <div className="form-group" style={{ marginBottom: '30px' }}>
-                <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Data QRIS Statis (String) - Bisa Multi QRIS</label>
-                <textarea 
-                  className="form-input-premium" 
-                  style={{ height: '100px', fontSize: '0.75rem', fontFamily: 'monospace' }} 
-                  placeholder="Masukkan string data QRIS Anda... (Pisahkan dengan baris baru/ENTER jika lebih dari satu)"
-                  value={settings.qris_static_string} 
-                  onChange={e => setSettings({...settings, qris_static_string: e.target.value})} 
-                />
-                <p style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '8px' }}>* Sistem akan menyuntikkan nominal otomatis ke string ini. Jika Anda memasukkan lebih dari satu (tiap baris), sistem akan memilih secara acak untuk pelanggan.</p>
+                <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>Data QRIS Statis (Multi QRIS / Rotasi)</span>
+                  <button type="button" onClick={() => setQrisList([...qrisList, { name: `QRIS ${qrisList.length + 1}`, payload: '' }])} style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '5px 10px', borderRadius: '8px', cursor: 'pointer', fontSize: '0.7rem', fontWeight: 'bold', transition: 'all 0.2s' }}>+ Tambah QRIS</button>
+                </label>
+                
+                {qrisList.map((qris, index) => (
+                  <div key={index} style={{ background: 'rgba(255,255,255,0.02)', padding: '15px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '15px', position: 'relative' }}>
+                    {qrisList.length > 1 && (
+                      <button type="button" onClick={() => { const newList = [...qrisList]; newList.splice(index, 1); setQrisList(newList); }} style={{ position: 'absolute', top: '15px', right: '15px', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '6px', color: '#ef4444', cursor: 'pointer', padding: '4px', display: 'flex' }} title="Hapus QRIS ini">
+                        <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>delete</span>
+                      </button>
+                    )}
+                    <div style={{ marginBottom: '10px', paddingRight: '35px' }}>
+                      <input 
+                        type="text" 
+                        className="form-input-premium" 
+                        style={{ padding: '10px 12px', fontSize: '0.85rem', marginBottom: '10px', background: 'rgba(0,0,0,0.2)' }} 
+                        placeholder="Nama QRIS (Misal: DANA Utama, GoPay, dll)"
+                        value={qris.name} 
+                        onChange={e => { const newList = [...qrisList]; newList[index].name = e.target.value; setQrisList(newList); }} 
+                      />
+                      <textarea 
+                        className="form-input-premium" 
+                        style={{ height: '70px', fontSize: '0.75rem', fontFamily: 'monospace', background: 'rgba(0,0,0,0.2)' }} 
+                        placeholder="Masukkan string payload QRIS (000201...)"
+                        value={qris.payload} 
+                        onChange={e => { const newList = [...qrisList]; newList[index].payload = e.target.value; setQrisList(newList); }} 
+                      />
+                    </div>
+                  </div>
+                ))}
+                
+                <p style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '8px' }}>* Sistem akan menyuntikkan nominal otomatis. Jika ada lebih dari 1 QRIS, sistem akan merotasinya secara acak ke pembeli.</p>
               </div>
 
               <button type="submit" disabled={isSaving} className="btn-success-premium" style={{ width: '100%', padding: '15px', borderRadius: '12px', fontSize: '1rem', fontWeight: '800' }}>

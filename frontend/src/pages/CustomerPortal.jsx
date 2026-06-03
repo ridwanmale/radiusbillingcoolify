@@ -267,8 +267,18 @@ const CustomerPortal = () => {
   const generateDynamicQR = (amount, orderId) => {
     if (!settings?.qris_static_string) return;
     
-    // Dukungan Multi-QRIS: Pisahkan berdasarkan baris baru dan pilih acak
-    const qrisList = settings.qris_static_string.split('\n').map(s => s.trim()).filter(Boolean);
+    let qrisList = [];
+    try {
+      // Coba parse sebagai JSON (Format baru)
+      const parsed = JSON.parse(settings.qris_static_string);
+      if (Array.isArray(parsed)) {
+        qrisList = parsed.map(q => q.payload).filter(Boolean);
+      }
+    } catch (e) {
+      // Fallback ke format lama (Dipisah enter)
+      qrisList = settings.qris_static_string.split('\n').map(s => s.trim()).filter(Boolean);
+    }
+    
     if (qrisList.length === 0) return;
     
     const randomIdx = Math.floor(Math.random() * qrisList.length);
