@@ -1121,7 +1121,7 @@ router.delete('/blacklist-uuid/:id', async (req, res) => {
 router.get('/top-spammers', async (req, res) => {
   try {
     // Cari UUID yang memiliki transaksi PENDING paling banyak yang BELUM ada di permanent blacklist
-    const [rows] = await db.query(
+    const [rows] = await db.query(`
       SELECT j.device_id, COUNT(j.id) as spam_count 
       FROM jurnal_keuangan j
       LEFT JOIN blacklist_uuid b ON j.device_id = b.device_id
@@ -1132,7 +1132,7 @@ router.get('/top-spammers', async (req, res) => {
       GROUP BY j.device_id
       ORDER BY spam_count DESC
       LIMIT 10
-    );
+    `);
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
