@@ -298,6 +298,15 @@ const upgradePool = async (pool, name) => {
       ) ENGINE=InnoDB;
     `);
 
+    // 10. Create Spam History (Long-term Memory) Table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS spam_history (
+        device_id VARCHAR(128) PRIMARY KEY,
+        block_count INT DEFAULT 1,
+        last_blocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB;
+    `);
+
     await pool.query(
       'INSERT IGNORE INTO role_menu_access (role, menu_id, is_allowed) VALUES (?, ?, ?)',
       ['superadmin', 'telegram_backup', 1]

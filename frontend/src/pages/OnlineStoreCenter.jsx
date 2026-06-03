@@ -441,14 +441,14 @@ const OnlineStoreCenter = () => {
               <span className="material-symbols-rounded" style={{ color: '#fbbf24' }}>warning</span>
               Sistem Deteksi Pintar: Top Spammer Saat Ini
             </h3>
-            <p style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '15px' }}>Tabel ini menampilkan perangkat (UUID) yang sedang memiliki jumlah transaksi PENDING terbanyak (belum dibayar) dan belum masuk ke Blacklist Permanen.</p>
+            <p style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '15px' }}>Tabel ini menampilkan rekam jejak perangkat (UUID) yang paling sering terkena blokir otomatis (Auto-Block) sepanjang waktu, dan belum masuk ke Blacklist Permanen.</p>
             
             <div style={{ background: 'rgba(0,0,0,0.2)', borderRadius: '10px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
                 <thead style={{ background: 'rgba(255,255,255,0.05)', color: '#94a3b8' }}>
                   <tr>
                     <th style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Device ID (UUID)</th>
-                    <th style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Jumlah Transaksi PENDING</th>
+                    <th style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Total Pelanggaran (Terblokir)</th>
                     <th style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>Aksi</th>
                   </tr>
                 </thead>
@@ -459,7 +459,7 @@ const OnlineStoreCenter = () => {
                     topSpammers.map((ts, idx) => (
                       <tr key={idx}>
                         <td style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.05)', color: 'white', fontFamily: 'monospace' }}>{ts.device_id}</td>
-                        <td style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.05)', color: '#ef4444', fontWeight: 'bold' }}>{ts.spam_count} transaksi</td>
+                        <td style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.05)', color: '#ef4444', fontWeight: 'bold' }}>{ts.spam_count} kali diblokir</td>
                         <td style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.05)', textAlign: 'center' }}>
                           <button type="button" onClick={() => handleAddPermanentBlacklist(ts.device_id)} className="btn-danger-small" style={{ padding: '6px 12px', fontSize: '0.75rem' }}>Blokir Permanen</button>
                         </td>
