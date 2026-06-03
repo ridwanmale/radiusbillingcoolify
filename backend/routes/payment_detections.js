@@ -4,10 +4,10 @@ const db = require('../config/db');
 const { generateOnlineVoucherCode, registerVoucherToRadius } = require('../utils/voucher');
 
 /**
- * POST /api/payment-detections/shopeepay-notification
+ * POST /api/payment-detections/armradius
  * Receives notification data from Android device
  */
-router.post('/shopeepay-notification*', async (req, res) => {
+router.post('/armradius*', async (req, res) => {
   const authHeader = req.headers.authorization;
   const { device_id, source_app, notification_title, notification_text, amount_detected, received_at, idempotency_key } = req.body;
 

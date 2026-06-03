@@ -662,9 +662,9 @@ const PaymentBridgeCenter = () => {
             </p>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
               <code style={{ flex: 1, padding: '12px', background: 'rgba(0,0,0,0.3)', borderRadius: '8px', color: '#fbbf24', wordBreak: 'break-all' }}>
-                {window.location.origin}/api/payment-detections/shopeepay-notification
+                {window.location.origin}/api/payment-detections/armradius
               </code>
-              <button onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/api/payment-detections/shopeepay-notification`); toast.info('Endpoint disalin!'); }} className="btn-glass" style={{ padding: '10px', borderRadius: '8px' }}>
+              <button onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/api/payment-detections/armradius`); toast.info('Endpoint disalin!'); }} className="btn-glass" style={{ padding: '10px', borderRadius: '8px' }}>
                 <span className="material-symbols-rounded">content_copy</span>
               </button>
             </div>
