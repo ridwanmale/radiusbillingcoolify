@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import ReactQuill from 'react-quill';
@@ -29,7 +29,6 @@ const OnlineStoreCenter = () => {
     spam_max_pending: 3
   });
   const [spamBlocklist, setSpamBlocklist] = useState([]);
-  const [activeTab, setActiveTab] = useState('pengaturan');
   const [isSaving, setIsSaving] = useState(false);
   const [qrisList, setQrisList] = useState([{ name: 'QRIS Utama', payload: '' }]);
   const [isQrisModalOpen, setIsQrisModalOpen] = useState(false);
@@ -123,41 +122,10 @@ const OnlineStoreCenter = () => {
         </div>
       </div>
 
-            {/* TAB NAVIGATION */}
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '25px', background: 'rgba(255,255,255,0.03)', padding: '6px', borderRadius: '16px', width: 'fit-content' }}>
-        {[
-          { id: 'pengaturan', label: 'Pengaturan Portal', icon: 'settings' },
-          { id: 'keamanan', label: 'Keamanan & Anti Spam', icon: 'shield' }
-        ].map(tab => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => setActiveTab(tab.id)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '10px 20px',
-              border: 'none',
-              borderRadius: '12px',
-              background: activeTab === tab.id ? 'rgba(56, 189, 248, 0.15)' : 'transparent',
-              color: activeTab === tab.id ? '#38bdf8' : 'rgba(255,255,255,0.6)',
-              cursor: 'pointer',
-              fontWeight: '700',
-              fontSize: '0.9rem',
-              transition: 'all 0.3s ease'
-            }}
-          >
-            <span className="material-symbols-rounded" style={{ fontSize: '20px' }}>{tab.icon}</span>
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
       {/* SETTINGS CONTENT */}
       <div className="fade-in">
         <form onSubmit={handleSaveSettings}>
-          <div style={{ display: activeTab === 'pengaturan' ? 'grid' : 'none', gridTemplateColumns: '1.5fr 1fr', gap: '25px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '25px' }}>
             {/* PORTAL DESIGN */}
             <div className="glass-card" style={{ padding: '30px' }}>
               <h2 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '25px', display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -326,7 +294,6 @@ const OnlineStoreCenter = () => {
                 <p style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '12px' }}>* Sistem akan menyuntikkan nominal otomatis. Jika ada lebih dari 1 QRIS, sistem akan merotasinya secara acak ke pembeli.</p>
               </div>
 
-              <div style={{ display: activeTab === 'keamanan' ? 'block' : 'none' }}>
               {/* SECTION: KEAMANAN & SPAM */}
               <div className="glass-card fade-in" style={{ padding: '25px', background: '#1e1e24', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '20px' }}>
                 <h3 style={{ margin: '0 0 20px 0', fontSize: '1.2rem', fontWeight: '800', color: 'white', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '10px' }}>
@@ -415,7 +382,6 @@ const OnlineStoreCenter = () => {
                     </tbody>
                   </table>
                 </div>
-              </div>
               </div>
 
               <button type="submit" disabled={isSaving} className="btn-success-premium" style={{ width: '100%', padding: '15px', borderRadius: '12px', fontSize: '1rem', fontWeight: '800' }}>
