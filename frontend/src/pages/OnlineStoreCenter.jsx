@@ -294,7 +294,6 @@ const OnlineStoreCenter = () => {
                 
                 <p style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '12px' }}>* Sistem akan menyuntikkan nominal otomatis. Jika ada lebih dari 1 QRIS, sistem akan merotasinya secara acak ke pembeli.</p>
               </div>
-              )}
 
               {activeTab === 'keamanan' && (<>
               {/* SECTION: KEAMANAN & SPAM */}
