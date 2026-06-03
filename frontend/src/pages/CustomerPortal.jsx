@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
 // --- INLINE SVG ICONS ---
@@ -266,7 +266,13 @@ const CustomerPortal = () => {
 
   const generateDynamicQR = (amount, orderId) => {
     if (!settings?.qris_static_string) return;
-    let payload = settings.qris_static_string.trim();
+    
+    // Dukungan Multi-QRIS: Pisahkan berdasarkan baris baru dan pilih acak
+    const qrisList = settings.qris_static_string.split('\n').map(s => s.trim()).filter(Boolean);
+    if (qrisList.length === 0) return;
+    
+    const randomIdx = Math.floor(Math.random() * qrisList.length);
+    let payload = qrisList[randomIdx];
     
     // ATURAN KETAT: Cek Tag 5303360 (Currency IDR) dan 5802ID (Country Code)
     // Jika tidak ada salah satunya, payload dianggap tidak standar dan tidak aman dikonversi

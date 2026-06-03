@@ -214,15 +214,15 @@ const OnlineStoreCenter = () => {
               </div>
 
               <div className="form-group" style={{ marginBottom: '30px' }}>
-                <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Data QRIS Statis (String)</label>
+                <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Data QRIS Statis (String) - Bisa Multi QRIS</label>
                 <textarea 
                   className="form-input-premium" 
                   style={{ height: '100px', fontSize: '0.75rem', fontFamily: 'monospace' }} 
-                  placeholder="Masukkan string data QRIS Anda..."
+                  placeholder="Masukkan string data QRIS Anda... (Pisahkan dengan baris baru/ENTER jika lebih dari satu)"
                   value={settings.qris_static_string} 
                   onChange={e => setSettings({...settings, qris_static_string: e.target.value})} 
                 />
-                <p style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '8px' }}>* Sistem akan menyuntikkan nominal otomatis ke string ini untuk pembayaran dinamis.</p>
+                <p style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '8px' }}>* Sistem akan menyuntikkan nominal otomatis ke string ini. Jika Anda memasukkan lebih dari satu (tiap baris), sistem akan memilih secara acak untuk pelanggan.</p>
               </div>
 
               <button type="submit" disabled={isSaving} className="btn-success-premium" style={{ width: '100%', padding: '15px', borderRadius: '12px', fontSize: '1rem', fontWeight: '800' }}>
