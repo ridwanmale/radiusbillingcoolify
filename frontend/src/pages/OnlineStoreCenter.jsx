@@ -256,11 +256,9 @@ const OnlineStoreCenter = () => {
                         <button type="button" onClick={() => { setEditingQrisIndex(index); setTempQris({ ...qris }); setIsQrisModalOpen(true); }} style={{ background: 'rgba(251, 191, 36, 0.1)', border: '1px solid rgba(251, 191, 36, 0.2)', borderRadius: '6px', color: '#fbbf24', cursor: 'pointer', padding: '6px', display: 'flex' }} title="Edit QRIS">
                           <span className="material-symbols-rounded" style={{ fontSize: '16px' }}>edit</span>
                         </button>
-                        {qrisList.length > 1 && (
-                          <button type="button" onClick={() => { const newList = [...qrisList]; newList.splice(index, 1); setQrisList(newList); }} style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '6px', color: '#ef4444', cursor: 'pointer', padding: '6px', display: 'flex' }} title="Hapus QRIS ini">
-                            <span className="material-symbols-rounded" style={{ fontSize: '16px' }}>delete</span>
-                          </button>
-                        )}
+                        <button type="button" onClick={() => { const newList = [...qrisList]; newList.splice(index, 1); setQrisList(newList); }} style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '6px', color: '#ef4444', cursor: 'pointer', padding: '6px', display: 'flex' }} title="Hapus QRIS ini">
+                          <span className="material-symbols-rounded" style={{ fontSize: '16px' }}>delete</span>
+                        </button>
                       </div>
                     </div>
                   ))}
