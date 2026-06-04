@@ -96,12 +96,28 @@ function setStep(stepName) {
         if (noChrome) {
             const notice = document.getElementById('webview-notice');
             const btn = document.getElementById('open-chrome-btn');
-            const pageUrl = window.location.href;
-            // Android Intent URL: paksa buka URL di Chrome
+            const urlDisplay = document.getElementById('portal-url-display');
+            const pageUrl = window.location.origin; // Ambil domain otomatis
             const intentUrl = `intent://${pageUrl.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.android.chrome;end`;
-            btn.href = intentUrl;
+            if (urlDisplay) urlDisplay.textContent = pageUrl;
+            if (btn) btn.href = intentUrl;
             notice.style.display = 'block';
         }
+    }
+}
+
+function copyPortalUrl() {
+    const url = window.location.origin;
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(url).then(() => showToast('Link disalin! Paste di Chrome.', 'success'));
+    } else {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.style.position = 'fixed'; ta.style.left = '-9999px';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); showToast('Link disalin! Paste di Chrome.', 'success'); }
+        catch (e) { showToast('Gagal menyalin.', 'error'); }
+        document.body.removeChild(ta);
     }
 }
 
