@@ -1168,7 +1168,9 @@ router.get('/restore-voucher/:device_id', async (req, res) => {
       FROM jurnal_keuangan j
       INNER JOIN radcheck r ON j.voucher_code = r.username
       LEFT JOIN radcheck rc_exp ON j.voucher_code = rc_exp.username AND rc_exp.attribute IN ('Expiration', 'Voucher-Expiration')
+      LEFT JOIN rincian_transaksi_voucher rtv ON j.voucher_code = rtv.username
       WHERE j.device_id = ? AND j.status = 'PAID' AND j.voucher_code IS NOT NULL 
+      AND (rtv.status IS NULL OR rtv.status NOT IN ('Expired', 'Nonaktif'))
       AND (
          rc_exp.value IS NULL 
          OR (rc_exp.value LIKE '%-%' AND STR_TO_DATE(rc_exp.value, '%Y-%m-%d %H:%i:%s') > NOW()) 
