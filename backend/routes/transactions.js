@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
     const filterMonth = month || new Date().getMonth() + 1;
     const filterYear = year || new Date().getFullYear();
 
-    // Query 1: Manual & Online Store Transactions (Pemasukan Online & Pengeluaran Manual)
+    // Query 1a: Manual Transactions (Pemasukan & Pengeluaran Manual) - Not Aggregated
     let manualQuery = `
       SELECT 
         id,
@@ -23,8 +23,28 @@ router.get('/', async (req, res) => {
       FROM jurnal_keuangan 
       WHERE MONTH(COALESCE(paid_at, tanggal)) = ? AND YEAR(COALESCE(paid_at, tanggal)) = ?
       AND (status = 'PAID' OR status IS NULL OR status = '' OR status = 'SUCCESS')
+      AND UPPER(jenis) NOT IN ('VOUCHER ONLINE', 'PEMBAYARAN PPPOE')
     `;
     const [manualRows] = await db.query(manualQuery, [filterMonth, filterYear]);
+
+    // Query 1b: System Transactions from jurnal_keuangan (Voucher Online, PPPOE) - Aggregated
+    let systemOnlineQuery = `
+      SELECT 
+        NULL as id,
+        DATE(COALESCE(paid_at, tanggal)) as tanggal, 
+        UPPER(kategori) as kategori, 
+        UPPER(jenis) as jenis, 
+        'SYSTEM' as admin, 
+        CONCAT('Akumulasi ', UPPER(jenis)) as deskripsi, 
+        SUM(COALESCE(qty, 1)) as qty, 
+        SUM(total) as total 
+      FROM jurnal_keuangan 
+      WHERE MONTH(COALESCE(paid_at, tanggal)) = ? AND YEAR(COALESCE(paid_at, tanggal)) = ?
+      AND (status = 'PAID' OR status IS NULL OR status = '' OR status = 'SUCCESS')
+      AND UPPER(jenis) IN ('VOUCHER ONLINE', 'PEMBAYARAN PPPOE')
+      GROUP BY DATE(COALESCE(paid_at, tanggal)), UPPER(kategori), UPPER(jenis)
+    `;
+    const [systemOnlineRows] = await db.query(systemOnlineQuery, [filterMonth, filterYear]);
 
     // Query 2: Physical Sold Vouchers (Pemasukan dihitung berdasarkan HPP)
     let incomeQuery = `
@@ -67,8 +87,8 @@ router.get('/', async (req, res) => {
     `;
     const [refundRows] = await db.query(refundQuery, [filterMonth, filterYear]);
 
-    // Combine all (Manual/Online + Physical Income + Refund)
-    const allTransactions = [...manualRows, ...incomeRows, ...refundRows].sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+    // Combine all (Manual + SystemOnline + Physical Income + Refund)
+    const allTransactions = [...manualRows, ...systemOnlineRows, ...incomeRows, ...refundRows].sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
 
     // Calculate Summary
     let totalPemasukan = 0;
