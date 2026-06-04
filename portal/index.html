@@ -120,10 +120,27 @@
             letter-spacing: -1.0px;
         }
 
+        .packages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
         @media (max-width: 600px) {
+            .packages-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
             .pkg-price {
-                font-size: 1.8rem;
+                font-size: 1.5rem;
                 margin: 10px 0 16px;
+            }
+            .glass-card {
+                padding: 16px;
+            }
+            .btn-primary {
+                font-size: 12px;
+                padding: 8px 12px;
             }
         }
 
@@ -209,7 +226,7 @@
                 <div style="font-size: 0.85rem; opacity: 0.6; font-weight: 600;">Sudah bayar online? Validasi pesanan Anda di sini.</div>
             </div>
 
-            <div id="packages-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+            <div id="packages-container" class="packages-grid">
                 <!-- Paket di-render via JS -->
             </div>
         </div>
