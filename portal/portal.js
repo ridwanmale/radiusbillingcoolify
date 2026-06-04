@@ -201,22 +201,24 @@ async function fetchPortalData() {
         // PWA Auto Login Check
         let savedVoucher = safeStorage.getItem('saved_voucher');
         
-        // --- iOS CNA / Safari Fallback Restore ---
-        if (!savedVoucher) {
-            try {
-                const devId = getDeviceId();
-                const resRestore = await fetch(`${API_URL}/online-store/restore-voucher/${devId}`);
-                if (resRestore.ok) {
-                    const restoreData = await resRestore.json();
-                    if (restoreData.success && restoreData.voucher_code) {
-                        savedVoucher = restoreData.voucher_code;
-                        safeStorage.setItem('saved_voucher', savedVoucher);
-                        safeStorage.setItem('saved_password', savedVoucher);
-                        showToast('Voucher berhasil dipulihkan', 'success');
-                    }
+        // --- Auto Restore & Verification ---
+        try {
+            const devId = getDeviceId();
+            const resRestore = await fetch(`${API_URL}/online-store/restore-voucher/${devId}`);
+            if (resRestore.ok) {
+                const restoreData = await resRestore.json();
+                if (restoreData.success && restoreData.voucher_code) {
+                    savedVoucher = restoreData.voucher_code;
+                    safeStorage.setItem('saved_voucher', savedVoucher);
+                    safeStorage.setItem('saved_password', savedVoucher);
+                } else {
+                    // Backend says no active voucher (expired or none bought), clear cache!
+                    savedVoucher = null;
+                    safeStorage.removeItem('saved_voucher');
+                    safeStorage.removeItem('saved_password');
                 }
-            } catch (e) { console.error('Gagal memulihkan voucher', e); }
-        }
+            }
+        } catch (e) { console.error('Gagal memulihkan/memverifikasi voucher', e); }
 
         if (savedVoucher) {
             const container = document.getElementById('saved-voucher-container');
