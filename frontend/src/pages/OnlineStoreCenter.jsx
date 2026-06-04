@@ -171,9 +171,9 @@ const OnlineStoreCenter = () => {
       {/* SETTINGS CONTENT */}
       <div className="fade-in">
         <form onSubmit={handleSaveSettings}>
-          <div style={{ display: activeTab === 'pengaturan' ? 'grid' : 'none', gridTemplateColumns: '1.5fr 1fr', gap: '25px' }}>
+          <div style={{ display: activeTab === 'pengaturan' ? 'flex' : 'none', flexDirection: 'column', gap: '25px', maxWidth: '900px' }}>
             {/* PORTAL DESIGN */}
-            <div className="glass-card" style={{ padding: '30px' }}>
+            <div className="glass-card" style={{ padding: '35px' }}>
               <h2 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '25px', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span className="material-symbols-rounded" style={{ color: '#818cf8' }}>palette</span>
                 Kustomisasi Portal
@@ -341,32 +341,8 @@ const OnlineStoreCenter = () => {
               </div>
             </div>
 
-            {/* PREVIEW / TIPS */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
-              <div className="glass-card" style={{ padding: '25px', border: '1px solid rgba(56, 189, 248, 0.2)' }}>
-                <h3 style={{ fontSize: '1rem', fontWeight: '800', marginBottom: '15px', color: '#38bdf8' }}>Status Integrasi</h3>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px' }}>
-                  <span className="material-symbols-rounded" style={{ color: '#10b981' }}>check_circle</span>
-                  <span style={{ fontSize: '0.9rem' }}>Payment Bridge Aktif</span>
-                </div>
-                <p style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: '1.5' }}>
-                  Otomatisasi pembayaran kini dikelola sepenuhnya melalui <strong>Payment Bridge Center</strong>. Pastikan perangkat Android Anda terhubung dan berstatus online untuk memproses transaksi secara otomatis.
-                </p>
-              </div>
-
-              <div className="glass-card" style={{ padding: '25px' }}>
-                <h3 style={{ fontSize: '0.9rem', fontWeight: '800', marginBottom: '10px' }}>Petunjuk Cepat</h3>
-                <ul style={{ fontSize: '0.8rem', color: '#94a3b8', paddingLeft: '18px', lineHeight: '1.6' }}>
-                  <li>Judul Portal akan muncul di halaman depan pelanggan.</li>
-                  <li>Warna Utama akan menyesuaikan tombol & aksen portal.</li>
-                  <li>Sistem menggunakan kode unik 1-200 untuk validasi otomatis.</li>
-                  <li>Pastikan string QRIS memiliki tag 5802ID untuk nominal otomatis.</li>
-                </ul>
-              </div>
             </div>
           </div>
-
-
               <div style={{ display: activeTab === 'keamanan' ? 'block' : 'none' }}>
               {/* SECTION: KEAMANAN & SPAM */}
               <div className="glass-card fade-in" style={{ padding: '25px', background: '#1e1e24', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '20px' }}>
@@ -425,9 +401,11 @@ const OnlineStoreCenter = () => {
 
 
               {activeTab === 'pengaturan' && (
-                <button type="submit" disabled={isSaving} className="btn-success-premium" style={{ width: '100%', padding: '15px', borderRadius: '12px', fontSize: '1rem', fontWeight: '800' }}>
-                  {isSaving ? 'Menyimpan...' : 'Simpan Konfigurasi'}
-                </button>
+                <div style={{ maxWidth: '900px', marginTop: '25px' }}>
+                  <button type="submit" disabled={isSaving} className="btn-success-premium" style={{ width: '100%', padding: '16px', borderRadius: '14px', fontSize: '1.05rem', fontWeight: '800', letterSpacing: '0.5px' }}>
+                    {isSaving ? 'Menyimpan...' : 'Simpan Konfigurasi'}
+                  </button>
+                </div>
               )}
         </form>
       </div>
