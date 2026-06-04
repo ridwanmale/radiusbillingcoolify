@@ -1,5 +1,5 @@
-// Konfigurasi API
-const API_URL = `/api`;
+// Konfigurasi API (Menggunakan Domain Admin Web)
+const API_URL = `https://newradiuslokal.arm-dev.net/api`;
 
 let portalSettings = {};
 let packages = [];
