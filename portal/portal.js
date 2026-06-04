@@ -199,7 +199,8 @@ async function fetchPortalData() {
         }
 
         // PWA Auto Login Check
-        let savedVoucher = safeStorage.getItem('saved_voucher');
+        let savedVoucher = null;
+        const localVoucher = safeStorage.getItem('saved_voucher');
         
         // --- Auto Restore & Verification ---
         try {
@@ -213,12 +214,18 @@ async function fetchPortalData() {
                     safeStorage.setItem('saved_password', savedVoucher);
                 } else {
                     // Backend says no active voucher (expired or none bought), clear cache!
-                    savedVoucher = null;
                     safeStorage.removeItem('saved_voucher');
                     safeStorage.removeItem('saved_password');
                 }
+            } else {
+                // API HTTP Error (e.g. 500), fallback to local cache just in case
+                savedVoucher = localVoucher;
             }
-        } catch (e) { console.error('Gagal memulihkan/memverifikasi voucher', e); }
+        } catch (e) { 
+            console.error('Gagal memulihkan/memverifikasi voucher', e); 
+            // Network Error (e.g. walled garden block), fallback to local cache
+            savedVoucher = localVoucher;
+        }
 
         if (savedVoucher) {
             const container = document.getElementById('saved-voucher-container');
