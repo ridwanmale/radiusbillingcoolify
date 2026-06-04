@@ -218,6 +218,10 @@ router.post('/settings', async (req, res) => {
     const spam_max_pending = req.body.spam_max_pending !== undefined ? req.body.spam_max_pending : existing.spam_max_pending;
     const spam_auto_unblock_minutes = req.body.spam_auto_unblock_minutes !== undefined ? req.body.spam_auto_unblock_minutes : existing.spam_auto_unblock_minutes;
 
+    const support_email = req.body.support_email !== undefined ? req.body.support_email : existing.support_email;
+    const support_phone = req.body.support_phone !== undefined ? req.body.support_phone : existing.support_phone;
+    const support_address = req.body.support_address !== undefined ? req.body.support_address : existing.support_address;
+
     // Konversi is_active ke boolean/tinyint
     let is_active = existing.is_active;
     if (req.body.is_active !== undefined) {
@@ -277,7 +281,8 @@ router.post('/settings', async (req, res) => {
           duitku_merchant_code = ?, duitku_api_key = ?, duitku_is_sandbox = ?,
           tripay_api_key = ?, tripay_private_key = ?, tripay_merchant_code = ?, tripay_is_sandbox = ?,
           enable_payment_bridge = ?, enable_midtrans = ?, enable_duitku = ?, enable_tripay = ?, success_message_html = ?, outside_network_message_html = ?,
-          auto_cleanup_enabled = ?, auto_cleanup_hours = ?, spam_protection_enabled = ?, spam_max_pending = ?, spam_auto_unblock_minutes = ?
+          auto_cleanup_enabled = ?, auto_cleanup_hours = ?, spam_protection_enabled = ?, spam_max_pending = ?, spam_auto_unblock_minutes = ?,
+          support_email = ?, support_phone = ?, support_address = ?
       WHERE id = 1
     `, [
       portal_title, portal_description, primary_color, qris_static_string,
@@ -286,7 +291,8 @@ router.post('/settings', async (req, res) => {
       duitku_merchant_code, duitku_api_key, duitku_is_sandbox,
       tripay_api_key, tripay_private_key, tripay_merchant_code, tripay_is_sandbox,
       enable_payment_bridge, enable_midtrans, enable_duitku, enable_tripay, success_message_html, outside_network_message_html,
-      auto_cleanup_enabled, auto_cleanup_hours, spam_protection_enabled, spam_max_pending, spam_auto_unblock_minutes
+      auto_cleanup_enabled, auto_cleanup_hours, spam_protection_enabled, spam_max_pending, spam_auto_unblock_minutes,
+      support_email, support_phone, support_address
     ]);
 
     // 4. Update settings (dns_name) jika hotspot_login_url dikirimkan

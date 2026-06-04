@@ -155,6 +155,16 @@ async function fetchPortalData() {
         document.getElementById('portal-desc').innerText = portalSettings.portal_description || '';
         document.body.style.setProperty('--primary', portalSettings.primary_color || '#6366f1');
 
+        if (document.getElementById('support-email')) {
+            document.getElementById('support-email').innerText = portalSettings.support_email || 'support@armradiusapp.com';
+        }
+        if (document.getElementById('support-phone')) {
+            document.getElementById('support-phone').innerText = portalSettings.support_phone || '+62 812-3456-7890';
+        }
+        if (document.getElementById('support-address')) {
+            document.getElementById('support-address').innerText = portalSettings.support_address || 'Jl. Contoh Nama Jalan No. 123, Kota, Provinsi';
+        }
+
         // PWA Auto Login Check
         const savedVoucher = localStorage.getItem('saved_voucher');
         if (savedVoucher) {

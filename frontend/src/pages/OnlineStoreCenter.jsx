@@ -38,6 +38,7 @@ const OnlineStoreCenter = () => {
   const [qrisList, setQrisList] = useState([{ name: 'QRIS Utama', payload: '' }]);
   const [isQrisModalOpen, setIsQrisModalOpen] = useState(false);
   const [isSecurityModalOpen, setIsSecurityModalOpen] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [editingQrisIndex, setEditingQrisIndex] = useState(-1);
   const [tempQris, setTempQris] = useState({ name: '', payload: '' });
 
@@ -174,10 +175,16 @@ const OnlineStoreCenter = () => {
           <div style={{ display: activeTab === 'pengaturan' ? 'flex' : 'none', flexDirection: 'column', gap: '25px', maxWidth: '900px' }}>
             {/* PORTAL DESIGN */}
             <div className="glass-card" style={{ padding: '35px' }}>
-              <h2 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '25px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span className="material-symbols-rounded" style={{ color: '#818cf8' }}>palette</span>
-                Kustomisasi Portal
-              </h2>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
+                <h2 style={{ fontSize: '1.2rem', fontWeight: '800', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span className="material-symbols-rounded" style={{ color: '#818cf8' }}>palette</span>
+                  Kustomisasi Portal
+                </h2>
+                <button type="button" onClick={() => setIsContactModalOpen(true)} className="btn-primary-premium" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '8px 12px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.2s' }}>
+                  <span className="material-symbols-rounded" style={{ fontSize: '16px' }}>contact_support</span>
+                  Kontak Bantuan
+                </button>
+              </div>
               
               <div className="form-group" style={{ marginBottom: '20px' }}>
                 <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Judul Portal</label>
@@ -552,6 +559,38 @@ const OnlineStoreCenter = () => {
                 setQrisList(newList);
                 setIsQrisModalOpen(false);
               }} style={{ flex: 1, padding: '12px', background: '#38bdf8', color: '#0a0a0c', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: '800' }}>Simpan</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL PENGATURAN KONTAK */}
+      {isContactModalOpen && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', backdropFilter: 'blur(5px)' }}>
+          <div className="glass-card fade-in" style={{ width: '100%', maxWidth: '500px', padding: '30px', background: '#1e1e24', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <h2 style={{ margin: '0 0 20px 0', fontSize: '1.3rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span className="material-symbols-rounded" style={{ color: '#38bdf8' }}>contact_support</span>
+              Pengaturan Kontak Bantuan
+            </h2>
+            <p style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '20px' }}>Informasi ini akan ditampilkan di bagian footer halaman portal untuk membantu pelanggan Anda.</p>
+
+            <div className="form-group" style={{ marginBottom: '15px' }}>
+              <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Email Support</label>
+              <input type="email" className="form-input-premium" value={settings.support_email || ''} onChange={e => setSettings({...settings, support_email: e.target.value})} placeholder="support@armradiusapp.com" />
+            </div>
+
+            <div className="form-group" style={{ marginBottom: '15px' }}>
+              <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Telepon / WA</label>
+              <input type="text" className="form-input-premium" value={settings.support_phone || ''} onChange={e => setSettings({...settings, support_phone: e.target.value})} placeholder="+62 812-3456-7890" />
+            </div>
+
+            <div className="form-group" style={{ marginBottom: '25px' }}>
+              <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Alamat Usaha</label>
+              <textarea className="form-input-premium" style={{ height: '80px', resize: 'none' }} value={settings.support_address || ''} onChange={e => setSettings({...settings, support_address: e.target.value})} placeholder="Jl. Contoh Nama Jalan No. 123, Kota, Provinsi" />
+            </div>
+
+            <div style={{ display: 'flex', gap: '15px', justifyContent: 'flex-end' }}>
+              <button type="button" onClick={() => setIsContactModalOpen(false)} style={{ padding: '10px 20px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', color: 'white', border: 'none', cursor: 'pointer' }}>Tutup</button>
             </div>
           </div>
         </div>

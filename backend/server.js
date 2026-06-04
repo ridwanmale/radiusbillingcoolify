@@ -152,7 +152,9 @@ const upgradePool = async (pool, name) => {
       'auto_cleanup_hours': 'INT DEFAULT 24',
       'spam_protection_enabled': 'BOOLEAN DEFAULT TRUE',
       'spam_max_pending': 'INT DEFAULT 3',
-      'spam_auto_unblock_minutes': 'INT DEFAULT 60'
+      'support_email': 'VARCHAR(128) DEFAULT "support@armradiusapp.com"',
+      'support_phone': 'VARCHAR(64) DEFAULT "+62 812-3456-7890"',
+      'support_address': 'VARCHAR(255) DEFAULT "Jl. Contoh Nama Jalan No. 123, Kota, Provinsi"'
     };
 
     for (const [col, definition] of Object.entries(columnsToAdd)) {
