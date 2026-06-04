@@ -1,5 +1,5 @@
 // Konfigurasi API
-const API_URL = `http://${window.location.hostname}:8088/api`;
+const API_URL = `/api`;
 
 let portalSettings = {};
 let packages = [];
