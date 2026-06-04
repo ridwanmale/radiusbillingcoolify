@@ -66,7 +66,9 @@ const PaymentBridgeCenter = () => {
   // --- STATE FOR SETTINGS ---
   const [portalSettings, setPortalSettings] = useState({
     history_auto_delete_enabled: false,
-    history_auto_delete_days: 30
+    history_auto_delete_days: 30,
+    auto_cleanup_enabled: true,
+    auto_cleanup_hours: 24
   });
   const [isAutoDeleteModalOpen, setIsAutoDeleteModalOpen] = useState(false);
 
@@ -937,10 +939,39 @@ const PaymentBridgeCenter = () => {
               Pengaturan Hapus Otomatis
             </h2>
             <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginBottom: '25px', lineHeight: '1.6' }}>
-              Fitur ini akan menghapus <strong>secara permanen</strong> semua Riwayat Transaksi (Status PAID/USED) yang usianya sudah melewati batas waktu yang Anda tentukan di bawah ini.
+              Anda dapat mengatur penghapusan transaksi PENDING (Anti-Spam) maupun penghapusan riwayat transaksi lama (PAID/USED) di sini.
             </p>
             
-            <div className="form-group" style={{ marginBottom: '25px' }}>
+            {/* 1. AUTO DELETE PENDING (SPAM) */}
+            <div className="form-group" style={{ marginBottom: '15px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', background: 'rgba(255,255,255,0.05)', padding: '15px', borderRadius: '12px' }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: '700', color: 'white', marginBottom: '5px' }}>Auto-Hapus Transaksi PENDING</div>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Mencegah penumpukan data spam transaksi gagal/belum dibayar.</div>
+                </div>
+                <div className={`custom-toggle ${portalSettings.auto_cleanup_enabled ? 'active' : ''}`} style={{ position: 'relative', width: '46px', height: '24px', background: portalSettings.auto_cleanup_enabled ? '#10b981' : 'rgba(255,255,255,0.1)', borderRadius: '24px', transition: '0.3s', flexShrink: 0 }}>
+                  <input type="checkbox" style={{ opacity: 0, position: 'absolute', width: '100%', height: '100%', cursor: 'pointer', zIndex: 2 }} checked={portalSettings.auto_cleanup_enabled} onChange={e => setPortalSettings({...portalSettings, auto_cleanup_enabled: e.target.checked})} />
+                  <div style={{ position: 'absolute', top: '2px', left: portalSettings.auto_cleanup_enabled ? '24px' : '2px', width: '20px', height: '20px', background: 'white', borderRadius: '50%', transition: '0.3s' }}></div>
+                </div>
+              </label>
+            </div>
+            {portalSettings.auto_cleanup_enabled && (
+              <div className="form-group fade-in" style={{ marginBottom: '25px' }}>
+                <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Hapus transaksi PENDING lebih tua dari (Jam):</label>
+                <input 
+                  type="number" 
+                  className="form-input-premium" 
+                  value={portalSettings.auto_cleanup_hours || 24} 
+                  onChange={e => setPortalSettings({...portalSettings, auto_cleanup_hours: parseInt(e.target.value)})} 
+                  style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '12px', color: 'white', outline: 'none' }}
+                />
+              </div>
+            )}
+
+            <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.1)', margin: '20px 0' }} />
+
+            {/* 2. AUTO DELETE PAID/USED (HISTORY) */}
+            <div className="form-group" style={{ marginBottom: '15px' }}>
               <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', background: 'rgba(255,255,255,0.05)', padding: '15px', borderRadius: '12px' }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: '700', color: 'white', marginBottom: '5px' }}>Aktifkan Auto-Delete</div>

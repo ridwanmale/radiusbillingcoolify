@@ -605,32 +605,6 @@ const OnlineStoreCenter = () => {
               Pengaturan Keamanan & Anti Spam
             </h3>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
-              <div className="form-group">
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'white', fontWeight: '600' }}>
-                  <input 
-                    type="checkbox" 
-                    checked={settings.auto_cleanup_enabled} 
-                    onChange={e => setSettings({...settings, auto_cleanup_enabled: e.target.checked})} 
-                    style={{ width: '18px', height: '18px', accentColor: '#10b981' }}
-                  />
-                  Aktifkan Auto-Cleanup
-                </label>
-                <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '5px 0 0 26px' }}>Otomatis menghapus transaksi PENDING untuk menghindari penumpukan data.</p>
-              </div>
-              {settings.auto_cleanup_enabled && (
-                <div className="form-group">
-                  <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Hapus transaksi lebih tua dari (Jam)</label>
-                  <input 
-                    type="number" 
-                    className="form-input-premium" 
-                    value={settings.auto_cleanup_hours || 24} 
-                    onChange={e => setSettings({...settings, auto_cleanup_hours: parseInt(e.target.value)})} 
-                  />
-                </div>
-              )}
-            </div>
-
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '30px' }}>
               <div className="form-group">
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'white', fontWeight: '600' }}>
