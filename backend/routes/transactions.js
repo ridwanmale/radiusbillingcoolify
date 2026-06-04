@@ -35,7 +35,7 @@ router.get('/', async (req, res) => {
         kat as kategori,
         jen as jenis,
         'SYSTEM' as admin,
-        CONCAT('Akumulasi ', jen) as deskripsi,
+        IF(jen = 'VOUCHER ONLINE', 'PENJUALAN VOUCHER ONLINE', CONCAT('AKUMULASI ', jen)) as deskripsi,
         SUM(qty) as qty,
         SUM(total) as total
       FROM (
@@ -62,7 +62,7 @@ router.get('/', async (req, res) => {
         'PEMASUKAN' as kategori, 
         'VOUCHER' as jenis, 
         'SYSTEM' as admin, 
-        'PENJUALAN FISIK' as deskripsi, 
+        'PENJUALAN VOUCHER FISIK' as deskripsi, 
         COUNT(*) as qty, 
         SUM(pm.hpp) as total
       FROM rincian_transaksi_voucher vm
@@ -83,7 +83,7 @@ router.get('/', async (req, res) => {
         'PENGELUARAN' as kategori, 
         'REFUND' as jenis, 
         'SYSTEM' as admin, 
-        'REFUND VOUCHER' as deskripsi, 
+        IF(vm.batch_id = 'ONLINE-STORE', 'REFUND VOUCHER ONLINE', 'REFUND VOUCHER FISIK') as deskripsi, 
         COUNT(*) as qty, 
         SUM(IF(vm.batch_id = 'ONLINE-STORE', pm.harga, pm.hpp)) as total
       FROM rincian_transaksi_voucher vm
