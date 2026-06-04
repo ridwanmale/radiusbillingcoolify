@@ -1,5 +1,8 @@
 // Konfigurasi API
-const API_URL = `http://${window.location.hostname}:8088/api`;
+let API_URL = `http://${window.location.hostname}:8088/api`;
+if (window.location.protocol === 'https:') {
+    API_URL = `https://${window.location.hostname}/api`;
+}
 
 let portalSettings = {};
 let packages = [];
