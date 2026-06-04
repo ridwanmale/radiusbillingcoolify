@@ -34,9 +34,9 @@ router.get('/stats', async (req, res) => {
     const [[{ online_income }]] = await db.query(`
       SELECT COALESCE(SUM(total), 0) as online_income
       FROM jurnal_keuangan
-      WHERE status = 'PAID' 
-      AND jenis = 'Voucher Online'
-      AND DATE(paid_at) = CURDATE()
+      WHERE (status = 'PAID' OR status IS NULL OR status = '' OR status = 'SUCCESS')
+      AND UPPER(jenis) = 'VOUCHER ONLINE'
+      AND DATE(COALESCE(paid_at, tanggal)) = CURDATE()
     `);
 
     // 6. Chart Data (Combined Physical HPP + Online Harga Jual)

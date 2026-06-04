@@ -229,10 +229,10 @@ const Dashboard = () => {
               <span className="material-symbols-rounded" style={{ fontSize: '1.4rem', color: '#38bdf8' }}>insights</span> ANALISA PEMASUKAN
             </h2>
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-              <select value={filter.year} onChange={(e) => setFilter({ ...filter, year: Number(e.target.value) })} style={{ background: 'rgba(255,255,255,0.05)', color: 'white', padding: '0.4rem 0.8rem', borderRadius: '10px', fontSize: '0.8rem', border: '1px solid rgba(255,255,255,0.1)', outline: 'none', cursor: 'pointer' }}>
+              <select value={filter.year} onChange={(e) => setFilter({ ...filter, year: Number(e.target.value) })} style={{ background: 'var(--bg-secondary)', color: 'white', padding: '0.4rem 0.8rem', borderRadius: '10px', fontSize: '0.8rem', border: '1px solid var(--border-color)', outline: 'none', cursor: 'pointer' }}>
                 {[...Array(5)].map((_, i) => { const y = new Date().getFullYear() - i; return <option key={y} value={y}>{y}</option>; })}
               </select>
-              <select value={filter.month} onChange={(e) => setFilter({ ...filter, month: Number(e.target.value) })} style={{ background: 'rgba(255,255,255,0.05)', color: 'white', padding: '0.4rem 0.8rem', borderRadius: '10px', fontSize: '0.8rem', border: '1px solid rgba(255,255,255,0.1)', outline: 'none', cursor: 'pointer' }}>
+              <select value={filter.month} onChange={(e) => setFilter({ ...filter, month: Number(e.target.value) })} style={{ background: 'var(--bg-secondary)', color: 'white', padding: '0.4rem 0.8rem', borderRadius: '10px', fontSize: '0.8rem', border: '1px solid var(--border-color)', outline: 'none', cursor: 'pointer' }}>
                 {['JAN', 'FEB', 'MAR', 'APR', 'MEI', 'JUN', 'JUL', 'AGU', 'SEP', 'OKT', 'NOV', 'DES'].map((m, i) => (<option key={i+1} value={i+1}>{m}</option>))}
               </select>
             </div>
