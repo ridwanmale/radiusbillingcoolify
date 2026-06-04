@@ -42,7 +42,7 @@ router.get('/', async (req, res) => {
       WHERE MONTH(COALESCE(paid_at, tanggal)) = ? AND YEAR(COALESCE(paid_at, tanggal)) = ?
       AND (status = 'PAID' OR status IS NULL OR status = '' OR status = 'SUCCESS')
       AND UPPER(jenis) IN ('VOUCHER ONLINE', 'PEMBAYARAN PPPOE')
-      GROUP BY DATE(COALESCE(paid_at, tanggal)), UPPER(kategori), UPPER(jenis)
+      GROUP BY tanggal, kategori, jenis
     `;
     const [systemOnlineRows] = await db.query(systemOnlineQuery, [filterMonth, filterYear]);
 
@@ -108,6 +108,7 @@ router.get('/', async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('[Transactions API] Fetch Error:', error);
     res.status(500).json({ error: error.message });
   }
 });
