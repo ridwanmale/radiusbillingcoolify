@@ -239,12 +239,12 @@
         <div id="step-check_status" class="hidden" style="max-width: 450px; margin: 0 auto;">
             <div class="glass-card" style="text-align: center;">
                 <h2 style="font-weight: 900; margin-bottom: 20px;">Validasi Pembayaran</h2>
-                <div style="box-sizing: border-box; width: 100%; padding: 25px 20px; background: rgba(56, 189, 248, 0.08); border: 2px dashed rgba(56, 189, 248, 0.3); border-radius: 20px; color: #38bdf8; margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; gap: 12px;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <input type="file" id="qr-upload-input" accept="image/*" onchange="handleQrUpload(event)" style="display: none;">
+                <label for="qr-upload-input" style="box-sizing: border-box; width: 100%; padding: 30px 20px; background: rgba(56, 189, 248, 0.08); border: 2px dashed rgba(56, 189, 248, 0.3); border-radius: 20px; color: #38bdf8; cursor: pointer; margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
                     <div style="font-weight: 800; font-size: 1.1rem; text-align: center;">Scan QRIS Pembayaran</div>
-                    <div style="font-size: 0.8rem; opacity: 0.7; text-align: center;">Silakan tekan tombol 'Choose File' di bawah:</div>
-                    <input type="file" id="qr-upload-input" accept="image/*" onchange="handleQrUpload(event)" style="margin-top: 10px; width: 100%; font-size: 14px;">
-                </div>
+                    <div style="font-size: 0.8rem; opacity: 0.7; text-align: center;">Ketuk area ini untuk membuka galeri</div>
+                </label>
                 <div style="margin-bottom: 15px; font-size: 0.8rem; opacity: 0.5;">Atau masukkan ID secara manual</div>
                 <input type="text" id="manual-order-id" placeholder="Masukkan Order ID..." style="width: 100%; padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white; margin-bottom: 15px; text-align: center; box-sizing: border-box;">
                 <button id="btn-validasi-manual" onclick="checkStatusManual()" class="btn-primary" style="padding: 15px; border-radius: 12px;">VALIDASI PEMBAYARAN</button>
