@@ -124,6 +124,23 @@ async function fetchPortalData() {
         document.getElementById('portal-desc').innerText = portalSettings.portal_description || '';
         document.body.style.setProperty('--primary', portalSettings.primary_color || '#6366f1');
 
+        // PWA Auto Login Check
+        const savedVoucher = localStorage.getItem('saved_voucher');
+        if (savedVoucher) {
+            const container = document.getElementById('saved-voucher-container');
+            container.innerHTML = `
+                <div style="flex: 1;">
+                    <div style="font-size: 0.75rem; color: var(--text-subtle); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Voucher Tersimpan</div>
+                    <div style="font-weight: 800; font-size: 1.2rem; color: var(--text);">${savedVoucher}</div>
+                </div>
+                <button onclick="handleSavedAutoLogin()" class="btn-primary" style="width: auto; background: var(--primary); color: white; padding: 12px 20px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                    LOGIN KEMBALI
+                </button>
+            `;
+            container.classList.remove('hidden');
+        }
+
         renderPackages();
         setupPaymentMethods();
         
@@ -524,6 +541,12 @@ function showSuccess() {
     document.getElementById('success-order-id').innerText = currentTransaction.order_id;
     document.getElementById('success-voucher-code').innerText = currentTransaction.voucher_code || '-';
     
+    // Save for Auto-Login later
+    if (currentTransaction.voucher_code) {
+        localStorage.setItem('saved_voucher', currentTransaction.voucher_code);
+        localStorage.setItem('saved_password', currentTransaction.password || currentTransaction.voucher_code);
+    }
+    
     if (portalSettings?.success_message_html) {
         document.getElementById('success-message-custom').innerHTML = portalSettings.success_message_html;
     } else {
@@ -587,6 +610,21 @@ function handleAutoLogin() {
     showToast("Mengaktifkan Koneksi...", "success");
     document.getElementById('a-manual-login').href = loginUrl;
     
+    setTimeout(() => {
+        window.location.href = loginUrl;
+    }, 1000);
+}
+
+function handleSavedAutoLogin() {
+    const savedVoucher = localStorage.getItem('saved_voucher');
+    const savedPassword = localStorage.getItem('saved_password') || savedVoucher;
+    if (!savedVoucher) return;
+
+    let targetHost = portalSettings?.hotspot_login_url || "arm.test";
+    targetHost = targetHost.replace("http://", "").replace("https://", "").split("/")[0];
+    const loginUrl = `http://${targetHost}/login?username=${savedVoucher}&password=${savedPassword}&dst=http://www.google.com`;
+    
+    showToast("Login Otomatis via PWA...", "success");
     setTimeout(() => {
         window.location.href = loginUrl;
     }, 1000);
