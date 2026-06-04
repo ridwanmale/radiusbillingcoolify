@@ -41,7 +41,7 @@ const Dashboard = () => {
       fetch(`/api/dashboard/stats?month=${filter.month}&year=${filter.year}`).then(res => res.json()),
       fetch(`/api/dashboard/recent`).then(res => res.json()),
       fetch(`/api/logs`).then(res => res.json()),
-      fetch(`/api/transactions?month=${currentMonth}&year=${currentYear}`).then(res => res.json())
+      fetch(`/api/transactions?month=${filter.month}&year=${filter.year}`).then(res => res.json())
     ])
     .then(([statsData, recentData, logsData, transData]) => {
       setStats(statsData);
@@ -253,7 +253,7 @@ const Dashboard = () => {
 
         <div className="glass-card" style={{ padding: 0, height: '450px', display: 'flex', flexDirection: 'column' }}>
           <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border-color)', background: 'rgba(255,255,255,0.02)' }}>
-            <h2 style={{ fontSize: '1rem', fontWeight: '800', color: 'white' }}>TRANSAKSI BULAN INI</h2>
+            <h2 style={{ fontSize: '1rem', fontWeight: '800', color: 'white' }}>RINGKASAN TRANSAKSI</h2>
           </div>
           <div style={{ flex: 1, padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', justifyContent: 'center' }}>
             <div><div style={{ fontSize: '2rem', fontWeight: '900', color: '#10b981' }}>{formatRupiah(financialStats.totalPemasukan)}</div><div style={{ color: 'var(--text-secondary)' }}>Total pemasukan</div></div>
