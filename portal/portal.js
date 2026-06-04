@@ -148,16 +148,22 @@ function renderPackages() {
     const container = document.getElementById('packages-container');
     container.innerHTML = '';
     packages.forEach((pkg, i) => {
-        const color = i % 3 === 0 ? '#8b5cf6' : i % 3 === 1 ? '#3b82f6' : '#ec4899';
         const card = document.createElement('div');
         card.className = 'glass-card';
-        card.style.textAlign = 'center';
-        card.style.borderTop = `4px solid ${color}`;
+        card.style.textAlign = 'left';
+        card.style.display = 'flex';
+        card.style.flexDirection = 'column';
+        card.style.justifyContent = 'space-between';
+        
         card.innerHTML = `
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
-            <h3 style="margin: 15px 0 5px; font-size: 1.5rem; font-weight: 800;">${pkg.groupname}</h3>
-            <div style="font-size: 2.2rem; font-weight: 900; margin: 15px 0;">${formatRupiah(pkg.harga)}</div>
-            <button onclick="handlePackageSelect(${i})" class="btn-primary">BELI SEKARANG</button>
+            <div>
+                <div style="width: 40px; height: 40px; border-radius: 8px; background: rgba(94,106,210,0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+                </div>
+                <h3 style="margin: 0; font-size: 1.4rem; font-weight: 600;">${pkg.groupname}</h3>
+                <div style="font-size: 2.5rem; font-weight: 600; margin: 15px 0 24px; letter-spacing: -1.0px;">${formatRupiah(pkg.harga)}</div>
+            </div>
+            <button onclick="handlePackageSelect(${i})" class="btn-primary" style="margin-top: auto;">BELI SEKARANG</button>
         `;
         container.appendChild(card);
     });
@@ -633,3 +639,16 @@ function handleSaveOrderCard() {
 
 // Init
 fetchPortalData();
+
+// PWA Service Worker Registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => {
+        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+      })
+      .catch(err => {
+        console.log('ServiceWorker registration failed: ', err);
+      });
+  });
+}
