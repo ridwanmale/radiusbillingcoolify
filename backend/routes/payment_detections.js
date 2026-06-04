@@ -113,7 +113,7 @@ router.post('/armradius*', async (req, res) => {
         nextAction = 'auto_approved';
 
         // 1. Generate Voucher
-        const voucherCode = await generateOnlineVoucherCode();
+        const voucherCode = await generateOnlineVoucherCode(order.package_id);
         await registerVoucherToRadius(voucherCode, order.package_id);
 
         // 2. Update order status to PAID
