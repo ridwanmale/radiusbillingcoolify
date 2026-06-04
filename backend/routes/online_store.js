@@ -1151,5 +1151,27 @@ router.get('/top-spammers', async (req, res) => {
   }
 });
 
+// GET Restore Voucher by device_id (for iOS Captive Portal)
+router.get('/restore-voucher/:device_id', async (req, res) => {
+  try {
+    const { device_id } = req.params;
+    const [rows] = await db.query(`
+      SELECT voucher_code, package_id 
+      FROM jurnal_keuangan 
+      WHERE device_id = ? AND status = 'PAID' AND voucher_code IS NOT NULL 
+      ORDER BY paid_at DESC 
+      LIMIT 1
+    `, [device_id]);
+    
+    if (rows.length > 0) {
+      res.json({ success: true, voucher_code: rows[0].voucher_code });
+    } else {
+      res.json({ success: false });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;
 
