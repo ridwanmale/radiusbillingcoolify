@@ -35,7 +35,7 @@ router.get('/', async (req, res) => {
         kat as kategori,
         jen as jenis,
         'SYSTEM' as admin,
-        IF(jen = 'VOUCHER ONLINE', 'PENJUALAN VOUCHER ONLINE', CONCAT('AKUMULASI ', jen)) as deskripsi,
+        IF(jen = 'VOUCHER ONLINE', 'PENJUALAN VOUCHER ONLINE', IF(jen = 'PEMBAYARAN PPPOE', 'PEMBAYARAN PPPOE', CONCAT('AKUMULASI ', jen))) as deskripsi,
         SUM(qty) as qty,
         SUM(total) as total
       FROM (
