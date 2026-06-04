@@ -1164,10 +1164,11 @@ router.get('/restore-voucher/:device_id', async (req, res) => {
   try {
     const { device_id } = req.params;
     const [rows] = await db.query(`
-      SELECT voucher_code, package_id 
-      FROM jurnal_keuangan 
-      WHERE device_id = ? AND status = 'PAID' AND voucher_code IS NOT NULL 
-      ORDER BY paid_at DESC 
+      SELECT j.voucher_code, j.package_id 
+      FROM jurnal_keuangan j
+      INNER JOIN radcheck r ON j.voucher_code = r.username
+      WHERE j.device_id = ? AND j.status = 'PAID' AND j.voucher_code IS NOT NULL 
+      ORDER BY j.paid_at DESC 
       LIMIT 1
     `, [device_id]);
     
