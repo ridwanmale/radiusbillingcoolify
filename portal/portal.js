@@ -1,10 +1,5 @@
-// Konfigurasi API (UBAH JIKA DOMAIN ADMIN BERBEDA DENGAN PORTAL)
-// Contoh jika Admin Anda di https://admin.armradiusapp.com, ubah menjadi:
-// let API_URL = "https://admin.armradiusapp.com/api";
-let API_URL = `http://${window.location.hostname}:8088/api`;
-if (window.location.protocol === 'https:') {
-    API_URL = `https://${window.location.hostname}/api`;
-}
+// Konfigurasi API
+const API_URL = `http://${window.location.hostname}:8088/api`;
 
 let portalSettings = {};
 let packages = [];
