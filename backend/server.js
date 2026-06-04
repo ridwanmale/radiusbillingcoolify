@@ -154,7 +154,9 @@ const upgradePool = async (pool, name) => {
       'spam_max_pending': 'INT DEFAULT 3',
       'support_email': 'VARCHAR(128) DEFAULT "support@armradiusapp.com"',
       'support_phone': 'VARCHAR(64) DEFAULT "+62 812-3456-7890"',
-      'support_address': 'VARCHAR(255) DEFAULT "Jl. Contoh Nama Jalan No. 123, Kota, Provinsi"'
+      'support_address': 'VARCHAR(255) DEFAULT "Jl. Contoh Nama Jalan No. 123, Kota, Provinsi"',
+      'history_auto_delete_enabled': 'BOOLEAN DEFAULT FALSE',
+      'history_auto_delete_days': 'INT DEFAULT 30'
     };
 
     for (const [col, definition] of Object.entries(columnsToAdd)) {
@@ -390,7 +392,7 @@ const cleanupJobs = async () => {
     }
 
       // 2. Bersihkan Transaksi Pending sesuai pengaturan portal_settings
-      const [pSettings] = await connection.query('SELECT auto_cleanup_enabled, auto_cleanup_hours, spam_auto_unblock_minutes FROM portal_settings WHERE id = 1');
+      const [pSettings] = await connection.query('SELECT auto_cleanup_enabled, auto_cleanup_hours, spam_auto_unblock_minutes, history_auto_delete_enabled, history_auto_delete_days FROM portal_settings WHERE id = 1');
       if (pSettings.length > 0) {
         if (pSettings[0].auto_cleanup_enabled) {
           const cleanupHours = parseInt(pSettings[0].auto_cleanup_hours) || 24;
@@ -401,6 +403,19 @@ const cleanupJobs = async () => {
           `, [cleanupHours]);
           if (delTrx.affectedRows > 0) {
             console.log(`[Cleanup] Berhasil menghapus ${delTrx.affectedRows} transaksi pending lama (>${cleanupHours} jam).`);
+          }
+        }
+        
+        // 2b. Bersihkan Transaksi PAID/USED sesuai pengaturan Auto Delete
+        if (pSettings[0].history_auto_delete_enabled) {
+          const deleteDays = parseInt(pSettings[0].history_auto_delete_days) || 30;
+          const [delHistory] = await connection.query(`
+            DELETE FROM jurnal_keuangan 
+            WHERE status IN ('PAID', 'USED') 
+            AND created_at < DATE_SUB(NOW(), INTERVAL ? DAY)
+          `, [deleteDays]);
+          if (delHistory.affectedRows > 0) {
+            console.log(`[Auto-Delete] Berhasil menghapus ${delHistory.affectedRows} transaksi lama (>${deleteDays} hari).`);
           }
         }
         

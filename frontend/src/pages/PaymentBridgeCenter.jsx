@@ -54,11 +54,21 @@ const PaymentBridgeCenter = () => {
   const [trxSearch, setTrxSearch] = useState('');
   const [trxStatusFilter, setTrxStatusFilter] = useState('ALL');
   const [selectedTrxs, setSelectedTrxs] = useState([]);
+  const [currentPageTrx, setCurrentPageTrx] = useState(1);
 
   // --- STATE FOR DETECTION LOGS ---
   const [logs, setLogs] = useState([]);
   const [logSearch, setLogSearch] = useState('');
   const [selectedLogs, setSelectedLogs] = useState([]);
+  const [currentPageLogs, setCurrentPageLogs] = useState(1);
+  const itemsPerPage = 10;
+
+  // --- STATE FOR SETTINGS ---
+  const [portalSettings, setPortalSettings] = useState({
+    history_auto_delete_enabled: false,
+    history_auto_delete_days: 30
+  });
+  const [isAutoDeleteModalOpen, setIsAutoDeleteModalOpen] = useState(false);
 
   // --- STATE FOR DEVICES ---
   const [devices, setDevices] = useState([]);
@@ -79,17 +89,21 @@ const PaymentBridgeCenter = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [trxRes, logsRes, devRes, settingsRes] = await Promise.all([
+      const [trxRes, logsRes, devRes, settingsRes, portalSettingsRes] = await Promise.all([
         fetch('/api/online-store/admin/transactions').then(res => res.json()),
         fetch('/api/payment-detections/logs').then(res => res.json()),
         fetch('/api/payment-detections/devices').then(res => res.json()),
-        fetch('/api/settings/payment-gateway').then(res => res.json()).catch(() => ({}))
+        fetch('/api/settings/payment-gateway').then(res => res.json()).catch(() => ({})),
+        fetch('/api/online-store/settings').then(res => res.json()).catch(() => ({}))
       ]);
       setTransactions(trxRes);
       setLogs(logsRes);
       setDevices(devRes);
       if (settingsRes?.midtrans) {
         setMidtransSettings(settingsRes.midtrans);
+      }
+      if (portalSettingsRes) {
+        setPortalSettings(prev => ({ ...prev, ...portalSettingsRes }));
       }
     } catch (error) {
       console.error('Fetch error:', error);
@@ -333,6 +347,17 @@ const PaymentBridgeCenter = () => {
     }
   };
 
+  const handleSaveAutoDelete = async () => {
+    try {
+      await axios.post('/api/online-store/settings', portalSettings);
+      toast.success('Pengaturan Auto-Hapus berhasil disimpan!');
+      setIsAutoDeleteModalOpen(false);
+      fetchData();
+    } catch (err) {
+      toast.error('Gagal menyimpan pengaturan: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
   // --- RENDER HELPERS ---
   const getStatusBadge = (status) => {
     const styles = {
@@ -371,6 +396,12 @@ const PaymentBridgeCenter = () => {
     (l.notification_text || '').toLowerCase().includes(logSearch.toLowerCase()) ||
     (l.matched_order_id || '').toString().includes(logSearch)
   );
+
+  const totalPagesTrx = Math.ceil(filteredTrx.length / itemsPerPage);
+  const currentTrxData = filteredTrx.slice((currentPageTrx - 1) * itemsPerPage, currentPageTrx * itemsPerPage);
+
+  const totalPagesLogs = Math.ceil(filteredLogs.length / itemsPerPage);
+  const currentLogsData = filteredLogs.slice((currentPageLogs - 1) * itemsPerPage, currentPageLogs * itemsPerPage);
 
   return (
     <div className="payment-bridge-container" style={{ padding: '20px', color: 'white' }}>
@@ -466,6 +497,15 @@ const PaymentBridgeCenter = () => {
               <option value="PAID" style={{ background: '#0a0a0c', color: 'white' }}>Paid</option>
             </select>
 
+            <button 
+              onClick={() => setIsAutoDeleteModalOpen(true)}
+              className="btn-glass"
+              style={{ padding: '12px 20px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '700' }}
+              title="Pengaturan Hapus Riwayat Otomatis"
+            >
+              <span className="material-symbols-rounded" style={{ color: '#38bdf8' }}>auto_delete</span>
+              Auto-Delete
+            </button>
 
             {selectedTrxs.length > 0 && (
               <button 
@@ -487,8 +527,16 @@ const PaymentBridgeCenter = () => {
                   <th style={{ padding: '15px 20px', textAlign: 'left', width: '40px' }}>
                     <input 
                       type="checkbox" 
-                      checked={filteredTrx.length > 0 && selectedTrxs.length === filteredTrx.length}
-                      onChange={toggleSelectAll}
+                      checked={currentTrxData.length > 0 && currentTrxData.every(t => selectedTrxs.includes(t.id))}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          const newSelected = [...selectedTrxs];
+                          currentTrxData.forEach(t => { if (!newSelected.includes(t.id)) newSelected.push(t.id) });
+                          setSelectedTrxs(newSelected);
+                        } else {
+                          setSelectedTrxs(selectedTrxs.filter(id => !currentTrxData.find(t => t.id === id)));
+                        }
+                      }}
                       style={{ cursor: 'pointer', transform: 'scale(1.2)' }}
                     />
                   </th>
@@ -502,7 +550,7 @@ const PaymentBridgeCenter = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredTrx.slice(0, 50).map(trx => (
+                {currentTrxData.map(trx => (
                   <tr key={trx.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', background: selectedTrxs.includes(trx.id) ? 'rgba(56, 189, 248, 0.05)' : 'transparent' }}>
                     <td style={{ padding: '12px 20px' }}>
                       <input 
@@ -541,6 +589,31 @@ const PaymentBridgeCenter = () => {
               </tbody>
             </table>
             </div>
+            
+            {/* PAGINATION CONTROLS */}
+            {totalPagesTrx > 1 && (
+              <div style={{ padding: '15px 20px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Halaman {currentPageTrx} dari {totalPagesTrx}</span>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button 
+                    onClick={() => setCurrentPageTrx(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPageTrx === 1}
+                    className="btn-glass"
+                    style={{ padding: '8px 15px', borderRadius: '8px', opacity: currentPageTrx === 1 ? 0.5 : 1, cursor: currentPageTrx === 1 ? 'not-allowed' : 'pointer' }}
+                  >
+                    Previous
+                  </button>
+                  <button 
+                    onClick={() => setCurrentPageTrx(prev => Math.min(prev + 1, totalPagesTrx))}
+                    disabled={currentPageTrx === totalPagesTrx}
+                    className="btn-glass"
+                    style={{ padding: '8px 15px', borderRadius: '8px', opacity: currentPageTrx === totalPagesTrx ? 0.5 : 1, cursor: currentPageTrx === totalPagesTrx ? 'not-allowed' : 'pointer' }}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -579,8 +652,16 @@ const PaymentBridgeCenter = () => {
                   <th style={{ padding: '15px 20px', textAlign: 'left', width: '40px' }}>
                     <input 
                       type="checkbox" 
-                      checked={filteredLogs.length > 0 && selectedLogs.length === filteredLogs.length}
-                      onChange={toggleSelectAllLogs}
+                      checked={currentLogsData.length > 0 && currentLogsData.every(l => selectedLogs.includes(l.id))}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          const newSelected = [...selectedLogs];
+                          currentLogsData.forEach(l => { if (!newSelected.includes(l.id)) newSelected.push(l.id) });
+                          setSelectedLogs(newSelected);
+                        } else {
+                          setSelectedLogs(selectedLogs.filter(id => !currentLogsData.find(l => l.id === id)));
+                        }
+                      }}
                       style={{ cursor: 'pointer', transform: 'scale(1.2)' }}
                     />
                   </th>
@@ -593,7 +674,7 @@ const PaymentBridgeCenter = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredLogs.slice(0, 50).map(log => (
+                {currentLogsData.map(log => (
                   <tr key={log.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', background: selectedLogs.includes(log.id) ? 'rgba(56, 189, 248, 0.05)' : 'transparent' }}>
                     <td style={{ padding: '12px 20px' }}>
                       <input 
@@ -627,6 +708,31 @@ const PaymentBridgeCenter = () => {
               </tbody>
             </table>
             </div>
+
+            {/* PAGINATION CONTROLS FOR LOGS */}
+            {totalPagesLogs > 1 && (
+              <div style={{ padding: '15px 20px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Halaman {currentPageLogs} dari {totalPagesLogs}</span>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button 
+                    onClick={() => setCurrentPageLogs(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPageLogs === 1}
+                    className="btn-glass"
+                    style={{ padding: '8px 15px', borderRadius: '8px', opacity: currentPageLogs === 1 ? 0.5 : 1, cursor: currentPageLogs === 1 ? 'not-allowed' : 'pointer' }}
+                  >
+                    Previous
+                  </button>
+                  <button 
+                    onClick={() => setCurrentPageLogs(prev => Math.min(prev + 1, totalPagesLogs))}
+                    disabled={currentPageLogs === totalPagesLogs}
+                    className="btn-glass"
+                    style={{ padding: '8px 15px', borderRadius: '8px', opacity: currentPageLogs === totalPagesLogs ? 0.5 : 1, cursor: currentPageLogs === totalPagesLogs ? 'not-allowed' : 'pointer' }}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -799,18 +905,18 @@ const PaymentBridgeCenter = () => {
               </button>
               <button 
                 type="button"
-                onClick={confirmModal.onConfirm} 
-                className="btn" 
+                onClick={confirmModal.onConfirm}
+                className="btn-primary-premium" 
                 style={{ 
-                  flex: 1, 
-                  background: confirmModal.confirmBg, 
-                  border: 'none', 
-                  color: 'white', 
+                  flex: 1,
+                  background: confirmModal.confirmBg,
+                  color: 'white',
                   borderRadius: '50px',
                   padding: '10px',
+                  border: 'none',
                   fontWeight: '700',
-                  cursor: 'pointer',
-                  boxShadow: `0 8px 20px ${confirmModal.confirmShadow}`
+                  boxShadow: `0 4px 15px ${confirmModal.confirmShadow}`,
+                  cursor: 'pointer'
                 }}
                 onMouseOver={e => e.currentTarget.style.filter = 'brightness(1.1)'}
                 onMouseOut={e => e.currentTarget.style.filter = 'brightness(1.0)'}
@@ -821,6 +927,71 @@ const PaymentBridgeCenter = () => {
           </div>
         </div>
       </div>
+
+      {/* AUTO DELETE SETTINGS MODAL */}
+      {isAutoDeleteModalOpen && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div className="glass-card fade-in" style={{ width: '100%', maxWidth: '450px', padding: '30px', animation: 'scaleUp 0.3s ease-out' }}>
+            <h2 style={{ fontSize: '1.4rem', fontWeight: '900', marginBottom: '10px', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span className="material-symbols-rounded">auto_delete</span>
+              Pengaturan Hapus Otomatis
+            </h2>
+            <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginBottom: '25px', lineHeight: '1.6' }}>
+              Fitur ini akan menghapus <strong>secara permanen</strong> semua Riwayat Transaksi (Status PAID/USED) yang usianya sudah melewati batas waktu yang Anda tentukan di bawah ini.
+            </p>
+            
+            <div className="form-group" style={{ marginBottom: '25px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', background: 'rgba(255,255,255,0.05)', padding: '15px', borderRadius: '12px' }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: '700', color: 'white', marginBottom: '5px' }}>Aktifkan Auto-Delete</div>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Hapus otomatis berjalan di latar belakang setiap hari</div>
+                </div>
+                <div className={`custom-toggle ${portalSettings.history_auto_delete_enabled ? 'active' : ''}`} style={{ position: 'relative', width: '46px', height: '24px', background: portalSettings.history_auto_delete_enabled ? '#38bdf8' : 'rgba(255,255,255,0.1)', borderRadius: '24px', transition: '0.3s', flexShrink: 0 }}>
+                  <input type="checkbox" style={{ opacity: 0, position: 'absolute', width: '100%', height: '100%', cursor: 'pointer', zIndex: 2 }} checked={portalSettings.history_auto_delete_enabled} onChange={e => setPortalSettings({...portalSettings, history_auto_delete_enabled: e.target.checked})} />
+                  <div style={{ position: 'absolute', top: '2px', left: portalSettings.history_auto_delete_enabled ? '24px' : '2px', width: '20px', height: '20px', background: 'white', borderRadius: '50%', transition: '0.3s' }}></div>
+                </div>
+              </label>
+            </div>
+
+            {portalSettings.history_auto_delete_enabled && (
+              <div className="form-group fade-in" style={{ marginBottom: '25px' }}>
+                <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Hapus Transaksi Lebih Lama Dari:</label>
+                <select 
+                  className="form-select-premium" 
+                  value={portalSettings.history_auto_delete_days}
+                  onChange={(e) => setPortalSettings({...portalSettings, history_auto_delete_days: parseInt(e.target.value)})}
+                  style={{ width: '100%', padding: '12px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(56, 189, 248, 0.3)', borderRadius: '12px', color: 'white', outline: 'none' }}
+                >
+                  <option value={7} style={{ background: '#1e1e24' }}>7 Hari (1 Minggu)</option>
+                  <option value={14} style={{ background: '#1e1e24' }}>14 Hari (2 Minggu)</option>
+                  <option value={30} style={{ background: '#1e1e24' }}>30 Hari (1 Bulan)</option>
+                  <option value={90} style={{ background: '#1e1e24' }}>90 Hari (3 Bulan)</option>
+                  <option value={180} style={{ background: '#1e1e24' }}>180 Hari (6 Bulan)</option>
+                </select>
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: '12px', marginTop: '30px' }}>
+              <button 
+                onClick={() => {
+                  setIsAutoDeleteModalOpen(false);
+                  fetchData(); // reload back original state if cancelled
+                }}
+                style={{ flex: 1, padding: '12px', background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: '12px', color: 'white', fontWeight: '700', cursor: 'pointer' }}
+              >
+                Batal
+              </button>
+              <button 
+                onClick={handleSaveAutoDelete}
+                className="btn-primary-premium"
+                style={{ flex: 2, padding: '12px', borderRadius: '12px', color: 'white', fontWeight: '800', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)' }}
+              >
+                Simpan & Terapkan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes scaleUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }

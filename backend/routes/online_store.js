@@ -218,6 +218,12 @@ router.post('/settings', async (req, res) => {
     const spam_max_pending = req.body.spam_max_pending !== undefined ? req.body.spam_max_pending : existing.spam_max_pending;
     const spam_auto_unblock_minutes = req.body.spam_auto_unblock_minutes !== undefined ? req.body.spam_auto_unblock_minutes : existing.spam_auto_unblock_minutes;
 
+    let history_auto_delete_enabled = existing.history_auto_delete_enabled;
+    if (req.body.history_auto_delete_enabled !== undefined) {
+      history_auto_delete_enabled = req.body.history_auto_delete_enabled ? 1 : 0;
+    }
+    const history_auto_delete_days = req.body.history_auto_delete_days !== undefined ? req.body.history_auto_delete_days : existing.history_auto_delete_days;
+
     const support_email = req.body.support_email !== undefined ? req.body.support_email : existing.support_email;
     const support_phone = req.body.support_phone !== undefined ? req.body.support_phone : existing.support_phone;
     const support_address = req.body.support_address !== undefined ? req.body.support_address : existing.support_address;
@@ -282,6 +288,7 @@ router.post('/settings', async (req, res) => {
           tripay_api_key = ?, tripay_private_key = ?, tripay_merchant_code = ?, tripay_is_sandbox = ?,
           enable_payment_bridge = ?, enable_midtrans = ?, enable_duitku = ?, enable_tripay = ?, success_message_html = ?, outside_network_message_html = ?,
           auto_cleanup_enabled = ?, auto_cleanup_hours = ?, spam_protection_enabled = ?, spam_max_pending = ?, spam_auto_unblock_minutes = ?,
+          history_auto_delete_enabled = ?, history_auto_delete_days = ?,
           support_email = ?, support_phone = ?, support_address = ?
       WHERE id = 1
     `, [
@@ -292,6 +299,7 @@ router.post('/settings', async (req, res) => {
       tripay_api_key, tripay_private_key, tripay_merchant_code, tripay_is_sandbox,
       enable_payment_bridge, enable_midtrans, enable_duitku, enable_tripay, success_message_html, outside_network_message_html,
       auto_cleanup_enabled, auto_cleanup_hours, spam_protection_enabled, spam_max_pending, spam_auto_unblock_minutes,
+      history_auto_delete_enabled, history_auto_delete_days,
       support_email, support_phone, support_address
     ]);
 
