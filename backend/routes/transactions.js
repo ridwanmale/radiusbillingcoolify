@@ -76,7 +76,7 @@ router.get('/', async (req, res) => {
         'SYSTEM' as admin, 
         'REFUND VOUCHER' as deskripsi, 
         COUNT(*) as qty, 
-        SUM(pm.harga) as total
+        SUM(IF(vm.batch_id = 'ONLINE-STORE', pm.harga, pm.hpp)) as total
       FROM rincian_transaksi_voucher vm
       LEFT JOIN radusergroup rug ON vm.username = rug.username
       LEFT JOIN profiles_metadata pm ON rug.groupname = pm.groupname
