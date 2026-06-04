@@ -23,14 +23,14 @@ router.get('/', async (req, res) => {
       FROM jurnal_keuangan 
       WHERE MONTH(COALESCE(paid_at, tanggal)) = ? AND YEAR(COALESCE(paid_at, tanggal)) = ?
       AND (status = 'PAID' OR status IS NULL OR status = '' OR status = 'SUCCESS')
-      AND UPPER(jenis) NOT IN ('VOUCHER ONLINE', 'PEMBAYARAN PPPOE')
+      AND (UPPER(jenis) NOT IN ('VOUCHER ONLINE', 'PEMBAYARAN PPPOE') OR jenis IS NULL)
     `;
     const [manualRows] = await db.query(manualQuery, [filterMonth, filterYear]);
 
     // Query 1b: System Transactions from jurnal_keuangan (Voucher Online, PPPOE) - Aggregated
     let systemOnlineQuery = `
       SELECT 
-        NULL as id,
+        MAX(id) as id,
         DATE(COALESCE(paid_at, tanggal)) as tanggal, 
         UPPER(kategori) as kategori, 
         UPPER(jenis) as jenis, 
