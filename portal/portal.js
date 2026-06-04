@@ -290,7 +290,13 @@ async function handlePayment(method) {
 
     try {
         let endpoint = '';
-        let payload = { package_id: selectedPkg.groupname, amount: selectedPkg.harga, customer_name: 'Customer', device_id: getDeviceId() };
+        let payload = { 
+            package_id: selectedPkg.groupname, 
+            amount: selectedPkg.harga, 
+            customer_name: 'Customer', 
+            device_id: getDeviceId(),
+            return_url: window.location.origin
+        };
         
         if (method === 'duitku') {
             endpoint = '/online-store/duitku/create-invoice';
