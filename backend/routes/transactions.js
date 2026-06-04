@@ -42,7 +42,7 @@ router.get('/', async (req, res) => {
       WHERE MONTH(COALESCE(paid_at, tanggal)) = ? AND YEAR(COALESCE(paid_at, tanggal)) = ?
       AND (status = 'PAID' OR status IS NULL OR status = '' OR status = 'SUCCESS')
       AND UPPER(jenis) IN ('VOUCHER ONLINE', 'PEMBAYARAN PPPOE')
-      GROUP BY tanggal, kategori, jenis
+      GROUP BY DATE(COALESCE(paid_at, tanggal)), UPPER(kategori), UPPER(jenis)
     `;
     const [systemOnlineRows] = await db.query(systemOnlineQuery, [filterMonth, filterYear]);
 
