@@ -67,31 +67,7 @@ const registerVoucherToRadius = async (voucherCode, profileName) => {
   await db.query('INSERT INTO radcheck (username, attribute, op, value) VALUES (?, ?, ?, ?)', [voucherCode, 'Cleartext-Password', ':=', voucherCode]);
   await db.query('INSERT INTO radusergroup (username, groupname, priority) VALUES (?, ?, ?)', [voucherCode, profileName, 1]);
   
-  if (profile) {
-    // Calculate seconds from masa_aktif and satuan
-    let seconds = 0;
-    const val = parseInt(profile.masa_aktif || 0);
-    const unit = (profile.satuan || 'Jam').toLowerCase();
 
-    if (unit.includes('menit')) seconds = val * 60;
-    else if (unit.includes('jam')) seconds = val * 3600;
-    else if (unit.includes('hari')) seconds = val * 86400;
-    else if (unit.includes('bulan')) seconds = val * 86400 * 30;
-
-    if (seconds > 0) {
-      // Set standard RADIUS Expiration attribute
-      await db.query(`
-          INSERT INTO radcheck (username, attribute, op, value) 
-          VALUES (?, 'Expiration', ':=', DATE_FORMAT(DATE_ADD(NOW(), INTERVAL ? SECOND), '%d %b %Y %H:%i:%s'))
-      `, [voucherCode, seconds]);
-      
-      // Also add Session-Timeout as a reply attribute for better compatibility with MikroTik
-      await db.query(`
-          INSERT INTO radreply (username, attribute, op, value)
-          VALUES (?, 'Session-Timeout', ':=', ?)
-      `, [voucherCode, seconds.toString()]);
-    }
-  }
 
   await db.query(`
     INSERT INTO rincian_transaksi_voucher (username, batch_id, status, sold_at, outlet_name)
