@@ -340,10 +340,9 @@ const OnlineStoreCenter = () => {
                 <p style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '12px' }}>* Sistem akan menyuntikkan nominal otomatis. Jika ada lebih dari 1 QRIS, sistem akan merotasinya secara acak ke pembeli.</p>
               </div>
             </div>
-
-            </div>
           </div>
-              <div style={{ display: activeTab === 'keamanan' ? 'block' : 'none' }}>
+          
+          <div style={{ display: activeTab === 'keamanan' ? 'block' : 'none' }}>
               {/* SECTION: KEAMANAN & SPAM */}
               <div className="glass-card fade-in" style={{ padding: '25px', background: '#1e1e24', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '20px' }}>
                 <h3 style={{ margin: '0 0 20px 0', fontSize: '1.2rem', fontWeight: '800', color: 'white', display: 'flex', alignItems: 'center', gap: '8px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '10px' }}>
