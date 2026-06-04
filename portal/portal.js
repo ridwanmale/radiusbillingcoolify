@@ -218,13 +218,15 @@ async function fetchPortalData() {
                     safeStorage.removeItem('saved_password');
                 }
             } else {
-                // API HTTP Error (e.g. 500), fallback to local cache just in case
-                savedVoucher = localVoucher;
+                // Jika API error (500/404), JANGAN gunakan cache lokal untuk mencegah voucher expired muncul.
+                safeStorage.removeItem('saved_voucher');
+                safeStorage.removeItem('saved_password');
             }
         } catch (e) { 
             console.error('Gagal memulihkan/memverifikasi voucher', e); 
-            // Network Error (e.g. walled garden block), fallback to local cache
-            savedVoucher = localVoucher;
+            // Jika network error (misal diblokir Walled Garden), JANGAN gunakan cache lokal.
+            safeStorage.removeItem('saved_voucher');
+            safeStorage.removeItem('saved_password');
         }
 
         if (savedVoucher) {
