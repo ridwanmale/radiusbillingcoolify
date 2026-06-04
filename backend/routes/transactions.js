@@ -31,18 +31,27 @@ router.get('/', async (req, res) => {
     let systemOnlineQuery = `
       SELECT 
         MAX(id) as id,
-        DATE(COALESCE(paid_at, tanggal)) as tanggal, 
-        UPPER(kategori) as kategori, 
-        UPPER(jenis) as jenis, 
-        'SYSTEM' as admin, 
-        CONCAT('Akumulasi ', UPPER(jenis)) as deskripsi, 
-        SUM(COALESCE(qty, 1)) as qty, 
-        SUM(total) as total 
-      FROM jurnal_keuangan 
-      WHERE MONTH(COALESCE(paid_at, tanggal)) = ? AND YEAR(COALESCE(paid_at, tanggal)) = ?
-      AND (status = 'PAID' OR status IS NULL OR status = '' OR status = 'SUCCESS')
-      AND UPPER(jenis) IN ('VOUCHER ONLINE', 'PEMBAYARAN PPPOE')
-      GROUP BY DATE(COALESCE(paid_at, tanggal)), UPPER(kategori), UPPER(jenis)
+        tgl as tanggal,
+        kat as kategori,
+        jen as jenis,
+        'SYSTEM' as admin,
+        CONCAT('Akumulasi ', jen) as deskripsi,
+        SUM(qty) as qty,
+        SUM(total) as total
+      FROM (
+        SELECT 
+          id,
+          DATE(COALESCE(paid_at, tanggal)) as tgl,
+          UPPER(kategori) as kat,
+          UPPER(jenis) as jen,
+          COALESCE(qty, 1) as qty,
+          total
+        FROM jurnal_keuangan
+        WHERE MONTH(COALESCE(paid_at, tanggal)) = ? AND YEAR(COALESCE(paid_at, tanggal)) = ?
+        AND (status = 'PAID' OR status IS NULL OR status = '' OR status = 'SUCCESS')
+        AND UPPER(jenis) IN ('VOUCHER ONLINE', 'PEMBAYARAN PPPOE')
+      ) sub
+      GROUP BY tgl, kat, jen
     `;
     const [systemOnlineRows] = await db.query(systemOnlineQuery, [filterMonth, filterYear]);
 
