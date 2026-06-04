@@ -337,7 +337,7 @@ router.post('/duitku/create-invoice', checkStoreOpen, checkSpamProtection, async
       email: customer_email || 'customer@example.com',
       phoneNumber: customer_phone || '08123456789',
       callbackUrl: `${publicUrl}/api/online-store/duitku/callback`,
-      returnUrl: req.body.return_url ? `${req.body.return_url}?order_id=${order_id}` : `${publicUrl}/portal?order_id=${order_id}`,
+      returnUrl: req.body.return_url ? (req.body.return_url.includes('?') ? `${req.body.return_url}&order_id=${order_id}` : `${req.body.return_url}?order_id=${order_id}`) : `${publicUrl}/portal?order_id=${order_id}`,
       signature,
       paymentMethod: payment_method || '', // Kosongkan untuk semua metode
     };
@@ -413,7 +413,7 @@ router.post('/tripay/create-transaction', checkStoreOpen, checkSpamProtection, a
         { name: `Voucher Hotspot - ${package_id}`, price: parseInt(amount), quantity: 1 }
       ],
       callback_url: `${publicUrl}/api/online-store/tripay/callback`,
-      return_url: req.body.return_url ? `${req.body.return_url}?order_id=${merchant_ref}` : `${publicUrl}/portal?order_id=${merchant_ref}`,
+      return_url: req.body.return_url ? (req.body.return_url.includes('?') ? `${req.body.return_url}&order_id=${merchant_ref}` : `${req.body.return_url}?order_id=${merchant_ref}`) : `${publicUrl}/portal?order_id=${merchant_ref}`,
       signature: signature
     };
 
@@ -494,7 +494,7 @@ router.post('/midtrans/create-transaction', checkStoreOpen, checkSpamProtection,
         name: `Voucher Hotspot - ${package_id}`
       }],
       callbacks: {
-        finish: req.body.return_url ? `${req.body.return_url}?order_id=${order_id}` : `${publicUrl}/portal?order_id=${order_id}`
+        finish: req.body.return_url ? (req.body.return_url.includes('?') ? `${req.body.return_url}&order_id=${order_id}` : `${req.body.return_url}?order_id=${order_id}`) : `${publicUrl}/portal?order_id=${order_id}`
       }
     };
 

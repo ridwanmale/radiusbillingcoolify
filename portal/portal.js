@@ -295,7 +295,7 @@ async function handlePayment(method) {
             amount: selectedPkg.harga, 
             customer_name: 'Customer', 
             device_id: getDeviceId(),
-            return_url: window.location.origin
+            return_url: window.location.href
         };
         
         if (method === 'duitku') {
