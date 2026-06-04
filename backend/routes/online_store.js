@@ -72,7 +72,7 @@ const checkSpamProtection = async (req, res, next) => {
     const settings = settingsRows[0];
     if (!settings || !settings.spam_protection_enabled) return next();
 
-    const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    const ip_address = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim().substring(0, 45);
     const device_id = req.body.device_id || '';
 
     // 0. Check Permanent Blacklist UUID
@@ -310,7 +310,7 @@ router.post('/settings', async (req, res) => {
 // 2a. Request Pembayaran Duitku
 router.post('/duitku/create-invoice', checkStoreOpen, checkSpamProtection, async (req, res) => {
   const { package_id, amount, customer_name, payment_method, customer_email, customer_phone, device_id } = req.body;
-  const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  const ip_address = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim().substring(0, 45);
   const order_id = 'INV-' + Date.now();
   
   try {
@@ -384,7 +384,7 @@ const { generateOnlineVoucherCode, registerVoucherToRadius } = require('../utils
 // 2b. Request Pembayaran Tripay
 router.post('/tripay/create-transaction', checkStoreOpen, checkSpamProtection, async (req, res) => {
   const { package_id, amount, customer_name, method, device_id } = req.body;
-  const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  const ip_address = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim().substring(0, 45);
   const merchant_ref = 'INV-' + Date.now();
   
   try {
@@ -453,7 +453,7 @@ router.post('/tripay/create-transaction', checkStoreOpen, checkSpamProtection, a
 // 2e. Request Pembayaran Midtrans
 router.post('/midtrans/create-transaction', checkStoreOpen, checkSpamProtection, async (req, res) => {
   const { package_id, amount, customer_name, device_id } = req.body;
-  const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  const ip_address = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim().substring(0, 45);
   const order_id = 'INV-' + Date.now();
 
   try {
@@ -599,7 +599,7 @@ router.post('/midtrans/callback', async (req, res) => {
 // 2c. Create Manual QRIS Transaction
 router.post('/create-transaction', checkStoreOpen, checkSpamProtection, async (req, res) => {
   const { package_id, amount, customer_name, device_id } = req.body;
-  const ip_address = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  const ip_address = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim().substring(0, 45);
   const order_id = 'QR-' + Date.now();
   
   try {
