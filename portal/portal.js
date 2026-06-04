@@ -13,12 +13,37 @@ let timeLeft = 300;
 let isProcessing = false;
 let qrString = '';
 
+// --- Safe Storage (iPhone Support) ---
+const safeStorage = {
+    getItem(key) {
+        try {
+            let val = localStorage.getItem(key);
+            if (!val) {
+                const match = document.cookie.match(new RegExp('(^| )' + key + '=([^;]+)'));
+                val = match ? match[2] : null;
+            }
+            return val;
+        } catch (e) {
+            const match = document.cookie.match(new RegExp('(^| )' + key + '=([^;]+)'));
+            return match ? match[2] : null;
+        }
+    },
+    setItem(key, value) {
+        try {
+            localStorage.setItem(key, value);
+        } catch (e) {
+            console.warn('localStorage failed, falling back to cookies');
+        }
+        document.cookie = `${key}=${value}; max-age=31536000; path=/`;
+    }
+};
+
 // --- Device ID for Anti Spam ---
 function getDeviceId() {
-    let devId = localStorage.getItem('device_id');
+    let devId = safeStorage.getItem('device_id');
     if (!devId) {
         devId = 'device-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now();
-        localStorage.setItem('device_id', devId);
+        safeStorage.setItem('device_id', devId);
     }
     return devId;
 }
@@ -166,7 +191,7 @@ async function fetchPortalData() {
         }
 
         // PWA Auto Login Check
-        const savedVoucher = localStorage.getItem('saved_voucher');
+        const savedVoucher = safeStorage.getItem('saved_voucher');
         if (savedVoucher) {
             const container = document.getElementById('saved-voucher-container');
             container.innerHTML = `
@@ -590,8 +615,8 @@ function showSuccess() {
     
     // Save for Auto-Login later
     if (currentTransaction.voucher_code) {
-        localStorage.setItem('saved_voucher', currentTransaction.voucher_code);
-        localStorage.setItem('saved_password', currentTransaction.password || currentTransaction.voucher_code);
+        safeStorage.setItem('saved_voucher', currentTransaction.voucher_code);
+        safeStorage.setItem('saved_password', currentTransaction.password || currentTransaction.voucher_code);
     }
     
     if (portalSettings?.success_message_html) {
@@ -663,8 +688,8 @@ function handleAutoLogin() {
 }
 
 function handleSavedAutoLogin() {
-    const savedVoucher = localStorage.getItem('saved_voucher');
-    const savedPassword = localStorage.getItem('saved_password') || savedVoucher;
+    const savedVoucher = safeStorage.getItem('saved_voucher');
+    const savedPassword = safeStorage.getItem('saved_password') || savedVoucher;
     if (!savedVoucher) return;
 
     let targetHost = portalSettings?.hotspot_login_url || "arm.test";
