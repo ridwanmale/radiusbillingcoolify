@@ -236,6 +236,29 @@ async function fetchPortalData() {
         renderPackages();
         setupPaymentMethods();
         
+        // --- Deteksi iOS CNA (Captive Portal) ---
+        const ua = navigator.userAgent;
+        const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+        const isSafari = /Safari/i.test(ua) && !/CriOS/i.test(ua) && !/FxiOS/i.test(ua);
+        const isCNA = isIOS && !isSafari;
+
+        if (isCNA) {
+            document.getElementById('packages-container').style.display = 'none';
+            const cnaNotice = document.createElement('div');
+            cnaNotice.style = "background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; border-radius: 12px; padding: 20px; margin-top: 20px; text-align: center;";
+            cnaNotice.innerHTML = `
+                <div style="color: #ef4444; font-weight: 900; font-size: 1.2rem; margin-bottom: 10px;">⚠️ PERHATIAN PENGGUNA IPHONE</div>
+                <div style="color: var(--text-subtle); font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5;">
+                    Anda sedang membuka halaman ini melalui layar otomatis WiFi (Captive Portal).<br><br>
+                    Untuk kelancaran pembayaran, Anda <b>WAJIB</b> melanjutkan di browser Safari.
+                </div>
+                <a href="${window.location.href}" target="_blank" class="btn-primary" style="background: #ef4444; border-color: #ef4444; text-decoration: none; padding: 18px; font-size: 1.1rem; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);">
+                    🍎 KLIK DI SINI UNTUK BUKA DI SAFARI
+                </a>
+            `;
+            document.getElementById('step-katalog').appendChild(cnaNotice);
+        }
+        
         setStep('katalog');
 
         // Cek jika ada order_id dari URL
