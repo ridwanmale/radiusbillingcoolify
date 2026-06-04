@@ -14,7 +14,12 @@ router.post('/armradius*', async (req, res) => {
   // Bersihkan amount_detected dari huruf/simbol, ambil angkanya saja (misal "Rp 10.000" jadi "10000")
   if (amount_detected) {
     amount_detected = String(amount_detected).replace(/[^0-9]/g, '');
+    if (amount_detected === '') amount_detected = null; // Fix for empty decimal
   }
+
+  // Bersihkan teks dari emoji agar tidak error di MySQL UTF-8
+  if (notification_title) notification_title = String(notification_title).replace(/[^\x00-\x7F]/g, "");
+  if (notification_text) notification_text = String(notification_text).replace(/[^\x00-\x7F]/g, "");
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ success: false, message: 'Unauthorized: Missing token' });
@@ -88,78 +93,80 @@ router.post('/armradius*', async (req, res) => {
 
     // 4. Cari Voucher Order yang Cocok
     // Kriteria: amount sama, status PENDING, dibuat dalam 2 jam terakhir
-    const [pendingOrders] = await db.query(`
-      SELECT * FROM jurnal_keuangan 
-      WHERE total_amount = ? 
-      AND status = 'PENDING'
-      AND created_at >= NOW() - INTERVAL 2 HOUR
-    `, [amount_detected]);
-
     let matchStatus = 'unmatched';
     let matchedOrderId = null;
     let nextAction = 'waiting_payment';
 
-    if (pendingOrders.length === 1) {
-      // COCOK TEPAT SATU
-      const order = pendingOrders[0];
-      matchStatus = 'matched';
-      matchedOrderId = order.order_id;
-      nextAction = 'auto_approved';
+    if (amount_detected && parseInt(amount_detected) > 0) {
+      const [pendingOrders] = await db.query(`
+        SELECT * FROM jurnal_keuangan 
+        WHERE total_amount = ? 
+        AND status = 'PENDING'
+        AND created_at >= NOW() - INTERVAL 2 HOUR
+      `, [amount_detected]);
 
-      // 1. Generate Voucher
-      const voucherCode = await generateOnlineVoucherCode();
-      await registerVoucherToRadius(voucherCode, order.package_id);
+      if (pendingOrders.length === 1) {
+        // COCOK TEPAT SATU
+        const order = pendingOrders[0];
+        matchStatus = 'matched';
+        matchedOrderId = order.order_id;
+        nextAction = 'auto_approved';
 
-      // 2. Update order status to PAID
-      await db.query(`
-        UPDATE jurnal_keuangan 
-        SET status = 'PAID', voucher_code = ?, paid_at = NOW(),
-            kategori = 'Pemasukan', jenis = 'Voucher Online', admin = 'Payment Bridge',
-            deskripsi = CONCAT(deskripsi, " [AUTO-PAID BRIDGE]"), qty = 1, total = ?
-        WHERE id = ?
-      `, [voucherCode, order.total_amount, order.id]);
+        // 1. Generate Voucher
+        const voucherCode = await generateOnlineVoucherCode();
+        await registerVoucherToRadius(voucherCode, order.package_id);
 
-      // 3. Update detection log
-      await db.query(
-        'UPDATE payment_detection_logs SET match_status = ?, matched_order_id = ? WHERE id = ?',
-        ['matched', order.id, logId]
-      );
+        // 2. Update order status to PAID
+        await db.query(`
+          UPDATE jurnal_keuangan 
+          SET status = 'PAID', voucher_code = ?, paid_at = NOW(),
+              kategori = 'Pemasukan', jenis = 'Voucher Online', admin = 'Payment Bridge',
+              deskripsi = CONCAT(deskripsi, " [AUTO-PAID BRIDGE]"), qty = 1, total = ?
+          WHERE id = ?
+        `, [voucherCode, order.total_amount, order.id]);
 
-      // 4. Kirim notifikasi Telegram ke Admin
-      try {
-        const { notifyTelegram } = require('../utils/telegram');
-        const tgMessage = `🔔 <b>PEMBAYARAN PAYMENT BRIDGE BERHASIL</b>\n\n` +
-                          `ID Pesanan: <code>${order.order_id}</code>\n` +
-                          `Metode: <b>ShopeePay (Auto-Bridge)</b>\n` +
-                          `Paket: <b>${order.package_id}</b>\n` +
-                          `Nominal: <b>Rp ${Math.round(parseFloat(order.total_amount)).toLocaleString('id-ID')}</b>\n` +
-                          `Kode Voucher: <code>${voucherCode}</code>\n\n` +
-                          `<i>Voucher telah otomatis aktif di server RADIUS.</i>`;
-        await notifyTelegram(tgMessage, 'Payment Gateway');
-      } catch (tgErr) {
-        console.error('[PaymentDetection] Telegram notify error:', tgErr.message);
-      }
+        // 3. Update detection log
+        await db.query(
+          'UPDATE payment_detection_logs SET match_status = ?, matched_order_id = ? WHERE id = ?',
+          ['matched', order.id, logId]
+        );
 
-    } else if (pendingOrders.length > 1) {
-      // COCOK BANYAK (Perlu Review Manual)
-      matchStatus = 'need_manual_review';
-      nextAction = 'need_manual_review';
-      
-      await db.query(
-        'UPDATE payment_detection_logs SET match_status = ? WHERE id = ?',
-        ['need_manual_review', logId]
-      );
+        // 4. Kirim notifikasi Telegram ke Admin
+        try {
+          const { notifyTelegram } = require('../utils/telegram');
+          const tgMessage = `🔔 <b>PEMBAYARAN PAYMENT BRIDGE BERHASIL</b>\n\n` +
+                            `ID Pesanan: <code>${order.order_id}</code>\n` +
+                            `Metode: <b>ShopeePay/DANA/GoPay (Auto-Bridge)</b>\n` +
+                            `Paket: <b>${order.package_id}</b>\n` +
+                            `Nominal: <b>Rp ${Math.round(parseFloat(order.total_amount)).toLocaleString('id-ID')}</b>\n` +
+                            `Kode Voucher: <code>${voucherCode}</code>\n\n` +
+                            `<i>Voucher telah otomatis aktif di server RADIUS.</i>`;
+          await notifyTelegram(tgMessage, 'Payment Gateway');
+        } catch (tgErr) {
+          console.error('[PaymentDetection] Telegram notify error:', tgErr.message);
+        }
 
-      // Kirim notifikasi ke Admin bahwa ada nominal ganda yang perlu direview
-      try {
-        const { notifyTelegram } = require('../utils/telegram');
-        const tgMessage = `⚠️ <b>TINDAKAN DIPERLUKAN: DUA TRANSAKSI COCOK</b>\n\n` +
-                          `Terdeteksi nominal ganda sebesar <b>Rp ${Math.round(parseFloat(amount_detected)).toLocaleString('id-ID')}</b>.\n` +
-                          `Sistem tidak dapat menentukan pesanan mana yang dibayar secara otomatis.\n\n` +
-                          `<i>Silakan masuk ke Admin Panel -> Payment Bridge Center untuk menyetujui transaksi secara manual.</i>`;
-        await notifyTelegram(tgMessage, 'Payment Gateway');
-      } catch (tgErr) {
-        console.error('[PaymentDetection] Telegram notify error:', tgErr.message);
+      } else if (pendingOrders.length > 1) {
+        // COCOK BANYAK (Perlu Review Manual)
+        matchStatus = 'need_manual_review';
+        nextAction = 'need_manual_review';
+        
+        await db.query(
+          'UPDATE payment_detection_logs SET match_status = ? WHERE id = ?',
+          ['need_manual_review', logId]
+        );
+
+        // Kirim notifikasi ke Admin bahwa ada nominal ganda yang perlu direview
+        try {
+          const { notifyTelegram } = require('../utils/telegram');
+          const tgMessage = `⚠️ <b>TINDAKAN DIPERLUKAN: DUA TRANSAKSI COCOK</b>\n\n` +
+                            `Terdeteksi nominal ganda sebesar <b>Rp ${Math.round(parseFloat(amount_detected)).toLocaleString('id-ID')}</b>.\n` +
+                            `Sistem tidak dapat menentukan pesanan mana yang dibayar secara otomatis.\n\n` +
+                            `<i>Silakan masuk ke Admin Panel -> Payment Bridge Center untuk menyetujui transaksi secara manual.</i>`;
+          await notifyTelegram(tgMessage, 'Payment Gateway');
+        } catch (tgErr) {
+          console.error('[PaymentDetection] Telegram notify error:', tgErr.message);
+        }
       }
     }
 
@@ -172,7 +179,7 @@ router.post('/armradius*', async (req, res) => {
 
   } catch (error) {
     console.error('[PaymentDetection] Error:', error);
-    res.status(500).json({ success: false, message: 'Internal server error' });
+    res.status(500).json({ success: false, message: error.message || 'Internal server error' });
   }
 });
 
