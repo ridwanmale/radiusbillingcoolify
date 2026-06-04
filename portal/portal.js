@@ -35,6 +35,14 @@ const safeStorage = {
             console.warn('localStorage failed, falling back to cookies');
         }
         document.cookie = `${key}=${value}; max-age=31536000; path=/`;
+    },
+    removeItem(key) {
+        try {
+            localStorage.removeItem(key);
+        } catch (e) {
+            console.warn('localStorage removeItem failed');
+        }
+        document.cookie = `${key}=; max-age=0; path=/`;
     }
 };
 
