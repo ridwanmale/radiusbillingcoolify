@@ -92,7 +92,7 @@ router.get('/', async (req, res) => {
       WHERE vm.status = 'Refund' 
       AND MONTH(vm.sold_at) = ? 
       AND YEAR(vm.sold_at) = ?
-      GROUP BY DATE(vm.sold_at)
+      GROUP BY DATE(vm.sold_at), vm.batch_id
     `;
     const [refundRows] = await db.query(refundQuery, [filterMonth, filterYear]);
 
