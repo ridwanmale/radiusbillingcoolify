@@ -9,7 +9,12 @@ const { generateOnlineVoucherCode, registerVoucherToRadius } = require('../utils
  */
 router.post('/armradius*', async (req, res) => {
   const authHeader = req.headers.authorization;
-  const { device_id, source_app, notification_title, notification_text, amount_detected, received_at, idempotency_key } = req.body;
+  let { device_id, source_app, notification_title, notification_text, amount_detected, received_at, idempotency_key } = req.body;
+
+  // Bersihkan amount_detected dari huruf/simbol, ambil angkanya saja (misal "Rp 10.000" jadi "10000")
+  if (amount_detected) {
+    amount_detected = String(amount_detected).replace(/[^0-9]/g, '');
+  }
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ success: false, message: 'Unauthorized: Missing token' });
@@ -46,16 +51,34 @@ router.post('/armradius*', async (req, res) => {
     }
 
     // 3. Simpan Log Awal (Format date untuk MySQL)
-    const formattedReceivedAt = received_at 
-      ? new Date(received_at).toISOString().slice(0, 19).replace('T', ' ') 
-      : new Date().toISOString().slice(0, 19).replace('T', ' ');
+    let formattedReceivedAt;
+    try {
+      if (received_at) {
+        // Cek apakah string berupa angka (milliseconds)
+        const parsedDate = isNaN(received_at) ? new Date(received_at) : new Date(Number(received_at));
+        formattedReceivedAt = parsedDate.toISOString().slice(0, 19).replace('T', ' ');
+      } else {
+        formattedReceivedAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
+      }
+    } catch (e) {
+      formattedReceivedAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    }
+
+    // Deteksi Provider dari source_app atau title
+    let provider = 'shopeepay';
+    const sa = (source_app || '').toLowerCase();
+    const nt = (notification_title || '').toLowerCase();
+    
+    if (sa.includes('dana') || nt.includes('dana')) provider = 'dana';
+    else if (sa.includes('gojek') || nt.includes('gopay')) provider = 'gopay';
+    else if (sa.includes('ovo') || nt.includes('ovo')) provider = 'ovo';
 
     const [logResult] = await db.query(`
       INSERT INTO payment_detection_logs 
       (provider, source_app, notification_title, notification_text, amount_detected, device_id, received_at, raw_payload, idempotency_key, match_status)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [
-      'shopeepay', source_app, notification_title, notification_text, amount_detected, device_id, formattedReceivedAt, JSON.stringify(req.body), idempotency_key, 'unmatched'
+      provider, source_app, notification_title, notification_text, amount_detected, device_id, formattedReceivedAt, JSON.stringify(req.body), idempotency_key, 'unmatched'
     ]);
     
     const logId = logResult.insertId;
