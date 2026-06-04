@@ -92,11 +92,15 @@ function setStep(stepName) {
     // Deteksi Android WebView dan tampilkan banner jika membuka halaman validasi
     if (stepName === 'check_status') {
         const ua = navigator.userAgent;
-        const isAndroidWebView = /Android/i.test(ua) && !/Chrome/i.test(ua);
-        const isCaptivePortal = /Android/i.test(ua) && /CaptivePortalLogin/i.test(ua);
-        const noChrome = /Android/i.test(ua) && (/Version\/[\d.]+.*Safari/i.test(ua) || isCaptivePortal || !window.chrome);
+        const noChrome = /Android/i.test(ua) && (/Version\/[\d.]+.*Safari/i.test(ua) || /CaptivePortalLogin/i.test(ua) || !window.chrome);
         if (noChrome) {
-            document.getElementById('webview-notice').style.display = 'block';
+            const notice = document.getElementById('webview-notice');
+            const btn = document.getElementById('open-chrome-btn');
+            const pageUrl = window.location.href;
+            // Android Intent URL: paksa buka URL di Chrome
+            const intentUrl = `intent://${pageUrl.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.android.chrome;end`;
+            btn.href = intentUrl;
+            notice.style.display = 'block';
         }
     }
 }
