@@ -40,6 +40,14 @@ const safeStorage = {
 
 // --- Device ID for Anti Spam ---
 function getDeviceId() {
+    const params = new URLSearchParams(window.location.search);
+    const urlMac = params.get('mac') || params.get('uuid');
+    
+    if (urlMac) {
+        safeStorage.setItem('device_id', urlMac);
+        return urlMac;
+    }
+
     let devId = safeStorage.getItem('device_id');
     if (!devId) {
         devId = 'device-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now();
