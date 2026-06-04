@@ -249,18 +249,34 @@ async function fetchPortalData() {
             cnaNotice.innerHTML = `
                 <div style="color: #ef4444; font-weight: 900; font-size: 1.2rem; margin-bottom: 10px;">⚠️ KHUSUS PENGGUNA IPHONE / IPAD</div>
                 <div style="color: var(--text-subtle); font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5;">
-                    Jika Anda melihat layar ini muncul otomatis (Layar WiFi), Anda <b>WAJIB</b> pindah ke Safari agar pembayaran tidak error.
+                    Apple memblokir penyimpanan otomatis di layar WiFi ini. Agar voucher Anda tidak hilang setelah bayar, Anda <b>WAJIB</b> menyalin link di bawah ini dan membukanya langsung di aplikasi Safari asli.
                 </div>
-                <a href="${window.location.href}" target="_blank" class="btn-primary" style="background: #ef4444; border-color: #ef4444; text-decoration: none; padding: 16px; font-size: 1rem; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3); margin-bottom: 15px;">
-                    🍎 BUKA DI SAFARI
-                </a>
+                <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 12px; margin-bottom: 15px; word-break: break-all; font-size: 0.85rem; color: #38bdf8;">
+                    ${window.location.href}
+                </div>
+                <button onclick="copyIosLink()" class="btn-primary" style="background: #ef4444; border-color: #ef4444; text-decoration: none; padding: 16px; font-size: 1rem; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3); margin-bottom: 15px; width: 100%;">
+                    📋 SALIN LINK
+                </button>
                 <button onclick="dismissSafariNotice()" style="background: none; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 12px; border-radius: 8px; font-size: 0.85rem; width: 100%; cursor: pointer;">
-                    Saya sudah di Safari (Abaikan)
+                    Lanjutkan di Sini (Risiko Voucher Hilang)
                 </button>
             `;
             document.getElementById('step-katalog').appendChild(cnaNotice);
             
-            // Add function globally if not exists
+            if (!window.copyIosLink) {
+                window.copyIosLink = function() {
+                    if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(window.location.href).then(() => alert('Link berhasil disalin! Silakan buka aplikasi Safari dan tempel (paste) link tersebut.'));
+                    } else {
+                        const ta = document.createElement('textarea');
+                        ta.value = window.location.href;
+                        ta.style.position = 'fixed'; ta.style.left = '-9999px';
+                        document.body.appendChild(ta); ta.select();
+                        document.execCommand('copy'); document.body.removeChild(ta);
+                        alert('Link berhasil disalin! Silakan buka aplikasi Safari dan tempel (paste) link tersebut.');
+                    }
+                };
+            }
             if (!window.dismissSafariNotice) {
                 window.dismissSafariNotice = function() {
                     safeStorage.setItem('safari_dismissed', 'true');
