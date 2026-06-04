@@ -88,6 +88,17 @@ function setStep(stepName) {
     } else {
         if (redirectTimer) clearInterval(redirectTimer);
     }
+
+    // Deteksi Android WebView dan tampilkan banner jika membuka halaman validasi
+    if (stepName === 'check_status') {
+        const ua = navigator.userAgent;
+        const isAndroidWebView = /Android/i.test(ua) && !/Chrome/i.test(ua);
+        const isCaptivePortal = /Android/i.test(ua) && /CaptivePortalLogin/i.test(ua);
+        const noChrome = /Android/i.test(ua) && (/Version\/[\d.]+.*Safari/i.test(ua) || isCaptivePortal || !window.chrome);
+        if (noChrome) {
+            document.getElementById('webview-notice').style.display = 'block';
+        }
+    }
 }
 
 // --- Init Fetch ---

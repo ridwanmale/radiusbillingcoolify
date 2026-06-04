@@ -237,6 +237,16 @@
 
         <!-- LAYAR 2: Validasi / Cek Status -->
         <div id="step-check_status" class="hidden" style="max-width: 450px; margin: 0 auto;">
+
+            <!-- Banner: Buka di Chrome (khusus Android WebView) -->
+            <div id="webview-notice" style="display: none; margin-bottom: 16px; padding: 14px 16px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 12px;">
+                <div style="font-size: 0.82rem; color: #f59e0b; font-weight: 700; margin-bottom: 8px;">⚠️ Untuk upload foto, gunakan Google Chrome</div>
+                <div style="font-size: 0.78rem; color: #d0d6e0; margin-bottom: 12px;">Popup login Wi-Fi bawaan Android memblokir akses ke galeri. Buka halaman ini di Google Chrome untuk dapat mengupload gambar QRIS.</div>
+                <button onclick="window.open(window.location.href, '_blank')" style="width: 100%; padding: 10px; background: #f59e0b; color: #000; border: none; border-radius: 8px; font-weight: 800; font-size: 0.9rem; cursor: pointer;">
+                    🌐 Buka di Browser Chrome
+                </button>
+            </div>
+
             <div class="glass-card" style="text-align: center;">
                 <h2 style="font-weight: 900; margin-bottom: 20px;">Validasi Pembayaran</h2>
                 <input type="file" id="qr-upload-input" accept="image/*" onchange="handleQrUpload(event)" style="display: none;">
