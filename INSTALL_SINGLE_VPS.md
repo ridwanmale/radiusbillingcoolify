@@ -96,3 +96,24 @@ Jika Anda tidak bisa mengubah konfigurasi host, Anda harus beralih ke image **Ma
 1. Edit file `docker-compose.yml` di folder instalasi Anda.
 2. Cari bagian `image: mysql:8.0` dan ubah menjadi `image: mariadb:10.11`
 3. Simpan, lalu jalankan ulang `docker compose up -d`.
+
+---
+
+## 7. Konfigurasi Wajib di Mikrotik (Sangat Penting)
+
+Agar fitur **Auto-Restore Voucher** (anti-hilang khusus iPhone/Android) dan **Auto-Block Spam** pada portal dapat berjalan sempurna, Portal membutuhkan data **MAC Address** pelanggan yang dikirim oleh Mikrotik.
+
+Anda **WAJIB** mengedit file `login.html` yang ada di dalam File List Mikrotik Anda.
+Cari baris kode HTML atau Javascript yang melempar (redirect) pelanggan ke alamat Portal Anda, lalu ubah dan tambahkan parameter `?mac=$(mac)&ip=$(ip)&link-login-only=$(link-login-only)`.
+
+**Contoh jika menggunakan Meta Refresh (HTML):**
+```html
+<meta http-equiv="refresh" content="0; url=https://beli.domainanda.com/?mac=$(mac)&ip=$(ip)&link-login-only=$(link-login-only)">
+```
+
+**Contoh jika menggunakan Javascript:**
+```javascript
+window.location.href = "https://beli.domainanda.com/?mac=$(mac)&ip=$(ip)&link-login-only=$(link-login-only)";
+```
+
+> **INFO:** Kode `$(mac)` adalah variabel bawaan Mikrotik. Jika parameter ini ditambahkan, sistem Portal otomatis mengenali pelanggan meskipun mereka menutup layar / merefresh halaman, sehingga voucher mereka tidak akan pernah hangus / hilang di layar.

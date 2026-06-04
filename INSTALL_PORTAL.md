@@ -88,3 +88,24 @@ docker-compose -f docker-compose_portalonlinevoucher.yml down
 Jika Anda menggunakan Nginx Manager, Cloudflare Tunnel, atau Traefik, Anda bisa mengarahkan domain publik khusus (misal: `beli.hotspotanda.com`) untuk meneruskan permintaan (*forwarding*) ke IP server Anda pada port portal (misalnya `8089`). 
 
 Pastikan koneksi antara portal web publik ini dan API Backend port 5000 tidak terblokir firewall (jika diletakkan pada server yang berbeda).
+
+---
+
+## 🛠️ Konfigurasi Wajib di Mikrotik (Sangat Penting)
+
+Agar fitur **Auto-Restore Voucher** (anti-hilang khusus iPhone/Android) dan **Auto-Block Spam** dapat berjalan sempurna, Portal membutuhkan data **MAC Address** pelanggan yang dikirim oleh Mikrotik.
+
+Anda **WAJIB** mengedit file `login.html` yang ada di dalam File List Mikrotik Anda.
+Cari baris kode HTML atau Javascript yang melempar (redirect) pelanggan ke alamat Portal Anda, lalu ubah dan tambahkan parameter `?mac=$(mac)&ip=$(ip)&link-login-only=$(link-login-only)`.
+
+**Contoh jika menggunakan Meta Refresh (HTML):**
+```html
+<meta http-equiv="refresh" content="0; url=https://beli.domainanda.com/?mac=$(mac)&ip=$(ip)&link-login-only=$(link-login-only)">
+```
+
+**Contoh jika menggunakan Javascript:**
+```javascript
+window.location.href = "https://beli.domainanda.com/?mac=$(mac)&ip=$(ip)&link-login-only=$(link-login-only)";
+```
+
+> **INFO:** Kode `$(mac)` adalah variabel bawaan Mikrotik. Jika parameter ini ditambahkan, sistem Portal otomatis mengenali pelanggan meskipun mereka menutup layar / merefresh halaman, sehingga voucher mereka tidak akan pernah hangus / hilang di layar.
