@@ -236,27 +236,38 @@ async function fetchPortalData() {
         renderPackages();
         setupPaymentMethods();
         
-        // --- Deteksi iOS CNA (Captive Portal) ---
+        // --- Deteksi iOS (iPhone/iPad) ---
         const ua = navigator.userAgent;
-        const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
-        const isSafari = /Safari/i.test(ua) && !/CriOS/i.test(ua) && !/FxiOS/i.test(ua);
-        const isCNA = isIOS && !isSafari;
+        const isIOS = (/iPad|iPhone|iPod/.test(ua) || (/Macintosh/.test(ua) && 'ontouchend' in document));
+        const safariDismissed = safeStorage.getItem('safari_dismissed');
 
-        if (isCNA) {
+        if (isIOS && !safariDismissed) {
             document.getElementById('packages-container').style.display = 'none';
             const cnaNotice = document.createElement('div');
+            cnaNotice.id = 'ios-cna-notice';
             cnaNotice.style = "background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; border-radius: 12px; padding: 20px; margin-top: 20px; text-align: center;";
             cnaNotice.innerHTML = `
-                <div style="color: #ef4444; font-weight: 900; font-size: 1.2rem; margin-bottom: 10px;">⚠️ PERHATIAN PENGGUNA IPHONE</div>
+                <div style="color: #ef4444; font-weight: 900; font-size: 1.2rem; margin-bottom: 10px;">⚠️ KHUSUS PENGGUNA IPHONE / IPAD</div>
                 <div style="color: var(--text-subtle); font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5;">
-                    Anda sedang membuka halaman ini melalui layar otomatis WiFi (Captive Portal).<br><br>
-                    Untuk kelancaran pembayaran, Anda <b>WAJIB</b> melanjutkan di browser Safari.
+                    Jika Anda melihat layar ini muncul otomatis (Layar WiFi), Anda <b>WAJIB</b> pindah ke Safari agar pembayaran tidak error.
                 </div>
-                <a href="${window.location.href}" target="_blank" class="btn-primary" style="background: #ef4444; border-color: #ef4444; text-decoration: none; padding: 18px; font-size: 1.1rem; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);">
-                    🍎 KLIK DI SINI UNTUK BUKA DI SAFARI
+                <a href="${window.location.href}" target="_blank" class="btn-primary" style="background: #ef4444; border-color: #ef4444; text-decoration: none; padding: 16px; font-size: 1rem; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3); margin-bottom: 15px;">
+                    🍎 BUKA DI SAFARI
                 </a>
+                <button onclick="dismissSafariNotice()" style="background: none; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 12px; border-radius: 8px; font-size: 0.85rem; width: 100%; cursor: pointer;">
+                    Saya sudah di Safari (Abaikan)
+                </button>
             `;
             document.getElementById('step-katalog').appendChild(cnaNotice);
+            
+            // Add function globally if not exists
+            if (!window.dismissSafariNotice) {
+                window.dismissSafariNotice = function() {
+                    safeStorage.setItem('safari_dismissed', 'true');
+                    document.getElementById('ios-cna-notice').style.display = 'none';
+                    document.getElementById('packages-container').style.display = 'grid';
+                };
+            }
         }
         
         setStep('katalog');
