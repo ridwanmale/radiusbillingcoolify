@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
-import MobileBottomBar from './components/MobileBottomBar';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -202,7 +201,6 @@ const App = () => {
                 &copy; 2026 Radius Billing by Ridwan x KHP. All rights reserved.
               </footer>
             </main>
-            <MobileBottomBar onMenuClick={() => setIsSidebarOpen(true)} />
           </div>
         )} />
       </Routes>
