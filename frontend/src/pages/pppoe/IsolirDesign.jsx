@@ -196,7 +196,7 @@ const PppoeIsolirDesign = () => {
 
               <button 
                 type="button" 
-                onClick={() => window.open('/api/pppoe/warning-page', '_blank')}
+                onClick={() => window.open('/isolir', '_blank')}
                 className="btn btn-secondary" 
                 style={{ width: '100%', padding: '12px', borderRadius: '10px', fontWeight: '600', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.3s' }}
                 onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
