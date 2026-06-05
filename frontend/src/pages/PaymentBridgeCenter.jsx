@@ -499,9 +499,8 @@ const PaymentBridgeCenter = () => {
               <option value="PAID" style={{ background: '#0a0a0c', color: 'white' }}>Paid</option>
             </select>
 
-            <button className="btn-glass-delete" 
+            <button className="btn-glass" 
               onClick={() => setIsAutoDeleteModalOpen(true)}
-              className="btn-glass"
               style={{ padding: '12px 20px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '700' }}
               title="Pengaturan Hapus Riwayat Otomatis"
             >
@@ -581,7 +580,7 @@ const PaymentBridgeCenter = () => {
                             <span className="material-symbols-rounded" style={{ color: '#10b981', fontSize: '18px' }}>check_circle</span>
                           </button>
                         )}
-                        <button className="btn-glass-delete" onClick={() => handleDeleteTrx(trx.id)} className="btn-danger-small" title="Hapus">
+                        <button className="btn-glass-delete" onClick={() => handleDeleteTrx(trx.id)} title="Hapus">
                           <span className="material-symbols-rounded" style={{ color: '#ef4444', fontSize: '18px' }}>delete</span>
                         </button>
                       </div>
@@ -594,26 +593,10 @@ const PaymentBridgeCenter = () => {
             
             {/* PAGINATION CONTROLS */}
             {totalPagesTrx > 1 && (
-              <div style={{ padding: '15px 20px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Halaman {currentPageTrx} dari {totalPagesTrx}</span>
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <button 
-                    onClick={() => setCurrentPageTrx(prev => Math.max(prev - 1, 1))}
-                    disabled={currentPageTrx === 1}
-                    className="btn-glass"
-                    style={{ padding: '8px 15px', borderRadius: '8px', opacity: currentPageTrx === 1 ? 0.5 : 1, cursor: currentPageTrx === 1 ? 'not-allowed' : 'pointer' }}
-                  >
-                    Previous
-                  </button>
-                  <button 
-                    onClick={() => setCurrentPageTrx(prev => Math.min(prev + 1, totalPagesTrx))}
-                    disabled={currentPageTrx === totalPagesTrx}
-                    className="btn-glass"
-                    style={{ padding: '8px 15px', borderRadius: '8px', opacity: currentPageTrx === totalPagesTrx ? 0.5 : 1, cursor: currentPageTrx === totalPagesTrx ? 'not-allowed' : 'pointer' }}
-                  >
-                    Next
-                  </button>
-                </div>
+              <div className="pagination-wrapper" style={{ marginTop: '15px' }}>
+                <button className="pagination-btn" onClick={() => setCurrentPageTrx(prev => Math.max(prev - 1, 1))} disabled={currentPageTrx === 1}>Prev</button>
+                <div className="pagination-text">{currentPageTrx} / {totalPagesTrx}</div>
+                <button className="pagination-btn" onClick={() => setCurrentPageTrx(prev => Math.min(prev + 1, totalPagesTrx))} disabled={currentPageTrx === totalPagesTrx}>Next</button>
               </div>
             )}
           </div>
@@ -701,7 +684,7 @@ const PaymentBridgeCenter = () => {
                       <span style={{ fontSize: '0.75rem', background: 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: '4px' }}>{log.source_app.split('.').pop()}</span>
                     </td>
                     <td style={{ padding: '12px 20px', textAlign: 'right' }}>
-                      <button className="btn-glass-delete" onClick={() => handleDeleteLog(log.id)} className="btn-danger-small" style={{ width: '35px', height: '35px' }}>
+                      <button className="btn-glass-delete" onClick={() => handleDeleteLog(log.id)} style={{ width: '35px', height: '35px' }}>
                         <span className="material-symbols-rounded" style={{ color: '#ef4444', fontSize: '18px' }}>delete</span>
                       </button>
                     </td>
@@ -713,26 +696,10 @@ const PaymentBridgeCenter = () => {
 
             {/* PAGINATION CONTROLS FOR LOGS */}
             {totalPagesLogs > 1 && (
-              <div style={{ padding: '15px 20px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Halaman {currentPageLogs} dari {totalPagesLogs}</span>
-                <div style={{ display: 'flex', gap: '10px' }}>
-                  <button 
-                    onClick={() => setCurrentPageLogs(prev => Math.max(prev - 1, 1))}
-                    disabled={currentPageLogs === 1}
-                    className="btn-glass"
-                    style={{ padding: '8px 15px', borderRadius: '8px', opacity: currentPageLogs === 1 ? 0.5 : 1, cursor: currentPageLogs === 1 ? 'not-allowed' : 'pointer' }}
-                  >
-                    Previous
-                  </button>
-                  <button 
-                    onClick={() => setCurrentPageLogs(prev => Math.min(prev + 1, totalPagesLogs))}
-                    disabled={currentPageLogs === totalPagesLogs}
-                    className="btn-glass"
-                    style={{ padding: '8px 15px', borderRadius: '8px', opacity: currentPageLogs === totalPagesLogs ? 0.5 : 1, cursor: currentPageLogs === totalPagesLogs ? 'not-allowed' : 'pointer' }}
-                  >
-                    Next
-                  </button>
-                </div>
+              <div className="pagination-wrapper" style={{ marginTop: '15px' }}>
+                <button className="pagination-btn" onClick={() => setCurrentPageLogs(prev => Math.max(prev - 1, 1))} disabled={currentPageLogs === 1}>Prev</button>
+                <div className="pagination-text">{currentPageLogs} / {totalPagesLogs}</div>
+                <button className="pagination-btn" onClick={() => setCurrentPageLogs(prev => Math.min(prev + 1, totalPagesLogs))} disabled={currentPageLogs === totalPagesLogs}>Next</button>
               </div>
             )}
           </div>
@@ -805,7 +772,7 @@ const PaymentBridgeCenter = () => {
                     <button onClick={() => handleToggleDevice(device.id, device.status)} className="btn-glass" style={{ padding: '8px 15px', borderRadius: '8px', fontSize: '0.8rem', fontWeight: '700' }}>
                       {device.status === 'active' ? 'Nonaktifkan' : 'Aktifkan'}
                     </button>
-                    <button className="btn-glass-delete" onClick={() => handleDeleteDevice(device.id)} className="btn-danger-small" style={{ width: '35px', height: '35px', borderRadius: '8px' }}>
+                    <button className="btn-glass-delete" onClick={() => handleDeleteDevice(device.id)} style={{ width: '35px', height: '35px', borderRadius: '8px' }}>
                       <span className="material-symbols-rounded" style={{ color: '#ef4444', fontSize: '18px' }}>delete</span>
                     </button>
                   </div>
