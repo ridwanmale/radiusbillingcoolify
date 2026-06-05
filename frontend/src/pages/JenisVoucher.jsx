@@ -211,7 +211,7 @@ const JenisVoucher = () => {
                 <button type="button" className="btn-glass" onClick={() => setShowModal(false)} style={{ padding: '10px 20px', borderRadius: '50px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white' }}>Batal</button>
                 <button type="submit" className="btn-glass-premium btn-blue" style={{ padding: '10px 30px' }}>
                   <span className="material-symbols-rounded" style={{ color: '#10b981' }}>save</span>
-                  <span>Simpan</span>
+                  <span>SIMPAN</span>
                 </button>
               </div>
             </form>

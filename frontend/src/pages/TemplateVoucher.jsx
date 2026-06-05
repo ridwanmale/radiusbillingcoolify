@@ -274,7 +274,7 @@ const TemplateVoucher = () => {
             ) : (
               <span className="material-symbols-rounded" style={{ color: '#10b981', fontSize: '20px' }}>save</span>
             )}
-            {isSaving ? 'MENYIMPAN...' : selectedId ? 'SIMPAN PERUBAHAN' : 'TAMBAH TEMPLATE'}
+            {isSaving ? 'MENYIMPAN...' : selectedId ? 'SIMPAN' : 'TAMBAH TEMPLATE'}
           </button>
           <button 
             className="btn-glass-premium btn-green" 

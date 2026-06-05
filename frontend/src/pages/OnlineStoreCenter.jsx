@@ -409,7 +409,7 @@ const OnlineStoreCenter = () => {
               {activeTab === 'pengaturan' && (
                 <div style={{ maxWidth: '900px', marginTop: '25px' }}>
                   <button type="submit" disabled={isSaving} className="btn-success-premium" style={{ width: '100%', padding: '16px', borderRadius: '14px', fontSize: '1.05rem', fontWeight: '800', letterSpacing: '0.5px' }}>
-                    {isSaving ? 'Menyimpan...' : 'Simpan Konfigurasi'}
+                    {isSaving ? 'MENYIMPAN...' : 'SIMPAN'}
                   </button>
                 </div>
               )}

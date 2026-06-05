@@ -855,9 +855,7 @@ const PaymentBridgeCenter = () => {
                 onClick={handleAddDevice}
                 className="btn-success-premium"
                 style={{ flex: 2, padding: '12px', borderRadius: '12px', color: 'white', fontWeight: '800', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)' }}
-              >
-                Simpan Perangkat
-              </button>
+              >SIMPAN</button>
             </div>
           </div>
         </div>
@@ -1016,9 +1014,7 @@ const PaymentBridgeCenter = () => {
                 onClick={handleSaveAutoDelete}
                 className="btn-primary-premium"
                 style={{ flex: 2, padding: '12px', borderRadius: '12px', color: 'white', fontWeight: '800', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg, #38bdf8 0%, #0284c7 100%)' }}
-              >
-                Simpan & Terapkan
-              </button>
+              >SIMPAN</button>
             </div>
           </div>
         </div>

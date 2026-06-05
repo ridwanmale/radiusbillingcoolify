@@ -204,9 +204,7 @@ const SettingMidtrans = () => {
                   cursor: 'pointer'
                 }}
               >
-                <span className="material-symbols-rounded" style={{ color: '#10b981', fontSize: '20px' }}>save</span>
-                Simpan Pengaturan
-              </button>
+                <span className="material-symbols-rounded" style={{ color: '#10b981', fontSize: '20px' }}>save</span>SIMPAN</button>
             </div>
           </div>
 

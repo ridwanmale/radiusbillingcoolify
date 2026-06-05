@@ -191,7 +191,7 @@ const PppoeIsolirDesign = () => {
                 className="btn btn-primary" 
                 style={{ width: '100%', padding: '12px', borderRadius: '8px', fontWeight: '600', border: 'none', color: 'white', cursor: 'pointer' }}
               >
-                {isSaving ? 'MENYIMPAN...' : 'SIMPAN DESAIN'}
+                {isSaving ? 'MENYIMPAN...' : 'SIMPAN'}
               </button>
 
               <button 

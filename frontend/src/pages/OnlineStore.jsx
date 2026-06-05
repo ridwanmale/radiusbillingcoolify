@@ -246,7 +246,7 @@ const OnlineStore = () => {
               onMouseOut={e => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)'}
             >
               <span className="material-symbols-rounded" style={{ color: '#10b981', fontSize: '22px' }}>save</span>
-              {isSaving ? 'Menyimpan...' : 'Simpan Perubahan Portal'}
+              {isSaving ? 'MENYIMPAN...' : 'SIMPAN'}
             </button>
           </form>
         </div>

@@ -340,7 +340,7 @@ const VpnRemote = () => {
             </div>
             <div style={{ display: 'flex', gap: '12px' }}>
               <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ flex: 1, background: 'rgba(255,255,255,0.05)', color: 'white' }}>Batal</button>
-              <button type="submit" className="btn btn-primary" style={{ flex: 2, background: 'var(--accent-primary)', color: 'white' }}>Simpan Akun</button>
+              <button type="submit" className="btn btn-primary" style={{ flex: 2, background: 'var(--accent-primary)', color: 'white' }}>SIMPAN</button>
             </div>
           </form>
         </div>
@@ -402,7 +402,7 @@ const VpnRemote = () => {
             </div>
             <div style={{ display: 'flex', gap: '12px' }}>
               <button type="button" className="btn" onClick={() => setShowSettingsModal(false)} style={{ flex: 1, background: 'rgba(255,255,255,0.05)', color: 'white' }}>Batal</button>
-              <button type="submit" className="btn btn-primary" style={{ flex: 2, background: '#3b82f6', color: 'white', border: 'none' }}>Simpan & Terapkan</button>
+              <button type="submit" className="btn btn-primary" style={{ flex: 2, background: '#3b82f6', color: 'white', border: 'none' }}>SIMPAN</button>
             </div>
           </form>
         </div>

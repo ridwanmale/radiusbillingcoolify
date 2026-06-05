@@ -451,9 +451,7 @@ const Transaksi = () => {
                 onMouseOver={e => e.currentTarget.style.background = 'rgba(16, 185, 129, 0.1)'}
                 onMouseOut={e => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)'}
               >
-                <span className="material-symbols-rounded" style={{ color: '#10b981' }}>check_circle</span>
-                SIMPAN TRANSAKSI
-              </button>
+                <span className="material-symbols-rounded" style={{ color: '#10b981' }}>check_circle</span>SIMPAN</button>
             </div>
           </form>
         </div>
@@ -515,9 +513,7 @@ const Transaksi = () => {
                 onMouseOver={e => e.currentTarget.style.background = 'rgba(59, 130, 246, 0.1)'}
                 onMouseOut={e => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)'}
               >
-                <span className="material-symbols-rounded" style={{ color: '#10b981' }}>save</span>
-                PERBARUI TRANSAKSI
-              </button>
+                <span className="material-symbols-rounded" style={{ color: '#10b981' }}>save</span>SIMPAN</button>
             </div>
           </form>
         </div>

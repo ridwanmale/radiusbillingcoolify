@@ -127,7 +127,7 @@ const UILayoutManagement = () => {
             disabled={saving}
             style={{ padding: '0.8rem 2rem' }}
           >
-            {saving ? 'Menyimpan...' : 'SIMPAN PERUBAHAN'}
+            {saving ? 'MENYIMPAN...' : 'SIMPAN'}
           </button>
         </div>
 

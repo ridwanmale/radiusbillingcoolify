@@ -715,7 +715,7 @@ ${output}`;
                   onMouseOut={(e) => { e.currentTarget.style.opacity = '1'; }}
                 >
                   <span className="material-symbols-rounded" style={{ fontSize: '20px' }}>{isEdit ? 'save' : 'add_circle'}</span>
-                  {isEdit ? 'Perbarui NAS' : 'Simpan NAS'}
+                  {isEdit ? 'SIMPAN' : 'SIMPAN'}
                 </button>
                 <button
                   type="button"

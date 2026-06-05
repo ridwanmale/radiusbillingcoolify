@@ -264,7 +264,7 @@ const Backup = () => {
                   </div>
                   <span style={{ color: 'white', fontSize: '0.9rem' }}>Aktifkan Jadwal Otomatis</span>
                 </div>
-                <button type="submit" style={{ background: '#38bdf8', color: 'white', border: 'none', padding: '10px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>Simpan Pengaturan</button>
+                <button type="submit" style={{ background: '#38bdf8', color: 'white', border: 'none', padding: '10px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>SIMPAN</button>
               </form>
             </div>
           )}
@@ -346,7 +346,7 @@ const Backup = () => {
                   <span style={{ color: 'white', fontSize: '0.9rem' }}>Aktifkan Jadwal Otomatis</span>
                 </div>
                 
-                <button type="submit" style={{ background: '#f59e0b', color: 'black', border: 'none', padding: '10px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>Simpan Pengaturan</button>
+                <button type="submit" style={{ background: '#f59e0b', color: 'black', border: 'none', padding: '10px 24px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }}>SIMPAN</button>
               </form>
             </div>
           )}

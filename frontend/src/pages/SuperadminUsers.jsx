@@ -214,7 +214,7 @@ const SuperadminUsers = ({ user }) => {
               </div>
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
                 <button type="button" className="btn btn-secondary" onClick={() => setShowAddModal(false)}>Batal</button>
-                <button type="submit" className="btn btn-primary" style={{ background: '#ef4444' }}>Simpan Superadmin</button>
+                <button type="submit" className="btn btn-primary" style={{ background: '#ef4444' }}>SIMPAN</button>
               </div>
             </form>
           </div>

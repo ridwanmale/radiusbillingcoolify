@@ -180,7 +180,7 @@ const AccessRules = ({ user }) => {
             disabled={saving || user?.role === 'demo'}
             style={{ padding: '0.8rem 2rem' }}
           >
-            {saving ? 'Menyimpan...' : 'SIMPAN ATURAN'}
+            {saving ? 'MENYIMPAN...' : 'SIMPAN'}
           </button>
         </div>
 

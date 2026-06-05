@@ -102,7 +102,7 @@ const NasSettings = () => {
               <input type="text" name="description" className="form-input" placeholder="Contoh: Router Cafe Cabang Utama" value={formData.description} onChange={handleChange} />
             </div>
             <div style={{ marginTop: '1.5rem' }}>
-              <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Simpan NAS</button>
+              <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>SIMPAN</button>
             </div>
           </form>
         </div>

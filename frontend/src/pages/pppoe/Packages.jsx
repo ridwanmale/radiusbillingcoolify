@@ -129,7 +129,7 @@ const PppoePackages = ({ user }) => {
             </div>
             <button type="submit" className="btn-glass-premium" style={{ width: '100%', marginTop: '1.5rem' }}>
               <span className="material-symbols-rounded">{isEdit ? 'edit' : 'save'}</span>
-              <span>{isEdit ? 'Update Paket' : 'Simpan Paket'}</span>
+              <span>{isEdit ? 'SIMPAN' : 'SIMPAN'}</span>
             </button>
           </form>
         </div>

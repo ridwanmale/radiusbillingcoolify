@@ -129,7 +129,7 @@ const PppoeBillingSettings = ({ user }) => {
           <div style={{ marginTop: '3rem', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '2rem' }}>
             <button type="submit" className="btn-glass-premium" disabled={isSaving} style={{ width: '200px' }}>
               <span className="material-symbols-rounded">{isSaving ? 'sync' : 'save'}</span>
-              <span>{isSaving ? 'Menyimpan...' : 'Simpan Pengaturan'}</span>
+              <span>{isSaving ? 'MENYIMPAN...' : 'SIMPAN'}</span>
             </button>
           </div>
         </form>

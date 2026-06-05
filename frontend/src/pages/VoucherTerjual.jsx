@@ -943,7 +943,7 @@ const VoucherTerjual = () => {
                     onClick={handleSaveAutoDelete}
                     disabled={isSavingAutoDelete}
                   >
-                    {isSavingAutoDelete ? 'Menyimpan...' : 'Simpan Konfigurasi'}
+                    {isSavingAutoDelete ? 'MENYIMPAN...' : 'SIMPAN'}
                   </button>
                 </div>
               </div>

@@ -189,7 +189,7 @@ const AppSettings = ({ user }) => {
                   disabled={isSaving}
                   style={{ padding: '0.8rem 2rem', fontWeight: '700' }}
                 >
-                  {isSaving ? 'Menyimpan...' : 'SIMPAN PERUBAHAN'}
+                  {isSaving ? 'MENYIMPAN...' : 'SIMPAN'}
                 </button>
               </div>
             </div>

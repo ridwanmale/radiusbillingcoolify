@@ -684,8 +684,7 @@ const CustomerPortal = () => {
                 <div style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '10px' }}>Paket: {transaction.package_id || selectedPkg?.groupname || 'Voucher'}</div>
                 <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
                   <button onClick={handleSaveOrderCard} style={{ flex: 1, padding: '12px', background: 'rgba(139, 92, 246, 0.2)', border: '1px solid rgba(139, 92, 246, 0.4)', borderRadius: '12px', color: '#a78bfa', fontSize: '0.85rem', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                    <Icons.Download /> SIMPAN KARTU
-                  </button>
+                    <Icons.Download />SIMPAN</button>
                   <button onClick={() => copyToClipboard(transaction.order_id)} style={{ padding: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#ffffff', cursor: 'pointer' }}><Icons.Copy /></button>
                 </div>
               </div>
@@ -695,8 +694,7 @@ const CustomerPortal = () => {
                   <img src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrString)}`} alt="QRIS" style={{ width: '220px', height: '220px', display: 'block' }} />
                 </div>
                 <button onClick={handleDownloadQRIS} style={{ width: '100%', padding: '14px', background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.2)', borderRadius: '14px', fontWeight: '800', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                  <Icons.Download /> SIMPAN QRIS
-                </button>
+                  <Icons.Download />SIMPAN</button>
               </div>
               <div style={{ color: '#fbbf24', fontSize: '0.95rem', margin: '20px 0', fontWeight: '700' }}>Menunggu pembayaran... ({Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')})</div>
               <button onClick={() => setStep('katalog')} style={{ color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', fontWeight: '600' }}>Batal</button>

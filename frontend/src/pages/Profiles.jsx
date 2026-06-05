@@ -638,7 +638,7 @@ const Profiles = () => {
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '2rem' }}>
               <button type="button" className="btn-glass-premium btn-red" onClick={() => setIsModalOpen(false)}>Batal</button>
               <button type="submit" className="btn-glass-premium btn-green" disabled={isSubmitting}>
-                {isSubmitting ? '⌛ Menyimpan...' : 'Simpan'}
+                {isSubmitting ? '⌛ MENYIMPAN...' : 'SIMPAN'}
               </button>
             </div>
           </form>

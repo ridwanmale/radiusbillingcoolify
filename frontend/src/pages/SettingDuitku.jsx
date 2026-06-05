@@ -136,7 +136,7 @@ const SettingDuitku = () => {
             disabled={isSaving}
             style={{ width: '100%', fontWeight: '700', padding: '12px' }}
           >
-            {isSaving ? 'MENYIMPAN...' : 'SIMPAN KONFIGURASI'}
+            {isSaving ? 'MENYIMPAN...' : 'SIMPAN'}
           </button>
         </form>
       </div>

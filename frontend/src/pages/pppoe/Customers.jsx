@@ -374,7 +374,7 @@ const PppoeCustomers = ({ user }) => {
               <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem', flexWrap: 'wrap' }}>
                 <button type="submit" className="btn-glass-premium" style={{ flex: 1, justifyContent: 'center', minWidth: '120px' }}>
                   <span className="material-symbols-rounded">{isEdit ? 'check_circle' : 'person_add'}</span>
-                  <span>{isEdit ? 'Simpan Perubahan' : 'Simpan Pelanggan'}</span>
+                  <span>{isEdit ? 'SIMPAN' : 'SIMPAN'}</span>
                 </button>
                 <button type="button" className="btn-glass-premium" style={{ flex: 1, justifyContent: 'center', background: 'rgba(239, 68, 68, 0.1)', minWidth: '120px' }} onClick={() => { setShowModal(false); setIsEdit(false); }}>
                   <span className="material-symbols-rounded" style={{ color: '#ef4444' }}>cancel</span>

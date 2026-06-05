@@ -231,7 +231,7 @@ const SettingTelegram = ({ user }) => {
               className="btn btn-primary" 
               style={{ flex: 2, padding: '12px', borderRadius: '8px', fontWeight: '600', border: 'none', color: 'white' }}
             >
-              {isSaving ? 'MENYIMPAN...' : 'SIMPAN CONFIG'}
+              {isSaving ? 'MENYIMPAN...' : 'SIMPAN'}
             </button>
           </div>
 

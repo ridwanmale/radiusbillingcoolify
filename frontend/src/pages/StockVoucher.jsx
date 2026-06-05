@@ -1093,7 +1093,7 @@ const StockVoucher = ({ user }) => {
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1.5rem' }}>
                 <button type="button" className="btn" style={{ background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }} onClick={() => setIsGenerateModalOpen(false)}>Batal</button>
                 <button type="submit" className="btn btn-primary" disabled={isGenerating || profiles.length === 0}>
-                  {isGenerating ? 'Menyimpan...' : 'Generate Voucher'}
+                  {isGenerating ? 'MENYIMPAN...' : 'Generate Voucher'}
                 </button>
               </div>
             </div>
@@ -1155,7 +1155,7 @@ const StockVoucher = ({ user }) => {
               {settingData.logo_base64 && <img src={settingData.logo_base64} alt="Preview" style={{ height: '50px', marginTop: '1rem', borderRadius: '4px' }} />}
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
-              <button type="submit" className="btn btn-primary">Simpan</button>
+              <button type="submit" className="btn btn-primary">SIMPAN</button>
             </div>
           </form>
         </div>
@@ -1319,7 +1319,7 @@ const StockVoucher = ({ user }) => {
             <div className="modal-footer" style={{ marginTop: '1.5rem', display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
               <button type="button" className="btn" onClick={() => setIsAddUserModalOpen(false)} disabled={isAddingUser} style={{ background: 'rgba(255,255,255,0.05)', color: 'white' }}>Batal</button>
               <button type="submit" className="btn" disabled={isAddingUser} style={{ background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', fontWeight: '700', padding: '0.7rem 2rem' }}>
-                {isAddingUser ? 'Memproses...' : 'Simpan User'}
+                {isAddingUser ? 'Memproses...' : 'SIMPAN'}
               </button>
             </div>
           </form>

@@ -338,9 +338,7 @@ const ShopeePaySettings = () => {
                 <button type="button" className="btn" onClick={() => setShowModal(false)} style={{ flex: 1, background: 'rgba(255,255,255,0.05)', color: 'white' }}>
                   BATAL
                 </button>
-                <button type="submit" className="btn btn-primary" style={{ flex: 2 }}>
-                  SIMPAN & AKTIFKAN
-                </button>
+                <button type="submit" className="btn btn-primary" style={{ flex: 2 }}>SIMPAN</button>
               </div>
             </form>
           </div>
