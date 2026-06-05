@@ -23,6 +23,23 @@ const DEFAULT_REDIRECT_SETTINGS = {
 
 const ensureRedirectSettingsTableColumns = async () => {
   try {
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS pppoe_redirect_settings (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        redirect_message VARCHAR(255) DEFAULT 'Akses Internet Dihentikan Sementara',
+        custom_message TEXT,
+        redirect_delay INT DEFAULT 5,
+        accent_color VARCHAR(16) DEFAULT '#ef4444',
+        cs_contact VARCHAR(128) DEFAULT '0812-3456-7890',
+        redirect_footer VARCHAR(255) DEFAULT 'Sistem Redirect PPPoE - Radius Billing',
+        created_at DATETIME,
+        updated_at DATETIME
+      )
+    `);
+  } catch (err) {
+    console.error('Failed to create pppoe_redirect_settings table', err);
+  }
+  try {
     await db.query(`ALTER TABLE pppoe_redirect_settings ADD COLUMN accent_color VARCHAR(16) DEFAULT '#ef4444'`);
   } catch (err) {}
   try {
