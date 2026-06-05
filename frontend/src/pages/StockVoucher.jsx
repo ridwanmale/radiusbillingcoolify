@@ -89,6 +89,8 @@ const StockVoucher = ({ user }) => {
   const [presets, setPresets] = useState([]);
   const [isPresetModalOpen, setIsPresetModalOpen] = useState(false);
   const [isSavingPreset, setIsSavingPreset] = useState(false);
+  const [isSavePresetPromptOpen, setIsSavePresetPromptOpen] = useState(false);
+  const [presetNameInput, setPresetNameInput] = useState('');
 
   const fetchPresets = async () => {
     try {
@@ -99,16 +101,22 @@ const StockVoucher = ({ user }) => {
 
   useEffect(() => { fetchPresets(); }, []);
 
-  const handleSavePreset = async () => {
-    const presetName = prompt('Masukkan nama untuk Shortcut/Preset ini (Misal: 1 Hari 50pcs):');
-    if (!presetName) return;
+  const handleSavePresetClick = () => {
+    setPresetNameInput('');
+    setIsSavePresetPromptOpen(true);
+  };
+
+  const executeSavePreset = async (e) => {
+    e.preventDefault();
+    if (!presetNameInput.trim()) return;
+    setIsSavePresetPromptOpen(false);
     setIsSavingPreset(true);
     try {
       const res = await fetch('/api/vouchers/presets', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          preset_name: presetName,
+          preset_name: presetNameInput,
           jenis: formData.jenis,
           profile: formData.profile,
           prefix: formData.prefix,
@@ -1187,7 +1195,7 @@ const StockVoucher = ({ user }) => {
               </div>
               
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1.5rem' }}>
-                <button type="button" className="btn btn-primary" style={{ background: '#6366f1', borderColor: '#6366f1' }} onClick={handleSavePreset} disabled={isSavingPreset || !formData.profile}>
+                <button type="button" className="btn btn-primary" style={{ background: '#6366f1', borderColor: '#6366f1' }} onClick={handleSavePresetClick} disabled={isSavingPreset || !formData.profile}>
                   {isSavingPreset ? 'MENYIMPAN...' : '⭐ Simpan sbg Preset'}
                 </button>
                 <button type="button" className="btn" style={{ background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }} onClick={() => setIsGenerateModalOpen(false)}>Batal</button>
@@ -1497,6 +1505,45 @@ const StockVoucher = ({ user }) => {
           border-radius: 12px;
         }
       `}</style>
+
+      {/* MODAL SIMPAN PRESET */}
+      <div className={`modal-overlay ${isSavePresetPromptOpen ? 'open' : ''}`} onClick={() => setIsSavePresetPromptOpen(false)}>
+        <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '450px' }}>
+          <div className="modal-header">
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span className="material-symbols-rounded" style={{ color: '#10b981' }}>bookmark_add</span>
+              Simpan Preset / Shortcut
+            </h2>
+            <button className="modal-close" onClick={() => setIsSavePresetPromptOpen(false)}>&times;</button>
+          </div>
+          
+          <form onSubmit={executeSavePreset}>
+            <div style={{ padding: '1.5rem 0' }}>
+              <label className="form-label">Nama Preset</label>
+              <input 
+                type="text" 
+                className="form-input" 
+                placeholder="Misal: 1 Hari 50pcs" 
+                value={presetNameInput}
+                onChange={e => setPresetNameInput(e.target.value)}
+                autoFocus
+                required 
+              />
+              <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', marginTop: '8px' }}>
+                Preset akan menyimpan pengaturan profil, harga, dan kuantitas saat ini untuk mempercepat pembuatan voucher berikutnya.
+              </p>
+            </div>
+            
+            <div className="modal-footer" style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+              <button type="button" className="btn-glass-premium btn-red" onClick={() => setIsSavePresetPromptOpen(false)}>Batal</button>
+              <button type="submit" className="btn-glass-premium btn-green">
+                <span className="material-symbols-rounded">save</span>
+                Simpan
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
 
       <ConfirmModal
         isOpen={confirmModal.isOpen}
