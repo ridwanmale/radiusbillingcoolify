@@ -148,26 +148,20 @@ const SuperadminUsers = ({ user }) => {
                   <td style={{ textAlign: 'center' }}>{formatDateTime(adminUser.created_at)}</td>
                   <td style={{ textAlign: 'center', display: 'flex', gap: '8px', justifyContent: 'center' }}>
                     <button 
-                      className="btn btn-secondary" 
+                      className="btn-glass-edit" 
                       onClick={() => {
                         setSelectedUserId(adminUser.id);
                         setShowEditPasswordModal(true);
                       }}
                       title="Ganti Password"
-                      style={{ padding: '6px 10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                     >
-                      <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>lock_reset</span>
+                      <span className="material-symbols-rounded" style={{ color: '#f59e0b', fontSize: '18px' }}>lock_reset</span>
                     </button>
                     <button 
                       className="btn-glass-delete" 
                       onClick={() => handleDeleteUser(adminUser.id, adminUser.username)}
                       disabled={adminUser.username === user?.username || adminUser.username === 'superadmin'}
                       style={{ 
-                        padding: '6px 10px', 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center',
-                        color: (adminUser.username === user?.username || adminUser.username === 'superadmin') ? 'var(--text-subtle)' : '#ef4444', 
                         opacity: (adminUser.username === user?.username || adminUser.username === 'superadmin') ? 0.3 : 1 
                       }}
                     >

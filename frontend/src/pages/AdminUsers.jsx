@@ -149,29 +149,24 @@ const AdminUsers = ({ user }) => {
                   <td>{formatDateTime(adminUser.created_at)}</td>
                   <td style={{ textAlign: 'right', display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                     <button 
-                      className="btn-icon" 
+                      className="btn-glass-edit" 
                       onClick={() => {
                         setSelectedUserId(adminUser.id);
                         setShowEditPasswordModal(true);
                       }}
                       title="Ganti Password"
-                      style={{ color: '#3b82f6' }}
                     >
-                      <span className="material-symbols-rounded">lock_reset</span>
+                      <span className="material-symbols-rounded" style={{ color: '#f59e0b', fontSize: '18px' }}>lock_reset</span>
                     </button>
                     <button 
                       className="btn-glass-delete" 
                       onClick={() => handleDeleteUser(adminUser.id)}
                       disabled={
-                        // 1. Cannot delete yourself
                         adminUser.username === user?.username ||
-                        // 2. Superadmin cannot delete other Superadmins (as requested: "can delete user besides Superadmin")
                         (adminUser.role === 'superadmin' || adminUser.username === 'superadmin') ||
-                        // 3. Regular admins cannot delete Superadmins or other Admins (security precaution)
                         (user?.role !== 'superadmin' && (adminUser.role === 'admin' || adminUser.username === 'admin'))
                       }
                       style={{ 
-                        color: '#ef4444', 
                         opacity: (
                           adminUser.username === user?.username || 
                           adminUser.role === 'superadmin' || 
@@ -179,7 +174,7 @@ const AdminUsers = ({ user }) => {
                         ) ? 0.3 : 1 
                       }}
                     >
-                      <span className="material-symbols-rounded" style={{ color: '#ef4444' }}>delete</span>
+                      <span className="material-symbols-rounded" style={{ color: '#ef4444', fontSize: '18px' }}>delete</span>
                     </button>
                   </td>
                 </tr>
