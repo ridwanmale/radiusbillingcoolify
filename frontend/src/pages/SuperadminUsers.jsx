@@ -125,11 +125,11 @@ const SuperadminUsers = ({ user }) => {
         <table className="data-table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Username</th>
-              <th>Role</th>
-              <th>Dibuat Pada</th>
-              <th style={{ textAlign: 'right' }}>Aksi</th>
+              <th style={{ textAlign: 'center' }}>ID</th>
+              <th style={{ textAlign: 'center' }}>Username</th>
+              <th style={{ textAlign: 'center' }}>Role</th>
+              <th style={{ textAlign: 'center' }}>Dibuat Pada</th>
+              <th style={{ textAlign: 'center' }}>Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -140,34 +140,38 @@ const SuperadminUsers = ({ user }) => {
             ) : (
               users.map(adminUser => (
                 <tr key={adminUser.id}>
-                  <td>#{adminUser.id}</td>
-                  <td style={{ fontWeight: '600' }}>{adminUser.username}</td>
-                  <td>
+                  <td style={{ textAlign: 'center' }}>#{adminUser.id}</td>
+                  <td style={{ fontWeight: '600', textAlign: 'center' }}>{adminUser.username}</td>
+                  <td style={{ textAlign: 'center' }}>
                     <span className="badge" style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}>{adminUser.role}</span>
                   </td>
-                  <td>{formatDateTime(adminUser.created_at)}</td>
-                  <td style={{ textAlign: 'right', display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                  <td style={{ textAlign: 'center' }}>{formatDateTime(adminUser.created_at)}</td>
+                  <td style={{ textAlign: 'center', display: 'flex', gap: '8px', justifyContent: 'center' }}>
                     <button 
-                      className="btn-icon" 
+                      className="btn btn-secondary" 
                       onClick={() => {
                         setSelectedUserId(adminUser.id);
                         setShowEditPasswordModal(true);
                       }}
                       title="Ganti Password"
-                      style={{ color: '#3b82f6' }}
+                      style={{ padding: '6px 10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                     >
-                      <span className="material-symbols-rounded">lock_reset</span>
+                      <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>lock_reset</span>
                     </button>
                     <button 
-                      className="btn-icon" 
+                      className="btn btn-secondary" 
                       onClick={() => handleDeleteUser(adminUser.id, adminUser.username)}
                       disabled={adminUser.username === user?.username || adminUser.username === 'superadmin'}
                       style={{ 
-                        color: '#ef4444', 
+                        padding: '6px 10px', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center',
+                        color: (adminUser.username === user?.username || adminUser.username === 'superadmin') ? 'var(--text-subtle)' : '#ef4444', 
                         opacity: (adminUser.username === user?.username || adminUser.username === 'superadmin') ? 0.3 : 1 
                       }}
                     >
-                      <span className="material-symbols-rounded">delete</span>
+                      <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>delete</span>
                     </button>
                   </td>
                 </tr>
