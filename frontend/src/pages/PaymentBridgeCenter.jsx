@@ -505,7 +505,7 @@ const PaymentBridgeCenter = () => {
               style={{ padding: '12px 20px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '700' }}
               title="Pengaturan Hapus Riwayat Otomatis"
             >
-              <span className="material-symbols-rounded" style={{ color: '#38bdf8' }}>auto_delete</span>
+              <span className="material-symbols-rounded" style={{ color: '#ef4444' }}>delete</span>
               Auto-Delete
             </button>
 
@@ -935,7 +935,7 @@ const PaymentBridgeCenter = () => {
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div className="glass-card fade-in" style={{ width: '100%', maxWidth: '450px', padding: '30px', animation: 'scaleUp 0.3s ease-out' }}>
             <h2 style={{ fontSize: '1.4rem', fontWeight: '900', marginBottom: '10px', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span className="material-symbols-rounded" style={{ color: '#ef4444' }}>auto_delete</span>
+              <span className="material-symbols-rounded" style={{ color: '#ef4444' }}>delete</span>
               Pengaturan Hapus Otomatis
             </h2>
             <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginBottom: '25px', lineHeight: '1.6' }}>

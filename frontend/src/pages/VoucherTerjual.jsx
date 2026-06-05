@@ -579,7 +579,7 @@ const VoucherTerjual = () => {
         </button>
 
         <button className="btn-glass-premium btn-red" onClick={() => setShowDeleteModal(true)}>
-          <span className="material-symbols-rounded" style={{ color: '#ef4444' }}>auto_delete</span> 
+          <span className="material-symbols-rounded" style={{ color: '#ef4444' }}>delete</span> 
           Hapus
         </button>
 
@@ -854,7 +854,7 @@ const VoucherTerjual = () => {
           <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '420px' }}>
             <div className="modal-header">
               <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span className="material-symbols-rounded" style={{ color: '#ec4899' }}>auto_delete</span>
+                <span className="material-symbols-rounded" style={{ color: '#ef4444' }}>delete</span>
                 Hapus Data Expired
               </h2>
               <button className="modal-close" onClick={() => setShowDeleteModal(false)}>&times;</button>
@@ -863,7 +863,7 @@ const VoucherTerjual = () => {
               {/* === HAPUS MANUAL SECTION === */}
               <div style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '1.25rem', marginBottom: '1.25rem' }}>
                 <h3 style={{ fontSize: '0.9rem', fontWeight: '700', marginBottom: '1rem', color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span className="material-symbols-rounded" style={{ fontSize: '18px', color: '#f59e0b' }}>delete</span>
+                  <span className="material-symbols-rounded" style={{ fontSize: '18px', color: '#ef4444' }}>delete</span>
                   Hapus Manual (Sesuai Filter)
                 </h3>
                 <div style={{ marginBottom: '1rem' }}>
@@ -902,7 +902,7 @@ const VoucherTerjual = () => {
               {/* === AUTO DELETE BERKALA SECTION === */}
               <div style={{ marginBottom: '0.5rem' }}>
                 <h3 style={{ fontSize: '0.9rem', fontWeight: '700', marginBottom: '1rem', color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span className="material-symbols-rounded" style={{ fontSize: '18px', color: '#3b82f6' }}>auto_delete</span>
+                  <span className="material-symbols-rounded" style={{ fontSize: '18px', color: '#ef4444' }}>delete</span>
                   Auto Delete Berkala (Otomatis)
                 </h3>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
