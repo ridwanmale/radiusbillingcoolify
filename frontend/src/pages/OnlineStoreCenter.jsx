@@ -131,6 +131,9 @@ const OnlineStoreCenter = () => {
           <p style={{ margin: '5px 0 0', color: 'rgba(255,255,255,0.5)', fontWeight: '500' }}>Manajemen Konfigurasi & Pengaturan Toko Online</p>
         </div>
         <div style={{ display: 'flex', gap: '15px' }}>
+          <a href="/isolir" target="_blank" className="btn-glass" style={{ padding: '10px 20px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: 'white', fontWeight: '700' }}>
+            <span className="material-symbols-rounded" style={{ color: '#ef4444' }}>wifi_off</span> Lihat Isolir
+          </a>
           <a href="/portal" target="_blank" className="btn-glass" style={{ padding: '10px 20px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: 'white', fontWeight: '700' }}>
             <span className="material-symbols-rounded" style={{ color: '#10b981' }}>open_in_new</span> Lihat Toko
           </a>
