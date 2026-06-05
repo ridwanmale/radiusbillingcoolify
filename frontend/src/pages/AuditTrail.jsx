@@ -225,10 +225,9 @@ const AuditTrail = ({ user }) => {
                   </td>
                   <td style={{ textAlign: 'right' }}>
                     <button 
-                      className="btn-icon" 
+                      className="btn-glass-info" 
                       onClick={() => setSelectedLog(log)}
                       title="Lihat Detail Lengkap"
-                      style={{ color: 'var(--accent-primary)' }}
                     >
                       <span className="material-symbols-rounded" style={{ color: 'var(--accent-primary)', fontSize: '20px' }}>info</span>
                     </button>

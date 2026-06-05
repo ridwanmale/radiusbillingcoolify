@@ -1191,3 +1191,21 @@ body {
     font-size: 0.85rem;
   }
 }
+
+.btn-glass-info {
+  padding: 0.4rem;
+  background: rgba(94, 106, 210, 0.1);
+  border: none;
+  border-radius: 8px;
+  display: inline-flex;
+  gap: 8px;
+  color: white;
+  font-weight: 600;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.btn-glass-info:hover {
+  background: rgba(94, 106, 210, 0.2);
+}
