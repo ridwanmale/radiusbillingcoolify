@@ -542,11 +542,11 @@ ${output}`;
                 display: 'flex'
               }}
             >
-              <span className="material-symbols-rounded" style={{ fontSize: '20px' }}>close</span>
+              <span className="material-symbols-rounded" style={{ color: '#ef4444', fontSize: '20px' }}>close</span>
             </button>
 
             <h3 style={{ margin: '0 0 1.5rem 0', color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span className="material-symbols-rounded">{isEdit ? 'edit_note' : 'add_circle'}</span>
+              <span className="material-symbols-rounded" style={{ color: isEdit ? '#f59e0b' : '#10b981' }}>{isEdit ? 'edit_note' : 'add_circle'}</span>
               {isEdit ? 'Edit Router NAS' : 'Tambah Router Baru'}
             </h3>
 
@@ -659,7 +659,7 @@ ${output}`;
               ) : (
                 <div className="form-group" style={{ padding: '12px', background: 'rgba(16, 185, 129, 0.05)', borderRadius: '10px', borderLeft: '3px solid #10b981', animation: 'fadeInDown 0.3s', marginBottom: '1.2rem' }}>
                   <label className="form-label" style={{ color: '#10b981', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>lock</span>
+                    <span className="material-symbols-rounded" style={{ color: '#10b981', fontSize: '18px' }}>lock</span>
                     RADIUS Secret Otomatis
                   </label>
                   <p style={{ margin: '4px 0 0 0', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
@@ -837,7 +837,7 @@ ${output}`;
                           onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(59, 130, 246, 0.2)'; }}
                           onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(59, 130, 246, 0.1)'; }}
                         >
-                          <span className="material-symbols-rounded" style={{ fontSize: '14px' }}>terminal</span>
+                          <span className="material-symbols-rounded" style={{ color: '#3b82f6', fontSize: '14px' }}>terminal</span>
                           Script
                         </button>
 
@@ -861,7 +861,7 @@ ${output}`;
                           onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(16, 185, 129, 0.2)'; }}
                           onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(16, 185, 129, 0.1)'; }}
                         >
-                          <span className="material-symbols-rounded" style={{ fontSize: '14px' }}>dns</span>
+                          <span className="material-symbols-rounded" style={{ color: '#10b981', fontSize: '14px' }}>dns</span>
                           Server
                         </button>
                       </div>
@@ -948,13 +948,16 @@ ${output}`;
                 border: '1px solid #34343a',
                 color: '#f7f8f8',
                 padding: '8px',
-                borderRadius: '50%',
+                borderRadius: '8px',
                 cursor: 'pointer',
                 display: 'flex',
-                transition: '0.2s'
+                transition: 'all 0.2s',
+                zIndex: 10
               }}
+              onMouseOver={(e) => e.currentTarget.style.background = '#ef4444'}
+              onMouseOut={(e) => e.currentTarget.style.background = '#141516'}
             >
-              <span className="material-symbols-rounded" style={{ fontSize: '20px' }}>close</span>
+              <span className="material-symbols-rounded" style={{ color: '#ef4444', fontSize: '20px' }}>close</span>
             </button>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
@@ -1058,20 +1061,9 @@ ${output}`;
                 </button>
               </div>
 
-              <div style={{
-                marginTop: '12px',
-                padding: '12px',
-                background: 'rgba(245, 158, 11, 0.05)',
-                border: '1px solid rgba(245, 158, 11, 0.2)',
-                borderRadius: '8px',
-                color: '#f59e0b',
-                fontSize: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}>
-                <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>warning</span>
-                <span>{getScriptServerWarning() || 'Masukkan IP publik server billing/VPS yang dapat dijangkau dari MikroTik.'}</span>
+              <div style={{ background: 'rgba(245, 158, 11, 0.1)', padding: '12px 16px', borderRadius: '8px', borderLeft: '4px solid #f59e0b', display: 'flex', gap: '12px', alignItems: 'flex-start', marginTop: '12px' }}>
+                <span className="material-symbols-rounded" style={{ color: '#f59e0b', fontSize: '18px' }}>warning</span>
+                <div style={{ fontSize: '0.85rem', color: '#cbd5e1', lineHeight: '1.5' }}>{getScriptServerWarning() || 'Masukkan IP publik server billing/VPS yang dapat dijangkau dari MikroTik.'}</div>
               </div>
             </div>
 
@@ -1098,13 +1090,18 @@ ${output}`;
                       cursor: 'pointer',
                       transition: '0.2s',
                       display: 'flex',
+                      flexDirection: 'column',
                       alignItems: 'center',
                       justifyContent: 'center',
                       gap: '8px'
                     }}
                   >
-                    <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>settings_ethernet</span>
-                    {ros === 'v7' ? 'RouterOS V7' : 'RouterOS V6'}
+                    <div style={{ flex: 1, padding: '16px', background: '#18191c', borderRadius: '8px', border: '1px solid #2a2c32' }}>
+                      <h4 style={{ color: 'var(--text-primary)', fontSize: '0.85rem', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span className="material-symbols-rounded" style={{ color: 'var(--accent-primary)', fontSize: '18px' }}>settings_ethernet</span> Port / API (Local)
+                      </h4>
+                      {ros === 'v7' ? 'RouterOS V7' : 'RouterOS V6'}
+                    </div>
                   </button>
                 ))}
               </div>
@@ -1318,7 +1315,7 @@ ${output}`;
                 display: 'flex'
               }}
             >
-              <span className="material-symbols-rounded" style={{ fontSize: '20px' }}>close</span>
+              <span className="material-symbols-rounded" style={{ color: '#ef4444', fontSize: '20px' }}>close</span>
             </button>
 
             <h3 style={{ margin: '0 0 1rem 0', color: 'white', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.2rem', fontWeight: 'bold' }}>
