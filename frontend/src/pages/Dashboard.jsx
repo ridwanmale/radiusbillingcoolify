@@ -266,7 +266,6 @@ const Dashboard = () => {
       <div className="glass-card" style={{ padding: 0, display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between' }}>
           <h2 style={{ fontSize: '1rem', fontWeight: '800', color: 'white' }}>LOG AKTIVITAS TERKINI</h2>
-          <button onClick={fetchStats} className="btn" style={{ fontSize: '0.75rem' }}>Perbarui</button>
         </div>
         <div style={{ maxHeight: '400px', overflow: 'auto' }}>
           <table className="data-table">
