@@ -279,8 +279,9 @@ const OnlineStoreCenter = () => {
                 </div>
               )}
 
-              <div className="form-group" style={{ marginBottom: '20px' }}>
-                <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '12px', display: 'block' }}>Metode Pembayaran Aktif</label>
+              <div className="form-group" style={{ marginBottom: '20px', padding: '15px', background: 'rgba(16, 185, 129, 0.05)', borderRadius: '12px', border: '1px solid rgba(16, 185, 129, 0.1)' }}>
+                <label style={{ fontSize: '0.8rem', color: '#10b981', fontWeight: '800', marginBottom: '12px', display: 'block' }}>Metode Pembayaran Voucher Online</label>
+                <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '-5px', marginBottom: '15px' }}>Aktifkan gateway yang bisa digunakan pelanggan untuk membeli voucher hotspot.</p>
                 <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
                   {[
                     { id: 'enable_payment_bridge', label: 'Payment Bridge', icon: 'account_balance_wallet', color: '#38bdf8' },
