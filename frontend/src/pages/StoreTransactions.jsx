@@ -317,7 +317,7 @@ const StoreTransactions = () => {
                                             {trx.status === 'PENDING' && (
                                                 <button onClick={() => handleApprove(trx.order_id)} style={{ padding: '6px 12px', background: '#10b981', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.8rem' }}>Setujui</button>
                                             )}
-                                            <button onClick={() => handleDelete(trx.id)} style={{ padding: '6px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>
+                                            <button className="btn-glass-delete" onClick={() => handleDelete(trx.id)} style={{ padding: '6px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>
                                                 <span className="material-symbols-rounded" style={{ color: '#ef4444', fontSize: '18px' }}>delete</span>
                                             </button>
                                         </div>

@@ -160,7 +160,7 @@ const AdminUsers = ({ user }) => {
                       <span className="material-symbols-rounded">lock_reset</span>
                     </button>
                     <button 
-                      className="btn-icon" 
+                      className="btn-glass-delete" 
                       onClick={() => handleDeleteUser(adminUser.id)}
                       disabled={
                         // 1. Cannot delete yourself

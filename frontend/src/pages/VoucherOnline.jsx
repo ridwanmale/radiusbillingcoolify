@@ -221,7 +221,7 @@ const VoucherOnline = () => {
             <span>Sinkron Sesi</span>
           </button>
 
-          <button className="btn-glass-premium btn-red" onClick={() => handleBulkAction('HAPUS')}>
+          <button className="btn-glass-delete" onClick={() => handleBulkAction('HAPUS')}>
             <span className="material-symbols-rounded" style={{ color: '#ef4444' }}>delete</span>
             <span>Hapus</span>
           </button>

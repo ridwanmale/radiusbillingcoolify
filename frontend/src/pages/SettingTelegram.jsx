@@ -283,7 +283,7 @@ const SettingTelegram = ({ user }) => {
                   >
                     {c.is_enabled ? 'AKTIF' : 'OFF'}
                   </span>
-                  <button 
+                  <button className="btn-glass-edit" 
                     onClick={() => setSelectedOutlet(c.outlet_name)}
                     className="btn-edit" 
                     style={{ 

@@ -499,7 +499,7 @@ const PaymentBridgeCenter = () => {
               <option value="PAID" style={{ background: '#0a0a0c', color: 'white' }}>Paid</option>
             </select>
 
-            <button 
+            <button className="btn-glass-delete" 
               onClick={() => setIsAutoDeleteModalOpen(true)}
               className="btn-glass"
               style={{ padding: '12px 20px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '700' }}
@@ -581,7 +581,7 @@ const PaymentBridgeCenter = () => {
                             <span className="material-symbols-rounded" style={{ color: '#10b981', fontSize: '18px' }}>check_circle</span>
                           </button>
                         )}
-                        <button onClick={() => handleDeleteTrx(trx.id)} className="btn-danger-small" title="Hapus">
+                        <button className="btn-glass-delete" onClick={() => handleDeleteTrx(trx.id)} className="btn-danger-small" title="Hapus">
                           <span className="material-symbols-rounded" style={{ color: '#ef4444', fontSize: '18px' }}>delete</span>
                         </button>
                       </div>
@@ -701,7 +701,7 @@ const PaymentBridgeCenter = () => {
                       <span style={{ fontSize: '0.75rem', background: 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: '4px' }}>{log.source_app.split('.').pop()}</span>
                     </td>
                     <td style={{ padding: '12px 20px', textAlign: 'right' }}>
-                      <button onClick={() => handleDeleteLog(log.id)} className="btn-danger-small" style={{ width: '35px', height: '35px' }}>
+                      <button className="btn-glass-delete" onClick={() => handleDeleteLog(log.id)} className="btn-danger-small" style={{ width: '35px', height: '35px' }}>
                         <span className="material-symbols-rounded" style={{ color: '#ef4444', fontSize: '18px' }}>delete</span>
                       </button>
                     </td>
@@ -805,7 +805,7 @@ const PaymentBridgeCenter = () => {
                     <button onClick={() => handleToggleDevice(device.id, device.status)} className="btn-glass" style={{ padding: '8px 15px', borderRadius: '8px', fontSize: '0.8rem', fontWeight: '700' }}>
                       {device.status === 'active' ? 'Nonaktifkan' : 'Aktifkan'}
                     </button>
-                    <button onClick={() => handleDeleteDevice(device.id)} className="btn-danger-small" style={{ width: '35px', height: '35px', borderRadius: '8px' }}>
+                    <button className="btn-glass-delete" onClick={() => handleDeleteDevice(device.id)} className="btn-danger-small" style={{ width: '35px', height: '35px', borderRadius: '8px' }}>
                       <span className="material-symbols-rounded" style={{ color: '#ef4444', fontSize: '18px' }}>delete</span>
                     </button>
                   </div>

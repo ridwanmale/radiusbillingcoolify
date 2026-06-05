@@ -309,7 +309,7 @@ const TemplateVoucher = () => {
               {t.template_name}
             </button>
             {selectedId === t.id && (
-              <button 
+              <button className="btn-glass-delete" 
                 onClick={(e) => { e.stopPropagation(); handleDelete(t.id); }} 
                 style={{ 
                   background: 'rgba(239, 68, 68, 0.1)', 

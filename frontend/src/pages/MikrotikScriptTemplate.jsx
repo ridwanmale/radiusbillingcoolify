@@ -302,7 +302,7 @@ const MikrotikScriptTemplate = () => {
                     }}>{t.name}</div>
                   </div>
                   {selectedId === t.id && (
-                    <button 
+                    <button className="btn-glass-delete" 
                       onClick={(e) => { e.stopPropagation(); handleDelete(t.id); }}
                       style={{ background: 'transparent', border: 'none', color: tokens.inkSubtle, cursor: 'pointer', display: 'flex', padding: '4px', borderRadius: '4px' }}
                       onMouseOver={e => e.currentTarget.style.color = '#ef4444'}

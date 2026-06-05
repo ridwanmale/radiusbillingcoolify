@@ -159,7 +159,7 @@ const SuperadminUsers = ({ user }) => {
                       <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>lock_reset</span>
                     </button>
                     <button 
-                      className="btn btn-secondary" 
+                      className="btn-glass-delete" 
                       onClick={() => handleDeleteUser(adminUser.id, adminUser.username)}
                       disabled={adminUser.username === user?.username || adminUser.username === 'superadmin'}
                       style={{ 

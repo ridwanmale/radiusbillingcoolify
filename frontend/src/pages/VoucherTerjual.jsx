@@ -578,7 +578,7 @@ const VoucherTerjual = () => {
           Refund
         </button>
 
-        <button className="btn-glass-premium btn-red" onClick={() => setShowDeleteModal(true)}>
+        <button className="btn-glass-delete" onClick={() => setShowDeleteModal(true)}>
           <span className="material-symbols-rounded" style={{ color: '#ef4444' }}>delete</span> 
           Hapus
         </button>

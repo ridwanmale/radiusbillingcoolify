@@ -274,7 +274,7 @@ const PppoeCustomers = ({ user }) => {
                       <span className="material-symbols-rounded" style={{ color: 'var(--accent-primary)', fontSize: '18px' }}>visibility</span>
                     </button>
                     <button 
-                      className="btn btn-sm" 
+                      className="btn-glass-edit" 
                       onClick={() => handleEdit(c)}
                       title="Edit"
                       style={{ background: 'rgba(255,255,255,0.05)', color: 'white' }}
@@ -282,7 +282,7 @@ const PppoeCustomers = ({ user }) => {
                       <span className="material-symbols-rounded" style={{ color: '#f59e0b', fontSize: '18px' }}>edit</span>
                     </button>
                     <button 
-                      className="btn btn-sm btn-danger" 
+                      className="btn-glass-delete" 
                       onClick={() => handleDelete(c)}
                       title="Hapus"
                     >

@@ -302,6 +302,9 @@ body {
   font-size: 0.7rem;
   font-weight: 500;
   display: inline-flex;
+  gap: 8px;
+  color: white;
+  font-weight: 600;
   align-items: center;
   justify-content: center;
   background: #141516; /* Surface-2 */
@@ -1092,4 +1095,41 @@ body {
 .form-input option, .form-input-premium option {
   background-color: #1a1a20;
   color: #ffffff;
+}
+
+
+/* Global Action Buttons (Glass Style) */
+.btn-glass-edit {
+  padding: 0.4rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  border-radius: 8px;
+  display: inline-flex;
+  gap: 8px;
+  color: white;
+  font-weight: 600;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.btn-glass-edit:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.btn-glass-delete {
+  padding: 0.4rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: none;
+  border-radius: 8px;
+  display: inline-flex;
+  gap: 8px;
+  color: white;
+  font-weight: 600;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.btn-glass-delete:hover {
+  background: rgba(239, 68, 68, 0.2);
 }

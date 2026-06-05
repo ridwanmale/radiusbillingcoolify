@@ -133,10 +133,10 @@ const JenisVoucher = () => {
                   {type.is_active ? 'Aktif' : 'Nonaktif'}
                 </span>
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  <button className="icon-btn btn-blue-sm" onClick={() => handleEdit(type)} title="Edit">
+                  <button className="btn-glass-edit" onClick={() => handleEdit(type)} title="Edit">
                     <span className="material-symbols-rounded" style={{ color: '#f59e0b' }}>edit</span>
                   </button>
-                  <button className="icon-btn btn-red-sm" onClick={() => handleDelete(type.id)} title="Hapus">
+                  <button className="btn-glass-delete" onClick={() => handleDelete(type.id)} title="Hapus">
                     <span className="material-symbols-rounded" style={{ color: '#ef4444' }}>delete</span>
                   </button>
                 </div>

@@ -193,7 +193,7 @@ const ShopeePaySettings = () => {
                   </span>
                 </div>
               </div>
-              <button 
+              <button className="btn-glass-delete" 
                 onClick={() => handleDelete(device.id, device.device_name)}
                 style={{ 
                   background: 'rgba(239, 68, 68, 0.1)', 

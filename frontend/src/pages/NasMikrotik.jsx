@@ -868,10 +868,10 @@ ${output}`;
                     </td>
                     <td>
                       <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-                        <button className="btn" style={{ padding: '0.4rem', background: 'rgba(255,255,255,0.05)', display: 'flex', border: 'none', borderRadius: '8px' }} onClick={() => handleEditClick(nas)}>
+                        <button className="btn-glass-edit" onClick={() => handleEditClick(nas)}>
                           <span className="material-symbols-rounded" style={{ color: '#f59e0b', fontSize: '1.2rem' }}>edit</span>
                         </button>
-                        <button className="btn" style={{ padding: '0.4rem', background: 'rgba(239, 68, 68, 0.1)', display: 'flex', border: 'none', borderRadius: '8px' }} onClick={() => handleDelete(nas.id)}>
+                        <button className="btn-glass-delete" onClick={() => handleDelete(nas.id)}>
                           <span className="material-symbols-rounded" style={{ color: '#ef4444', fontSize: '1.2rem' }}>delete</span>
                         </button>
                       </div>

@@ -238,14 +238,14 @@ const VpnRemote = () => {
                             <button className="action-btn" title="Salin Script" onClick={() => copyToClipboard(generateL2tpScript(acc))} style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>
                               <span className="material-symbols-rounded" style={{ color: 'var(--accent-primary)' }}>content_copy</span>
                             </button>
-                            <button className="action-btn" title="Edit" onClick={() => {
+                            <button className="btn-glass-edit" title="Edit" onClick={() => {
                               setEditingId(acc.id);
                               setFormData({ username: acc.username, password: acc.password, psk: acc.psk, status: acc.status });
                               setShowModal(true);
                             }} style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>
                               <span className="material-symbols-rounded" style={{ color: '#f59e0b' }}>edit</span>
                             </button>
-                            <button className="action-btn" title="Hapus" onClick={() => handleDelete(acc.id)} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}>
+                            <button className="btn-glass-delete" title="Hapus" onClick={() => handleDelete(acc.id)} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}>
                               <span className="material-symbols-rounded" style={{ color: '#ef4444' }}>delete</span>
                             </button>
                           </div>
