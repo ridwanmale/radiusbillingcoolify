@@ -8,7 +8,7 @@ router.get('/', async (req, res) => {
     const [rows] = await db.query(`
       SELECT 
         vm.batch_id as kode_print,
-        vm.created_at,
+        MIN(vm.created_at) as created_at,
         vm.outlet_name,
         COALESCE(rug.groupname, 'Unknown') as profile,
         COUNT(DISTINCT vm.username) as qty,
@@ -25,7 +25,7 @@ router.get('/', async (req, res) => {
       LEFT JOIN radusergroup rug ON vm.username = rug.username
       LEFT JOIN profiles_metadata pm ON rug.groupname = pm.groupname
       WHERE vm.batch_id != 'ONLINE-STORE'
-      GROUP BY vm.batch_id, vm.created_at, vm.outlet_name, COALESCE(rug.groupname, 'Unknown'), pm.harga, pm.komisi
+      GROUP BY vm.batch_id, vm.outlet_name, COALESCE(rug.groupname, 'Unknown'), pm.harga, pm.komisi
       ORDER BY created_at DESC
     `);
     
