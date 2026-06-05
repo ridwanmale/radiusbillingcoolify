@@ -569,7 +569,7 @@ const VoucherTerjual = () => {
 
       <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center', marginBottom: '1.5rem', justifyContent: 'flex-start' }}>
         <button className="btn-glass-premium btn-blue" onClick={fetchTerjual}>
-          <span className="material-symbols-rounded">refresh</span>
+          <span className="material-symbols-rounded" style={{ color: '#3b82f6' }}>refresh</span>
           Refresh
         </button>
 
@@ -579,12 +579,12 @@ const VoucherTerjual = () => {
         </button>
 
         <button className="btn-glass-premium btn-red" onClick={() => setShowDeleteModal(true)}>
-          <span className="material-symbols-rounded">auto_delete</span> 
+          <span className="material-symbols-rounded" style={{ color: '#ef4444' }}>auto_delete</span> 
           Hapus
         </button>
 
                 <button className="btn-glass-premium btn-green" onClick={() => setIsExportModalOpen(true)}>
-          <span className="material-symbols-rounded">download</span> 
+          <span className="material-symbols-rounded" style={{ color: '#3b82f6' }}>download</span> 
           Export
         </button>
       </div><div style={{ marginBottom: '2rem' }}>
@@ -1027,7 +1027,7 @@ const VoucherTerjual = () => {
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
               <button className="btn-glass-premium btn-red" onClick={() => setIsExportModalOpen(false)}>Batal</button>
               <button className="btn-glass-premium btn-green" onClick={handleExportCSV}>
-                <span className="material-symbols-rounded">download</span>
+                <span className="material-symbols-rounded" style={{ color: '#3b82f6' }}>download</span>
                 Download CSV
               </button>
             </div>

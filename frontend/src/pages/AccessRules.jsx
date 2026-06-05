@@ -115,7 +115,7 @@ const AccessRules = ({ user }) => {
         alignItems: 'center',
         gap: '12px'
       }}>
-        <span className="material-symbols-rounded" style={{ fontSize: '20px' }}>info</span>
+        <span className="material-symbols-rounded" style={{ color: 'var(--accent-primary)', fontSize: '20px' }}>info</span>
         <span>
           <strong>Informasi Peran Demo:</strong> Role <strong>demo</strong> dirancang untuk kebutuhan demonstrasi. Pengguna dengan peran ini dapat menjelajahi menu yang diizinkan, tetapi <strong>tidak memiliki izin untuk menambah (Create) atau menghapus (Delete) data</strong> di seluruh aplikasi.
         </span>

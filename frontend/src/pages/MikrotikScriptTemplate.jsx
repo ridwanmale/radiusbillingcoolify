@@ -230,7 +230,7 @@ const MikrotikScriptTemplate = () => {
             e.currentTarget.style.transform = 'translateY(0)';
           }}
         >
-          <span className="material-symbols-rounded" style={{ fontSize: '20px' }}>add</span> New Template
+          <span className="material-symbols-rounded" style={{ color: '#10b981', fontSize: '20px' }}>add</span> New Template
         </button>
       </div>
 
@@ -308,7 +308,7 @@ const MikrotikScriptTemplate = () => {
                       onMouseOver={e => e.currentTarget.style.color = '#ef4444'}
                       onMouseOut={e => e.currentTarget.style.color = tokens.inkSubtle}
                     >
-                      <span className="material-symbols-rounded" style={{ fontSize: '16px' }}>delete</span>
+                      <span className="material-symbols-rounded" style={{ color: '#ef4444', fontSize: '16px' }}>delete</span>
                     </button>
                   )}
                 </div>
@@ -445,7 +445,7 @@ const MikrotikScriptTemplate = () => {
                 onMouseOver={e => e.currentTarget.style.background = tokens.surface3}
                 onMouseOut={e => e.currentTarget.style.background = tokens.surface2}
               >
-                <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>visibility</span>
+                <span className="material-symbols-rounded" style={{ color: 'var(--accent-primary)', fontSize: '18px' }}>visibility</span>
                 Live Preview
               </button>
               <button 

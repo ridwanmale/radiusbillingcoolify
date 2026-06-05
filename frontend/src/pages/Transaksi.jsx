@@ -202,7 +202,7 @@ const Transaksi = () => {
           onMouseOver={e => e.currentTarget.style.background = 'var(--accent-primary-hover)'}
           onMouseOut={e => e.currentTarget.style.background = 'var(--accent-primary)'}
         >
-          <span className="material-symbols-rounded">add_circle</span> TAMBAH
+          <span className="material-symbols-rounded" style={{ color: '#10b981' }}>add_circle</span> TAMBAH
         </button>
         <button 
           className="btn" 
@@ -221,7 +221,7 @@ const Transaksi = () => {
           onMouseOver={e => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)'}
           onMouseOut={e => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)'}
         >
-          <span className="material-symbols-rounded" style={{ fontSize: '20px' }}>refresh</span>
+          <span className="material-symbols-rounded" style={{ color: '#3b82f6', fontSize: '20px' }}>refresh</span>
         </button>
       </div><div style={{ marginBottom: '2rem' }}>
         {/* ACTION BAR ABOVE TABLE */}
@@ -451,7 +451,7 @@ const Transaksi = () => {
                 onMouseOver={e => e.currentTarget.style.background = 'rgba(16, 185, 129, 0.1)'}
                 onMouseOut={e => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)'}
               >
-                <span className="material-symbols-rounded">check_circle</span>
+                <span className="material-symbols-rounded" style={{ color: '#10b981' }}>check_circle</span>
                 SIMPAN TRANSAKSI
               </button>
             </div>
@@ -515,7 +515,7 @@ const Transaksi = () => {
                 onMouseOver={e => e.currentTarget.style.background = 'rgba(59, 130, 246, 0.1)'}
                 onMouseOut={e => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)'}
               >
-                <span className="material-symbols-rounded">save</span>
+                <span className="material-symbols-rounded" style={{ color: '#10b981' }}>save</span>
                 PERBARUI TRANSAKSI
               </button>
             </div>

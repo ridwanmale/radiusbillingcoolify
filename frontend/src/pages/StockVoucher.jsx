@@ -751,12 +751,12 @@ const StockVoucher = ({ user }) => {
               <div className="dropdown-item" onClick={() => handleBulkAction('cetak')}><span className="material-symbols-rounded">print</span> CETAK TERPILIH</div>
               <div className="dropdown-item" onClick={() => handleBulkAction('lock_mac')}><span className="material-symbols-rounded">lock</span> LOCK MAC (Auto Bind)</div>
               <div className="dropdown-item" onClick={() => handleBulkAction('unlock_mac')}><span className="material-symbols-rounded">lock_open</span> RESET MAC LOCK (Unbind)</div>
-              <div className="dropdown-item" onClick={() => handleBulkAction('disable_mac_lock')}><span className="material-symbols-rounded">block</span> DISABLE MAC LOCK</div>
-              <div className="dropdown-item" onClick={() => handleBulkAction('set_aktif')}><span className="material-symbols-rounded">check_circle</span> SET AKTIF</div>
+              <div className="dropdown-item" onClick={() => handleBulkAction('disable_mac_lock')}><span className="material-symbols-rounded" style={{ color: '#ef4444' }}>block</span> DISABLE MAC LOCK</div>
+              <div className="dropdown-item" onClick={() => handleBulkAction('set_aktif')}><span className="material-symbols-rounded" style={{ color: '#10b981' }}>check_circle</span> SET AKTIF</div>
               <div className="dropdown-item" onClick={() => handleBulkAction('set_nonaktif')}><span className="material-symbols-rounded">do_not_disturb_on</span> NON AKTIF</div>
               <div className="dropdown-item" onClick={() => handleBulkAction('change_router')}><span className="material-symbols-rounded">router</span> GANTI ROUTER</div>
               <div className="dropdown-item danger" onClick={() => handleBulkAction('delete')} style={{ borderTop: '1px solid var(--border-color)', marginTop: '5px' }}>
-                <span className="material-symbols-rounded">delete</span> HAPUS
+                <span className="material-symbols-rounded" style={{ color: '#ef4444' }}>delete</span> HAPUS
               </div>
             </div>
           </div>
@@ -772,14 +772,14 @@ const StockVoucher = ({ user }) => {
           </button>
           
           <button className="btn-glass-premium btn-cyan" onClick={() => setIsSettingModalOpen(true)}>
-            <span className="material-symbols-rounded">settings</span>
+            <span className="material-symbols-rounded" style={{ color: '#f59e0b' }}>settings</span>
             <span>Setting</span>
           </button>
           
 
 
           <button className="btn-glass-premium btn-blue" onClick={() => setIsGenerateModalOpen(true)}>
-            <span className="material-symbols-rounded">add_circle</span>
+            <span className="material-symbols-rounded" style={{ color: '#10b981' }}>add_circle</span>
             <span>Generate</span>
           </button>
 
@@ -1231,7 +1231,7 @@ const StockVoucher = ({ user }) => {
                 <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <small style={{ color: 'var(--text-secondary)' }}>Format: username, password</small>
                   <button type="button" className="btn-glass-premium btn-blue" style={{ padding: '4px 10px', fontSize: '0.8rem' }} onClick={downloadTemplate}>
-                    <span className="material-symbols-rounded" style={{ fontSize: '1rem' }}>download</span> Template
+                    <span className="material-symbols-rounded" style={{ color: '#3b82f6', fontSize: '1rem' }}>download</span> Template
                   </button>
                 </div>
               </div>

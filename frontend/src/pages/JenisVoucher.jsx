@@ -93,7 +93,7 @@ const JenisVoucher = () => {
           className="btn-glass-premium btn-blue" 
           onClick={() => { setEditingType(null); setFormData({ name: '', description: '', icon: 'confirmation_number', sort_order: 0, is_active: 1 }); setShowModal(true); }}
         >
-          <span className="material-symbols-rounded">add_circle</span>
+          <span className="material-symbols-rounded" style={{ color: '#10b981' }}>add_circle</span>
           <span>Tambah Jenis</span>
         </button>
       </div>
@@ -134,10 +134,10 @@ const JenisVoucher = () => {
                 </span>
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <button className="icon-btn btn-blue-sm" onClick={() => handleEdit(type)} title="Edit">
-                    <span className="material-symbols-rounded">edit</span>
+                    <span className="material-symbols-rounded" style={{ color: '#f59e0b' }}>edit</span>
                   </button>
                   <button className="icon-btn btn-red-sm" onClick={() => handleDelete(type.id)} title="Hapus">
-                    <span className="material-symbols-rounded">delete</span>
+                    <span className="material-symbols-rounded" style={{ color: '#ef4444' }}>delete</span>
                   </button>
                 </div>
               </div>
@@ -210,7 +210,7 @@ const JenisVoucher = () => {
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
                 <button type="button" className="btn-glass" onClick={() => setShowModal(false)} style={{ padding: '10px 20px', borderRadius: '50px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white' }}>Batal</button>
                 <button type="submit" className="btn-glass-premium btn-blue" style={{ padding: '10px 30px' }}>
-                  <span className="material-symbols-rounded">save</span>
+                  <span className="material-symbols-rounded" style={{ color: '#10b981' }}>save</span>
                   <span>Simpan</span>
                 </button>
               </div>

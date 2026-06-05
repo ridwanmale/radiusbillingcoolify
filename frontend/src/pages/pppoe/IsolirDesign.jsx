@@ -212,7 +212,7 @@ const PppoeIsolirDesign = () => {
         {/* Live Preview Column */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
           <h3 style={{ margin: '0 0 5px', fontSize: '1.1rem', fontWeight: '700', color: '#10b981', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span className="material-symbols-rounded">visibility</span> Live Preview Pelanggan
+            <span className="material-symbols-rounded" style={{ color: 'var(--accent-primary)' }}>visibility</span> Live Preview Pelanggan
           </h3>
 
           <div style={{ 

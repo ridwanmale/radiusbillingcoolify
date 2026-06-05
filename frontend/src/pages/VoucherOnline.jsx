@@ -197,7 +197,7 @@ const VoucherOnline = () => {
         </div>
         <div style={{ display: 'flex', gap: '0.75rem' }}>
           <button className="btn-glass-premium btn-blue" onClick={fetchOnline}>
-            <span className="material-symbols-rounded">refresh</span>
+            <span className="material-symbols-rounded" style={{ color: '#3b82f6' }}>refresh</span>
             <span>Refresh</span>
           </button>
 
@@ -217,12 +217,12 @@ const VoucherOnline = () => {
               }
             }}
           >
-            <span className="material-symbols-rounded">sync</span>
+            <span className="material-symbols-rounded" style={{ color: '#3b82f6' }}>sync</span>
             <span>Sinkron Sesi</span>
           </button>
 
           <button className="btn-glass-premium btn-red" onClick={() => handleBulkAction('HAPUS')}>
-            <span className="material-symbols-rounded">delete</span>
+            <span className="material-symbols-rounded" style={{ color: '#ef4444' }}>delete</span>
             <span>Hapus</span>
           </button>
         </div>

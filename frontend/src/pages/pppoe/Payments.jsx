@@ -39,7 +39,7 @@ const PppoePayments = () => {
           <p className="page-subtitle">Daftar transaksi pembayaran tagihan internet pelanggan.</p>
         </div>
         <button className="btn-glass-premium" onClick={fetchPayments}>
-          <span className="material-symbols-rounded">refresh</span>
+          <span className="material-symbols-rounded" style={{ color: '#3b82f6' }}>refresh</span>
           <span>Refresh Data</span>
         </button>
       </div>

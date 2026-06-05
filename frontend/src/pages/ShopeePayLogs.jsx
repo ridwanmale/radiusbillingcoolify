@@ -81,7 +81,7 @@ const ShopeePayLogs = () => {
           </p>
         </div>
         <button className="btn btn-primary" onClick={fetchLogs} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span className="material-symbols-rounded">refresh</span>
+          <span className="material-symbols-rounded" style={{ color: '#3b82f6' }}>refresh</span>
           REFRESH DATA
         </button>
       </div>

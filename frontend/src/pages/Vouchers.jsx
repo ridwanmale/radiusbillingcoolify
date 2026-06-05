@@ -154,7 +154,7 @@ const Vouchers = () => {
               onMouseOver={e => e.currentTarget.style.background = 'rgba(59, 130, 246, 0.1)'}
               onMouseOut={e => e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)'}
             >
-              <span className="material-symbols-rounded">add_circle</span>
+              <span className="material-symbols-rounded" style={{ color: '#10b981' }}>add_circle</span>
               Generate
             </button>
           </form>

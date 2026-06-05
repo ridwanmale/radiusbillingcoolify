@@ -498,7 +498,7 @@ ${output}`;
           onMouseOver={(e) => { e.currentTarget.style.opacity = '0.9'; }}
           onMouseOut={(e) => { e.currentTarget.style.opacity = '1'; }}
         >
-          <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>add_circle</span>
+          <span className="material-symbols-rounded" style={{ color: '#10b981', fontSize: '18px' }}>add_circle</span>
           Tambah Router Baru
         </button>
       </div>
@@ -609,7 +609,7 @@ ${output}`;
               ) : (
                 <div className="form-group" style={{ animation: 'fadeInDown 0.3s', padding: '12px', background: 'rgba(59, 130, 246, 0.05)', borderRadius: '10px', borderLeft: '3px solid #3b82f6' }}>
                   <label className="form-label" style={{ color: '#3b82f6', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>info</span>
+                    <span className="material-symbols-rounded" style={{ color: 'var(--accent-primary)', fontSize: '18px' }}>info</span>
                     Alokasi IP Client VPN
                   </label>
                   <p style={{ margin: '4px 0 0 0', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
@@ -869,10 +869,10 @@ ${output}`;
                     <td>
                       <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
                         <button className="btn" style={{ padding: '0.4rem', background: 'var(--accent-primary)', color: 'white', display: 'flex' }} onClick={() => handleEditClick(nas)}>
-                          <span className="material-symbols-rounded" style={{ fontSize: '1.2rem' }}>edit</span>
+                          <span className="material-symbols-rounded" style={{ color: '#f59e0b', fontSize: '1.2rem' }}>edit</span>
                         </button>
                         <button className="btn" style={{ padding: '0.4rem', background: 'var(--danger)', color: 'white', display: 'flex' }} onClick={() => handleDelete(nas.id)}>
-                          <span className="material-symbols-rounded" style={{ fontSize: '1.2rem' }}>delete</span>
+                          <span className="material-symbols-rounded" style={{ color: '#ef4444', fontSize: '1.2rem' }}>delete</span>
                         </button>
                       </div>
                     </td>
@@ -1053,7 +1053,7 @@ ${output}`;
                     transition: '0.2s'
                   }}
                 >
-                  <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>save</span>
+                  <span className="material-symbols-rounded" style={{ color: '#10b981', fontSize: '18px' }}>save</span>
                   Save Configuration
                 </button>
               </div>
@@ -1197,7 +1197,7 @@ ${output}`;
                     display: 'flex'
                   }}
                 >
-                  <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>download</span>
+                  <span className="material-symbols-rounded" style={{ color: '#3b82f6', fontSize: '18px' }}>download</span>
                 </button>
 
                 <button

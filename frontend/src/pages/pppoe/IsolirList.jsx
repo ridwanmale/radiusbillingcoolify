@@ -50,7 +50,7 @@ const PppoeIsolirList = ({ user }) => {
           <p className="page-subtitle">Pelanggan yang sedang di-isolir karena tunggakan atau expired.</p>
         </div>
         <button className="btn-refresh-glass" onClick={fetchIsolir}>
-          <span className="material-symbols-rounded">refresh</span>
+          <span className="material-symbols-rounded" style={{ color: '#3b82f6' }}>refresh</span>
           <span>Refresh Data</span>
         </button>
       </div>
@@ -126,7 +126,7 @@ const PppoeIsolirList = ({ user }) => {
                       onClick={() => handleActivate(c.id, c.name)}
                       style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
                     >
-                      <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>check_circle</span>
+                      <span className="material-symbols-rounded" style={{ color: '#10b981', fontSize: '18px' }}>check_circle</span>
                       Buka Isolir
                     </button>
                   </td>

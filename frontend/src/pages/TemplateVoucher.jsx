@@ -272,7 +272,7 @@ const TemplateVoucher = () => {
             {isSaving ? (
               <span className="material-symbols-rounded spinning" style={{ fontSize: '20px' }}>refresh</span>
             ) : (
-              <span className="material-symbols-rounded" style={{ fontSize: '20px' }}>save</span>
+              <span className="material-symbols-rounded" style={{ color: '#10b981', fontSize: '20px' }}>save</span>
             )}
             {isSaving ? 'MENYIMPAN...' : selectedId ? 'SIMPAN PERUBAHAN' : 'TAMBAH TEMPLATE'}
           </button>
@@ -280,7 +280,7 @@ const TemplateVoucher = () => {
             className="btn-glass-premium btn-green" 
             onClick={handleNew} 
           >
-            <span className="material-symbols-rounded">add_circle</span> TAMBAH TEMPLATE BARU
+            <span className="material-symbols-rounded" style={{ color: '#10b981' }}>add_circle</span> TAMBAH TEMPLATE BARU
           </button>
         </div>
       </div>
@@ -322,7 +322,7 @@ const TemplateVoucher = () => {
                   alignItems: 'center'
                 }}
               >
-                <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>delete</span>
+                <span className="material-symbols-rounded" style={{ color: '#ef4444', fontSize: '18px' }}>delete</span>
               </button>
             )}
           </div>
@@ -428,7 +428,7 @@ const TemplateVoucher = () => {
                 transition: 'all 0.2s'
               }}
             >
-              <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>visibility</span>
+              <span className="material-symbols-rounded" style={{ color: 'var(--accent-primary)', fontSize: '18px' }}>visibility</span>
               LIVE PREVIEW
             </button>
             <button

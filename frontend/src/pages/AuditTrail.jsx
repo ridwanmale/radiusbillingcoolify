@@ -140,7 +140,7 @@ const AuditTrail = ({ user }) => {
               fontWeight: '700'
             }}
           >
-            <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>refresh</span>
+            <span className="material-symbols-rounded" style={{ color: '#3b82f6', fontSize: '18px' }}>refresh</span>
             SEGARKAN
           </button>
         </div>
@@ -230,7 +230,7 @@ const AuditTrail = ({ user }) => {
                       title="Lihat Detail Lengkap"
                       style={{ color: 'var(--accent-primary)' }}
                     >
-                      <span className="material-symbols-rounded" style={{ fontSize: '20px' }}>info</span>
+                      <span className="material-symbols-rounded" style={{ color: 'var(--accent-primary)', fontSize: '20px' }}>info</span>
                     </button>
                   </td>
                 </tr>

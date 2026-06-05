@@ -271,7 +271,7 @@ const PppoeCustomers = ({ user }) => {
                       onClick={() => handleShowDetail(c)}
                       title="Detail"
                     >
-                      <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>visibility</span>
+                      <span className="material-symbols-rounded" style={{ color: 'var(--accent-primary)', fontSize: '18px' }}>visibility</span>
                     </button>
                     <button 
                       className="btn btn-sm" 
@@ -279,14 +279,14 @@ const PppoeCustomers = ({ user }) => {
                       title="Edit"
                       style={{ background: 'rgba(255,255,255,0.05)', color: 'white' }}
                     >
-                      <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>edit</span>
+                      <span className="material-symbols-rounded" style={{ color: '#f59e0b', fontSize: '18px' }}>edit</span>
                     </button>
                     <button 
                       className="btn btn-sm btn-danger" 
                       onClick={() => handleDelete(c)}
                       title="Hapus"
                     >
-                      <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>delete</span>
+                      <span className="material-symbols-rounded" style={{ color: '#ef4444', fontSize: '18px' }}>delete</span>
                     </button>
                     {c.status === 'isolir' ? (
                       <button 
@@ -295,7 +295,7 @@ const PppoeCustomers = ({ user }) => {
                         title="Aktifkan"
                         style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981' }}
                       >
-                        <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>check_circle</span>
+                        <span className="material-symbols-rounded" style={{ color: '#10b981', fontSize: '18px' }}>check_circle</span>
                       </button>
                     ) : (
                       <button 
@@ -304,7 +304,7 @@ const PppoeCustomers = ({ user }) => {
                         title="Isolir Manual"
                         style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b' }}
                       >
-                        <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>block</span>
+                        <span className="material-symbols-rounded" style={{ color: '#ef4444', fontSize: '18px' }}>block</span>
                       </button>
                     )}
                   </div>

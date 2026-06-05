@@ -141,7 +141,7 @@ const VpnRemote = () => {
             onClick={() => setShowSettingsModal(true)}
             style={{ background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '8px' }}
           >
-            <span className="material-symbols-rounded">settings</span> Pool IP
+            <span className="material-symbols-rounded" style={{ color: '#f59e0b' }}>settings</span> Pool IP
           </button>
           <button 
             className="btn btn-primary" 
@@ -166,7 +166,7 @@ const VpnRemote = () => {
               transition: 'all 0.3s ease'
             }}
           >
-            <span className="material-symbols-rounded">add_circle</span> Tambah Akun
+            <span className="material-symbols-rounded" style={{ color: '#10b981' }}>add_circle</span> Tambah Akun
           </button>
         </div>
       </div>
@@ -236,17 +236,17 @@ const VpnRemote = () => {
                         <td style={{ padding: '1.2rem 1rem', borderRadius: '0 12px 12px 0', textAlign: 'right' }}>
                           <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                             <button className="action-btn" title="Salin Script" onClick={() => copyToClipboard(generateL2tpScript(acc))} style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981' }}>
-                              <span className="material-symbols-rounded">content_copy</span>
+                              <span className="material-symbols-rounded" style={{ color: 'var(--accent-primary)' }}>content_copy</span>
                             </button>
                             <button className="action-btn" title="Edit" onClick={() => {
                               setEditingId(acc.id);
                               setFormData({ username: acc.username, password: acc.password, psk: acc.psk, status: acc.status });
                               setShowModal(true);
                             }} style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6' }}>
-                              <span className="material-symbols-rounded">edit</span>
+                              <span className="material-symbols-rounded" style={{ color: '#f59e0b' }}>edit</span>
                             </button>
                             <button className="action-btn" title="Hapus" onClick={() => handleDelete(acc.id)} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }}>
-                              <span className="material-symbols-rounded">delete</span>
+                              <span className="material-symbols-rounded" style={{ color: '#ef4444' }}>delete</span>
                             </button>
                           </div>
                         </td>
@@ -300,14 +300,14 @@ const VpnRemote = () => {
           <div className="glass-card" style={{ padding: '1.5rem', background: 'rgba(94, 106, 210, 0.05)' }}>
             <h3 style={{ fontSize: '0.9rem', fontWeight: '800', marginBottom: '1rem' }}>Status Layanan</h3>
             <div className="protocol-item active">
-              <span className="material-symbols-rounded">check_circle</span>
+              <span className="material-symbols-rounded" style={{ color: '#10b981' }}>check_circle</span>
               <div>
                 <div style={{ fontWeight: '700', fontSize: '0.85rem' }}>WireGuard Server</div>
                 <div style={{ fontSize: '0.7rem', opacity: 0.7 }}>Running on Port 51820</div>
               </div>
             </div>
             <div className="protocol-item active">
-              <span className="material-symbols-rounded">check_circle</span>
+              <span className="material-symbols-rounded" style={{ color: '#10b981' }}>check_circle</span>
               <div>
                 <div style={{ fontWeight: '700', fontSize: '0.85rem' }}>L2TP / IPsec</div>
                 <div style={{ fontSize: '0.7rem', opacity: 0.7 }}>Running on Port 500/4500</div>
@@ -396,7 +396,7 @@ const VpnRemote = () => {
                <div style={{ background: '#000', padding: '10px', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                  <code style={{ fontSize: '0.75rem', color: '#4ade80' }}>docker-compose up -d vpn-l2tp</code>
                  <button type="button" onClick={() => copyToClipboard('docker-compose up -d vpn-l2tp')} style={{ background: 'none', border: 'none', color: '#f59e0b', cursor: 'pointer' }}>
-                   <span className="material-symbols-rounded" style={{ fontSize: '1.2rem' }}>content_copy</span>
+                   <span className="material-symbols-rounded" style={{ color: 'var(--accent-primary)', fontSize: '1.2rem' }}>content_copy</span>
                  </button>
                </div>
             </div>

@@ -119,7 +119,7 @@ const SettingDuitku = () => {
 
           <div style={{ background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.2)', padding: '1rem', borderRadius: '12px', marginBottom: '2rem' }}>
             <h4 style={{ margin: '0 0 8px', fontSize: '0.85rem', color: '#60a5fa', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span className="material-symbols-rounded" style={{ fontSize: '1.2rem' }}>info</span>
+              <span className="material-symbols-rounded" style={{ color: 'var(--accent-primary)', fontSize: '1.2rem' }}>info</span>
               Informasi Callback
             </h4>
             <p style={{ margin: 0, fontSize: '0.75rem', color: 'rgba(255,255,255,0.7)', lineHeight: '1.5' }}>

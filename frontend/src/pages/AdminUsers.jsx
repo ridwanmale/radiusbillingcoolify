@@ -179,7 +179,7 @@ const AdminUsers = ({ user }) => {
                         ) ? 0.3 : 1 
                       }}
                     >
-                      <span className="material-symbols-rounded">delete</span>
+                      <span className="material-symbols-rounded" style={{ color: '#ef4444' }}>delete</span>
                     </button>
                   </td>
                 </tr>

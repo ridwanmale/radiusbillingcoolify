@@ -115,7 +115,7 @@ const ShopeePaySettings = () => {
           </p>
         </div>
         <button className="btn btn-primary" onClick={openAddModal} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span className="material-symbols-rounded">add_circle</span>
+          <span className="material-symbols-rounded" style={{ color: '#10b981' }}>add_circle</span>
           TAMBAH DEVICE
         </button>
       </div>
@@ -211,7 +211,7 @@ const ShopeePaySettings = () => {
                 onMouseOut={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
                 title="Hapus Perangkat"
               >
-                <span className="material-symbols-rounded" style={{ fontSize: '20px' }}>delete</span>
+                <span className="material-symbols-rounded" style={{ color: '#ef4444', fontSize: '20px' }}>delete</span>
               </button>
             </div>
 

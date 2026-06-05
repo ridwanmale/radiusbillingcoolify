@@ -334,10 +334,10 @@ const OnlineStoreCenter = () => {
                       </div>
                       <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
                         <button type="button" onClick={() => { setEditingQrisIndex(index); setTempQris({ ...qris }); setIsQrisModalOpen(true); }} style={{ background: 'rgba(251, 191, 36, 0.1)', border: '1px solid rgba(251, 191, 36, 0.2)', borderRadius: '6px', color: '#fbbf24', cursor: 'pointer', padding: '6px', display: 'flex' }} title="Edit QRIS">
-                          <span className="material-symbols-rounded" style={{ fontSize: '16px' }}>edit</span>
+                          <span className="material-symbols-rounded" style={{ color: '#f59e0b', fontSize: '16px' }}>edit</span>
                         </button>
                         <button type="button" onClick={() => { const newList = [...qrisList]; newList.splice(index, 1); setQrisList(newList); }} style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '6px', color: '#ef4444', cursor: 'pointer', padding: '6px', display: 'flex' }} title="Hapus QRIS ini">
-                          <span className="material-symbols-rounded" style={{ fontSize: '16px' }}>delete</span>
+                          <span className="material-symbols-rounded" style={{ color: '#ef4444', fontSize: '16px' }}>delete</span>
                         </button>
                       </div>
                     </div>
@@ -359,7 +359,7 @@ const OnlineStoreCenter = () => {
 
                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
                   <button type="button" onClick={() => setIsSecurityModalOpen(true)} className="btn-primary-premium" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '10px 15px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.2s' }}>
-                    <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>settings</span>
+                    <span className="material-symbols-rounded" style={{ color: '#f59e0b', fontSize: '18px' }}>settings</span>
                     Pengaturan Keamanan
                   </button>
                 </div>
@@ -387,7 +387,7 @@ const OnlineStoreCenter = () => {
                                 <span>{b.device_id || '-'}</span>
                                 {b.device_id && (
                                   <button type="button" onClick={() => copyToClipboard(b.device_id)} style={{ background: 'transparent', border: 'none', color: '#38bdf8', cursor: 'pointer', padding: '0', display: 'flex' }} title="Copy UUID">
-                                    <span className="material-symbols-rounded" style={{ fontSize: '14px' }}>content_copy</span>
+                                    <span className="material-symbols-rounded" style={{ color: 'var(--accent-primary)', fontSize: '14px' }}>content_copy</span>
                                   </button>
                                 )}
                               </div>
@@ -476,7 +476,7 @@ const OnlineStoreCenter = () => {
                 onClick={() => handleAddPermanentBlacklist(newUuidBlacklist)}
                 className="btn-success-premium" 
                 style={{ padding: '0 20px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>
-                <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>add</span>
+                <span className="material-symbols-rounded" style={{ color: '#10b981', fontSize: '18px' }}>add</span>
                 Tambahkan ke Blacklist
               </button>
             </div>

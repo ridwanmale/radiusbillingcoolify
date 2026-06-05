@@ -150,7 +150,7 @@ const SettingTripayGlobal = () => {
               disabled={saving}
               style={{ padding: '12px 30px' }}
             >
-              <span className="material-symbols-rounded">save</span>
+              <span className="material-symbols-rounded" style={{ color: '#10b981' }}>save</span>
               <span>{saving ? 'Menyimpan...' : 'Simpan Pengaturan'}</span>
             </button>
           </div>

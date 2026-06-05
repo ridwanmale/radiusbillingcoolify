@@ -578,11 +578,11 @@ const PaymentBridgeCenter = () => {
                       <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                         {trx.status === 'PENDING' && (
                           <button onClick={() => handleApproveTrx(trx.order_id)} className="btn-success-small" title="Approve">
-                            <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>check_circle</span>
+                            <span className="material-symbols-rounded" style={{ color: '#10b981', fontSize: '18px' }}>check_circle</span>
                           </button>
                         )}
                         <button onClick={() => handleDeleteTrx(trx.id)} className="btn-danger-small" title="Hapus">
-                          <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>delete</span>
+                          <span className="material-symbols-rounded" style={{ color: '#ef4444', fontSize: '18px' }}>delete</span>
                         </button>
                       </div>
                     </td>
@@ -702,7 +702,7 @@ const PaymentBridgeCenter = () => {
                     </td>
                     <td style={{ padding: '12px 20px', textAlign: 'right' }}>
                       <button onClick={() => handleDeleteLog(log.id)} className="btn-danger-small" style={{ width: '35px', height: '35px' }}>
-                        <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>delete</span>
+                        <span className="material-symbols-rounded" style={{ color: '#ef4444', fontSize: '18px' }}>delete</span>
                       </button>
                     </td>
                   </tr>
@@ -754,7 +754,7 @@ const PaymentBridgeCenter = () => {
                 {window.location.origin}/api/payment-detections/armradius
               </code>
               <button onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/api/payment-detections/armradius`); toast.info('Endpoint disalin!'); }} className="btn-glass" style={{ padding: '10px', borderRadius: '8px' }}>
-                <span className="material-symbols-rounded">content_copy</span>
+                <span className="material-symbols-rounded" style={{ color: 'var(--accent-primary)' }}>content_copy</span>
               </button>
             </div>
             <p style={{ margin: '10px 0 0 0', fontSize: '0.8rem', color: '#94a3b8' }}>
@@ -791,7 +791,7 @@ const PaymentBridgeCenter = () => {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <code style={{ flex: 1, fontSize: '0.85rem', color: '#fbbf24', overflow: 'hidden', textOverflow: 'ellipsis' }}>{device.api_token}</code>
                     <button onClick={() => { navigator.clipboard.writeText(device.api_token); toast.info('Token disalin!'); }} className="btn-icon">
-                      <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>content_copy</span>
+                      <span className="material-symbols-rounded" style={{ color: 'var(--accent-primary)', fontSize: '18px' }}>content_copy</span>
                     </button>
                   </div>
                 </div>
@@ -806,7 +806,7 @@ const PaymentBridgeCenter = () => {
                       {device.status === 'active' ? 'Nonaktifkan' : 'Aktifkan'}
                     </button>
                     <button onClick={() => handleDeleteDevice(device.id)} className="btn-danger-small" style={{ width: '35px', height: '35px', borderRadius: '8px' }}>
-                      <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>delete</span>
+                      <span className="material-symbols-rounded" style={{ color: '#ef4444', fontSize: '18px' }}>delete</span>
                     </button>
                   </div>
                 </div>
@@ -826,7 +826,7 @@ const PaymentBridgeCenter = () => {
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div className="glass-card" style={{ width: '100%', maxWidth: '400px', padding: '30px', animation: 'scaleUp 0.3s ease-out' }}>
             <h2 style={{ fontSize: '1.5rem', fontWeight: '900', marginBottom: '15px', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span className="material-symbols-rounded">add_circle</span>
+              <span className="material-symbols-rounded" style={{ color: '#10b981' }}>add_circle</span>
               Tambah Perangkat
             </h2>
             <p style={{ color: '#94a3b8', fontSize: '0.9rem', marginBottom: '25px', lineHeight: '1.5' }}>
@@ -935,7 +935,7 @@ const PaymentBridgeCenter = () => {
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div className="glass-card fade-in" style={{ width: '100%', maxWidth: '450px', padding: '30px', animation: 'scaleUp 0.3s ease-out' }}>
             <h2 style={{ fontSize: '1.4rem', fontWeight: '900', marginBottom: '10px', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span className="material-symbols-rounded">auto_delete</span>
+              <span className="material-symbols-rounded" style={{ color: '#ef4444' }}>auto_delete</span>
               Pengaturan Hapus Otomatis
             </h2>
             <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginBottom: '25px', lineHeight: '1.6' }}>

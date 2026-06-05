@@ -186,7 +186,7 @@ const Dashboard = () => {
               alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-secondary)'
             }}
           >
-            <span className="material-symbols-rounded" style={{ fontSize: '1.2rem' }}>sync</span>
+            <span className="material-symbols-rounded" style={{ color: '#3b82f6', fontSize: '1.2rem' }}>sync</span>
           </button>
         </div>
 

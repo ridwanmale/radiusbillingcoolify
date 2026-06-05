@@ -299,7 +299,7 @@ const SettingTelegram = ({ user }) => {
                       cursor: 'pointer'
                     }}
                   >
-                    <span className="material-symbols-rounded" style={{ fontSize: '1.1rem' }}>edit</span>
+                    <span className="material-symbols-rounded" style={{ color: '#f59e0b', fontSize: '1.1rem' }}>edit</span>
                   </button>
                 </div>
               </div>

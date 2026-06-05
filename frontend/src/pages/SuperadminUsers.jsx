@@ -171,7 +171,7 @@ const SuperadminUsers = ({ user }) => {
                         opacity: (adminUser.username === user?.username || adminUser.username === 'superadmin') ? 0.3 : 1 
                       }}
                     >
-                      <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>delete</span>
+                      <span className="material-symbols-rounded" style={{ color: '#ef4444', fontSize: '18px' }}>delete</span>
                     </button>
                   </td>
                 </tr>
