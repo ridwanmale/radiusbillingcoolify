@@ -7,7 +7,7 @@ const RekapVoucher = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const today = new Date();
-  const [filterDate, setFilterDate] = useState(today.getDate().toString());
+  const [filterDate, setFilterDate] = useState('');
   const [filterMonth, setFilterMonth] = useState((today.getMonth() + 1).toString());
   const [filterYear, setFilterYear] = useState(today.getFullYear().toString());
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, message: '', onConfirm: null });
