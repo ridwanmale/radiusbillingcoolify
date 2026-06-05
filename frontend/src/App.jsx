@@ -27,6 +27,8 @@ import VpnRemote from './pages/VpnRemote';
 import OnlineStore from './pages/OnlineStore';
 import StoreTransactions from './pages/StoreTransactions';
 import CustomerPortal from './pages/CustomerPortal';
+import IsolirNotice from './pages/pppoe/IsolirNotice';
+import PayInvoice from './pages/pppoe/PayInvoice';
 import SettingDuitku from './pages/SettingDuitku';
 import SettingMidtrans from './pages/SettingMidtrans';
 import DeviceControl from './pages/DeviceControl';
@@ -117,6 +119,8 @@ const App = () => {
       <Routes>
         {/* PUBLIC ROUTES */}
         <Route path="/portal" element={<CustomerPortal />} />
+          <Route path="/isolir" element={<IsolirNotice />} />
+          <Route path="/pay-invoice" element={<PayInvoice />} />
         <Route path="/print" element={<PrintPage />} />
         
         {/* APP ROUTES */}
