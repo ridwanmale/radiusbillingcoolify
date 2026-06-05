@@ -86,6 +86,98 @@ const StockVoucher = ({ user }) => {
   const [printCodeInput, setPrintCodeInput] = useState('');
 
   // Setting Form State
+  const [presets, setPresets] = useState([]);
+  const [isPresetModalOpen, setIsPresetModalOpen] = useState(false);
+  const [isSavingPreset, setIsSavingPreset] = useState(false);
+
+  const fetchPresets = async () => {
+    try {
+      const res = await fetch('/api/vouchers/presets');
+      if (res.ok) setPresets(await res.json());
+    } catch(err) { console.error('Failed to fetch presets', err); }
+  };
+
+  useEffect(() => { fetchPresets(); }, []);
+
+  const handleSavePreset = async () => {
+    const presetName = prompt('Masukkan nama untuk Shortcut/Preset ini (Misal: 1 Hari 50pcs):');
+    if (!presetName) return;
+    setIsSavingPreset(true);
+    try {
+      const res = await fetch('/api/vouchers/presets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          preset_name: presetName,
+          jenis: formData.jenis,
+          profile: formData.profile,
+          prefix: formData.prefix,
+          charset_type: formData.charsetType,
+          panjang_user: formData.length,
+          panjang_pass: formData.length,
+          qty: formData.qty,
+          server: formData.outletName
+        })
+      });
+      if (res.ok) {
+        toast.success('Preset berhasil disimpan!');
+        fetchPresets();
+      } else {
+        toast.error('Gagal menyimpan preset');
+      }
+    } catch(err) {
+      toast.error('Gagal koneksi ke server');
+    } finally { setIsSavingPreset(false); }
+  };
+
+  const handleDeletePreset = async (id) => {
+    if (!window.confirm('Yakin ingin menghapus preset ini?')) return;
+    try {
+      const res = await fetch('/api/vouchers/presets/' + id, { method: 'DELETE' });
+      if (res.ok) {
+        toast.success('Preset dihapus');
+        fetchPresets();
+      }
+    } catch(err) {}
+  };
+
+  const handleExecutePreset = async (preset) => {
+    setIsPresetModalOpen(false);
+    setIsGenerating(true);
+    const toastId = toast.loading('🚀 Menjalankan Preset: Generate Vouchers...');
+    try {
+      const res = await fetch('/api/vouchers/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          admin_username: user?.username || 'admin',
+          qty: preset.qty,
+          profile: preset.profile,
+          length: preset.panjang_user,
+          prefix: preset.prefix,
+          charsetType: preset.charset_type,
+          macLock: false,
+          jenis: preset.jenis,
+          outletName: preset.server === 'all' ? '' : preset.server
+        })
+      });
+      const result = await res.json();
+      if (res.ok) {
+        await fetchData();
+        toast.update(toastId, { render: '✅ Sukses Generate!', type: 'success', isLoading: false, autoClose: 3000 });
+        if (result.data && result.data.length > 0) {
+          handleOpenPrintTab(result.data);
+        }
+      } else {
+        toast.update(toastId, { render: '❌ Gagal: ' + result.error, type: 'error', isLoading: false, autoClose: 4000 });
+      }
+    } catch (err) {
+      toast.update(toastId, { render: '❌ Gagal Server Error', type: 'error', isLoading: false, autoClose: 4000 });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const [settingData, setSettingData] = useState({
     hotspot_name: '',
     dns_name: '',
@@ -761,6 +853,11 @@ const StockVoucher = ({ user }) => {
             </div>
           </div>
 
+          <button className="btn-glass-premium btn-green" onClick={() => setIsPresetModalOpen(true)}>
+            <span className="material-symbols-rounded">bolt</span>
+            <span>PRINT CEPAT</span>
+          </button>
+
           <button className="btn-glass-premium btn-purple" onClick={() => setIsPrintModalOpen(true)}>
             <span className="material-symbols-rounded">print</span>
             <span>PRINT</span>
@@ -954,6 +1051,59 @@ const StockVoucher = ({ user }) => {
       </div>
     </div>
 
+      {/* MODAL PRINT CEPAT (PRESET) */}
+      <div className={`modal-overlay ${isPresetModalOpen ? 'open' : ''}`} onClick={() => setIsPresetModalOpen(false)}>
+        <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '800px' }}>
+          <div className="modal-header">
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span className="material-symbols-rounded" style={{ color: '#10b981' }}>bolt</span>
+              Print Cepat (Generate Presets)
+            </h2>
+            <button className="modal-close" onClick={() => setIsPresetModalOpen(false)}>&times;</button>
+          </div>
+          <div style={{ marginTop: '1rem', marginBottom: '1.5rem', color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
+            Daftar template voucher yang telah Anda simpan. Klik tombol Generate & Print untuk otomatis membuat dan mencetak voucher.
+          </div>
+          <div className="table-container">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Nama Preset</th>
+                  <th>Profile</th>
+                  <th>QTY</th>
+                  <th>Prefix / Panjang</th>
+                  <th>Server</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {presets.length === 0 ? (
+                  <tr><td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>Belum ada preset tersimpan. Anda bisa menyimpan preset dari form Generate Voucher.</td></tr>
+                ) : (
+                  presets.map((p, i) => (
+                    <tr key={i} className="hoverable-row">
+                      <td style={{ fontWeight: '700', color: 'white' }}>{p.preset_name}</td>
+                      <td><span className="badge" style={{ background: 'var(--accent-primary)', fontWeight: '700' }}>{p.profile}</span></td>
+                      <td style={{ fontWeight: '700', color: '#10b981' }}>{p.qty} Pcs</td>
+                      <td>{p.prefix || '-'} / {p.panjang_user} char</td>
+                      <td>{p.server || 'All'}</td>
+                      <td style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                        <button type="button" className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '4px' }} onClick={() => handleExecutePreset(p)}>
+                          <span className="material-symbols-rounded" style={{ fontSize: '1.1rem' }}>rocket_launch</span> Generate & Print
+                        </button>
+                        <button type="button" className="btn btn-danger" style={{ padding: '6px' }} onClick={() => handleDeletePreset(p.id)}>
+                          <span className="material-symbols-rounded" style={{ fontSize: '1.1rem' }}>delete</span>
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       {/* MODAL GENERATE */}
       <div className={`modal-overlay ${isGenerateModalOpen ? 'open' : ''}`} onClick={() => !isGenerating && setIsGenerateModalOpen(false)}>
         <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -1037,6 +1187,9 @@ const StockVoucher = ({ user }) => {
               </div>
               
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1.5rem' }}>
+                <button type="button" className="btn btn-primary" style={{ background: '#6366f1', borderColor: '#6366f1' }} onClick={handleSavePreset} disabled={isSavingPreset || !formData.profile}>
+                  {isSavingPreset ? 'MENYIMPAN...' : '⭐ Simpan sbg Preset'}
+                </button>
                 <button type="button" className="btn" style={{ background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }} onClick={() => setIsGenerateModalOpen(false)}>Batal</button>
                 <button type="submit" className="btn btn-primary" disabled={isGenerating || profiles.length === 0}>
                   {isGenerating ? 'MENYIMPAN...' : 'Generate Voucher'}

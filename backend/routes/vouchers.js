@@ -720,3 +720,50 @@ router.put('/access-rules', async (req, res) => {
 
 module.exports = router;
 
+
+
+// --- QUICK GENERATE PRESETS ---
+
+// GET /api/vouchers/presets
+router.get('/presets', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM generate_presets ORDER BY created_at DESC');
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching presets:', error);
+    res.status(500).json({ error: 'Failed to fetch presets' });
+  }
+});
+
+// POST /api/vouchers/presets
+router.post('/presets', async (req, res) => {
+  const { preset_name, jenis, profile, prefix, charset_type, panjang_user, panjang_pass, qty, server } = req.body;
+  if (!preset_name || !profile || !qty) {
+    return res.status(400).json({ error: 'Preset Name, Profile, and Qty are required' });
+  }
+  
+  try {
+    await pool.query(
+      \INSERT INTO generate_presets 
+      (preset_name, jenis, profile, prefix, charset_type, panjang_user, panjang_pass, qty, server) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)\,
+      [preset_name, jenis || 'UP', profile, prefix || '', charset_type || 'mix', panjang_user || 6, panjang_pass || 6, qty, server || 'all']
+    );
+    res.json({ message: 'Preset saved successfully' });
+  } catch (error) {
+    console.error('Error saving preset:', error);
+    res.status(500).json({ error: 'Failed to save preset' });
+  }
+});
+
+// DELETE /api/vouchers/presets/:id
+router.delete('/presets/:id', async (req, res) => {
+  try {
+    await pool.query('DELETE FROM generate_presets WHERE id = ?', [req.params.id]);
+    res.json({ message: 'Preset deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting preset:', error);
+    res.status(500).json({ error: 'Failed to delete preset' });
+  }
+});
+
