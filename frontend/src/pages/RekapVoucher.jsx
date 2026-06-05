@@ -6,9 +6,10 @@ const RekapVoucher = () => {
   const [rekapList, setRekapList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterDate, setFilterDate] = useState('');
-  const [filterMonth, setFilterMonth] = useState('');
-  const [filterYear, setFilterYear] = useState('');
+  const today = new Date();
+  const [filterDate, setFilterDate] = useState(today.getDate().toString());
+  const [filterMonth, setFilterMonth] = useState((today.getMonth() + 1).toString());
+  const [filterYear, setFilterYear] = useState(today.getFullYear().toString());
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, message: '', onConfirm: null });
   const triggerConfirm = (message, onConfirm) => setConfirmModal({ isOpen: true, message, onConfirm });
   
@@ -173,19 +174,19 @@ const RekapVoucher = () => {
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
             <select value={filterDate} onChange={(e) => { setFilterDate(e.target.value); setCurrentPage(1); }} className="form-input" style={{ width: '90px', padding: '6px 8px', background: 'rgba(255,255,255,0.05)', fontSize: '0.9rem' }}>
-              <option value="" style={{ background: '#1e1b1e' }}>Tanggal</option>
+              <option value="" style={{ background: '#1e1b1e' }}>Semua Tgl</option>
               {[...Array(31)].map((_, i) => <option key={i+1} value={i+1} style={{ background: '#1e1b1e' }}>{i+1}</option>)}
             </select>
 
             <select value={filterMonth} onChange={(e) => { setFilterMonth(e.target.value); setCurrentPage(1); }} className="form-input" style={{ width: '90px', padding: '6px 8px', background: 'rgba(255,255,255,0.05)', fontSize: '0.9rem' }}>
-              <option value="" style={{ background: '#1e1b1e' }}>Bulan</option>
+              <option value="" style={{ background: '#1e1b1e' }}>Semua Bln</option>
               {['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'].map((m, i) => (
                 <option key={i+1} value={i+1} style={{ background: '#1e1b1e' }}>{m}</option>
               ))}
             </select>
 
             <select value={filterYear} onChange={(e) => { setFilterYear(e.target.value); setCurrentPage(1); }} className="form-input" style={{ width: '90px', padding: '6px 8px', background: 'rgba(255,255,255,0.05)', fontSize: '0.9rem' }}>
-              <option value="" style={{ background: '#1e1b1e' }}>Tahun</option>
+              <option value="" style={{ background: '#1e1b1e' }}>Semua Thn</option>
               {[...Array(5)].map((_, i) => { const y = new Date().getFullYear() - i; return <option key={y} value={y} style={{ background: '#1e1b1e' }}>{y}</option>; })}
             </select>
 
