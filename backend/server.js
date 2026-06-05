@@ -314,6 +314,7 @@ const upgradePool = async (pool, name) => {
         panjang_pass INT DEFAULT 6,
         qty INT DEFAULT 1,
         server VARCHAR(100) DEFAULT 'all',
+        template_id VARCHAR(50) DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       ) ENGINE=InnoDB;
     `);
@@ -331,6 +332,13 @@ const upgradePool = async (pool, name) => {
       'INSERT IGNORE INTO role_menu_access (role, menu_id, is_allowed) VALUES (?, ?, ?)',
       ['superadmin', 'telegram_backup', 1]
     );
+
+    try {
+      await pool.query('ALTER TABLE generate_presets ADD COLUMN template_id VARCHAR(50) DEFAULT NULL');
+      console.log(`[DB UPGRADE] Ditambahkan kolom template_id pada tabel generate_presets.`);
+    } catch (e) {
+      if (e.code !== 'ER_DUP_FIELDNAME') throw e;
+    }
 
     console.log(`[DB UPGRADE] Completed schema verification on ${name}.`);
   } catch (err) {

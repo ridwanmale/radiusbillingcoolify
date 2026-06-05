@@ -737,7 +737,7 @@ router.get('/presets', async (req, res) => {
 
 // POST /api/vouchers/presets
 router.post('/presets', async (req, res) => {
-  const { preset_name, jenis, profile, prefix, charset_type, panjang_user, panjang_pass, qty, server } = req.body;
+  const { preset_name, jenis, profile, prefix, charset_type, panjang_user, panjang_pass, qty, server, template_id } = req.body;
   if (!preset_name || !profile || !qty) {
     return res.status(400).json({ error: 'Preset Name, Profile, and Qty are required' });
   }
@@ -745,9 +745,9 @@ router.post('/presets', async (req, res) => {
   try {
     await db.query(
       `INSERT INTO generate_presets 
-      (preset_name, jenis, profile, prefix, charset_type, panjang_user, panjang_pass, qty, server) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [preset_name, jenis || 'UP', profile, prefix || '', charset_type || 'mix', panjang_user || 6, panjang_pass || 6, qty, server || 'all']
+      (preset_name, jenis, profile, prefix, charset_type, panjang_user, panjang_pass, qty, server, template_id) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [preset_name, jenis || 'UP', profile, prefix || '', charset_type || 'mix', panjang_user || 6, panjang_pass || 6, qty, server || 'all', template_id || null]
     );
     res.json({ message: 'Preset saved successfully' });
   } catch (error) {
@@ -758,7 +758,7 @@ router.post('/presets', async (req, res) => {
 
 // PUT /api/vouchers/presets/:id
 router.put('/presets/:id', async (req, res) => {
-  const { preset_name, jenis, profile, prefix, charset_type, panjang_user, panjang_pass, server } = req.body;
+  const { preset_name, jenis, profile, prefix, charset_type, panjang_user, panjang_pass, server, template_id } = req.body;
   if (!preset_name || !profile) {
     return res.status(400).json({ error: 'Preset Name and Profile are required' });
   }
@@ -766,9 +766,9 @@ router.put('/presets/:id', async (req, res) => {
   try {
     await db.query(
       `UPDATE generate_presets SET 
-       preset_name = ?, jenis = ?, profile = ?, prefix = ?, charset_type = ?, panjang_user = ?, panjang_pass = ?, server = ? 
+       preset_name = ?, jenis = ?, profile = ?, prefix = ?, charset_type = ?, panjang_user = ?, panjang_pass = ?, server = ?, template_id = ? 
        WHERE id = ?`,
-      [preset_name, jenis || 'UP', profile, prefix || '', charset_type || 'mix', panjang_user || 6, panjang_pass || 6, server || 'all', req.params.id]
+      [preset_name, jenis || 'UP', profile, prefix || '', charset_type || 'mix', panjang_user || 6, panjang_pass || 6, server || 'all', template_id || null, req.params.id]
     );
     res.json({ message: 'Preset updated successfully' });
   } catch (error) {

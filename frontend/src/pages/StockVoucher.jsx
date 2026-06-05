@@ -131,7 +131,8 @@ const StockVoucher = ({ user }) => {
           panjang_user: formData.length,
           panjang_pass: formData.length,
           qty: formData.qty,
-          server: formData.outletName
+          server: formData.outletName,
+          template_id: selectedTemplateId
         })
       });
       if (res.ok) {
@@ -151,6 +152,7 @@ const StockVoucher = ({ user }) => {
       preset_name: preset.preset_name,
       profile: preset.profile,
       server: preset.server || '',
+      template_id: preset.template_id || '',
       prefix: preset.prefix || '',
       panjang_user: preset.panjang_user || 6,
       panjang_pass: preset.panjang_pass || 6
@@ -230,7 +232,7 @@ const StockVoucher = ({ user }) => {
         await fetchData();
         toast.update(toastId, { render: '✅ Sukses Generate!', type: 'success', isLoading: false, autoClose: 3000 });
         if (result.data && result.data.length > 0) {
-          handleOpenPrintTab(result.data);
+          handleOpenPrintTab(result.data, presetToExecute.template_id);
         }
       } else {
         toast.update(toastId, { render: '❌ Gagal: ' + result.error, type: 'error', isLoading: false, autoClose: 4000 });
@@ -292,10 +294,13 @@ const StockVoucher = ({ user }) => {
   }, []);
 
   // --- PRINT LOGIC ---
-  const handleOpenPrintTab = (toPrint) => {
-    if (toPrint.length === 0) return;
+  const handleOpenPrintTab = (toPrint, overrideTemplateId = null) => {
+    if (toPrint.length === 0) {
+      toast.warning('Pilih minimal 1 voucher untuk diprint');
+      return;
+    }
     
-    if (selectedTemplateId === 'no_print') {
+    if ((overrideTemplateId || selectedTemplateId) === 'no_print') {
       toast.warning('Silakan pilih Design Template terlebih dahulu untuk mencetak!');
       return;
     }
@@ -305,7 +310,7 @@ const StockVoucher = ({ user }) => {
       vouchers: toPrint,
       settings: settings,
       profiles: profiles,
-      templateId: selectedTemplateId
+      templateId: overrideTemplateId || selectedTemplateId
     }));
 
     // Buka tab baru
@@ -1709,6 +1714,18 @@ const StockVoucher = ({ user }) => {
                   >
                     <option value="">-- All Server --</option>
                     {outlets.map(o => <option key={o.id} value={o.name}>{o.name}</option>)}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Design Template Printer</label>
+                  <select 
+                    className="form-input"
+                    value={editPresetFormData.template_id || ''}
+                    onChange={e => setEditPresetFormData({...editPresetFormData, template_id: e.target.value})}
+                  >
+                    <option value="">-- Gunakan Pilihan Saat Ini --</option>
+                    <option value="no_print">Jangan Print (Hanya Generate)</option>
+                    {templates.map(t => <option key={t.id} value={t.id}>{t.template_name}</option>)}
                   </select>
                 </div>
               </div>
