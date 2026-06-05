@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 
 const SettingTelegram = ({ user }) => {
@@ -285,7 +285,6 @@ const SettingTelegram = ({ user }) => {
                   </span>
                   <button className="btn-glass-edit" 
                     onClick={() => setSelectedOutlet(c.outlet_name)}
-                    className="btn-edit" 
                     style={{ 
                       width: '32px', 
                       height: '32px', 
