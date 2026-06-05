@@ -43,14 +43,17 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   </React.StrictMode>,
 )
 
-// Auto-reload the page when a new Service Worker takes over
+// Force unregister ALL Service Workers to prevent aggressive caching
 if ('serviceWorker' in navigator) {
-  let refreshing = false;
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (!refreshing) {
-      refreshing = true;
-      window.location.reload();
+  navigator.serviceWorker.getRegistrations().then(function(registrations) {
+    for(let registration of registrations) {
+      registration.unregister().then(function(boolean) {
+        if(boolean) {
+          console.log('Service worker unregistered successfully.');
+          // Reload once to clear the cache state
+          window.location.reload();
+        }
+      });
     }
   });
 }
-
