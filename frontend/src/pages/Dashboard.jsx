@@ -269,15 +269,23 @@ const Dashboard = () => {
         </div>
         <div style={{ maxHeight: '400px', overflow: 'auto' }}>
           <table className="data-table">
-            <thead><tr><th>Waktu</th><th>Admin</th><th>Aksi</th><th>Detail</th><th>IP</th></tr></thead>
+            <thead>
+              <tr>
+                <th style={{ textAlign: 'center' }}>Waktu</th>
+                <th style={{ textAlign: 'center' }}>Admin</th>
+                <th style={{ textAlign: 'center' }}>Aksi</th>
+                <th style={{ textAlign: 'center' }}>Detail</th>
+                <th style={{ textAlign: 'center' }}>IP</th>
+              </tr>
+            </thead>
             <tbody>
               {logs.map((log) => (
                 <tr key={log.id}>
-                  <td style={{ fontSize: '0.8rem' }}>{formatDateTime(log.created_at)}</td>
-                  <td>{log.admin_username || 'System'}</td>
-                  <td>{log.action}</td>
-                  <td>{log.details}</td>
-                  <td>{log.ip_address}</td>
+                  <td style={{ fontSize: '0.8rem', textAlign: 'center' }}>{formatDateTime(log.created_at)}</td>
+                  <td style={{ textAlign: 'center' }}>{log.admin_username || 'System'}</td>
+                  <td style={{ textAlign: 'center' }}>{log.action}</td>
+                  <td style={{ textAlign: 'center' }}>{log.details}</td>
+                  <td style={{ textAlign: 'center' }}>{log.ip_address}</td>
                 </tr>
               ))}
             </tbody>
