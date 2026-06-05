@@ -93,7 +93,11 @@ const StockVoucher = ({ user }) => {
   const [presetNameInput, setPresetNameInput] = useState('');
   const [isExecutePresetModalOpen, setIsExecutePresetModalOpen] = useState(false);
   const [presetToExecute, setPresetToExecute] = useState(null);
-  const [executeQtyInput, setExecuteQtyInput] = useState(1);
+  const [executeQtyInput, setExecuteQtyInput] = useState('');
+
+  // Edit Preset State
+  const [isEditPresetModalOpen, setIsEditPresetModalOpen] = useState(false);
+  const [editPresetFormData, setEditPresetFormData] = useState(null);
 
   const fetchPresets = async () => {
     try {
@@ -135,6 +139,43 @@ const StockVoucher = ({ user }) => {
         fetchPresets();
       } else {
         toast.error('Gagal menyimpan preset');
+      }
+    } catch(err) {
+      toast.error('Gagal koneksi ke server');
+    } finally { setIsSavingPreset(false); }
+  };
+
+  const handleEditPresetClick = (preset) => {
+    setEditPresetFormData({
+      id: preset.id,
+      preset_name: preset.preset_name,
+      profile: preset.profile,
+      server: preset.server || '',
+      prefix: preset.prefix || '',
+      panjang_user: preset.panjang_user || 6,
+      panjang_pass: preset.panjang_pass || 6
+    });
+    setIsPresetModalOpen(false);
+    setIsEditPresetModalOpen(true);
+  };
+
+  const executeEditPreset = async (e) => {
+    e.preventDefault();
+    if (!editPresetFormData) return;
+    setIsEditPresetModalOpen(false);
+    setIsSavingPreset(true);
+    try {
+      const res = await fetch('/api/vouchers/presets/' + editPresetFormData.id, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editPresetFormData)
+      });
+      if (res.ok) {
+        toast.success('Preset berhasil diperbarui!');
+        fetchPresets();
+        setIsPresetModalOpen(true); // Re-open preset modal
+      } else {
+        toast.error('Gagal memperbarui preset');
       }
     } catch(err) {
       toast.error('Gagal koneksi ke server');
@@ -1112,6 +1153,9 @@ const StockVoucher = ({ user }) => {
                         <button type="button" className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '4px' }} onClick={() => handleExecutePresetClick(p)}>
                           <span className="material-symbols-rounded" style={{ fontSize: '1.1rem' }}>rocket_launch</span> Generate & Print
                         </button>
+                        <button type="button" className="btn btn-warning" style={{ padding: '6px', background: '#f59e0b', color: 'white', border: 'none' }} onClick={() => handleEditPresetClick(p)}>
+                          <span className="material-symbols-rounded" style={{ fontSize: '1.1rem' }}>edit</span>
+                        </button>
                         <button type="button" className="btn btn-danger" style={{ padding: '6px' }} onClick={() => handleDeletePreset(p.id)}>
                           <span className="material-symbols-rounded" style={{ fontSize: '1.1rem' }}>delete</span>
                         </button>
@@ -1596,6 +1640,88 @@ const StockVoucher = ({ user }) => {
               </button>
             </div>
           </form>
+        </div>
+      </div>
+
+      {/* MODAL EDIT PRESET */}
+      <div className={`modal-overlay ${isEditPresetModalOpen ? 'open' : ''}`} onClick={() => setIsEditPresetModalOpen(false)}>
+        <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '450px' }}>
+          <div className="modal-header">
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span className="material-symbols-rounded" style={{ color: '#f59e0b' }}>edit_note</span>
+              Edit Preset / Shortcut
+            </h2>
+            <button className="modal-close" onClick={() => setIsEditPresetModalOpen(false)}>&times;</button>
+          </div>
+          
+          {editPresetFormData && (
+            <form onSubmit={executeEditPreset}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1.5rem 0' }}>
+                <div className="form-group">
+                  <label className="form-label">Nama Preset</label>
+                  <input 
+                    type="text" 
+                    className="form-input" 
+                    value={editPresetFormData.preset_name}
+                    onChange={e => setEditPresetFormData({...editPresetFormData, preset_name: e.target.value})}
+                    required 
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Profile / Paket</label>
+                  <select 
+                    className="form-input" 
+                    value={editPresetFormData.profile}
+                    onChange={e => setEditPresetFormData({...editPresetFormData, profile: e.target.value})}
+                    required
+                  >
+                    <option value="">-- Pilih Profile --</option>
+                    {physicalProfiles.map((p, i) => <option key={i} value={p.groupname}>{p.groupname}</option>)}
+                  </select>
+                </div>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label className="form-label">Prefix</label>
+                    <input 
+                      type="text" 
+                      className="form-input" 
+                      value={editPresetFormData.prefix}
+                      onChange={e => setEditPresetFormData({...editPresetFormData, prefix: e.target.value})}
+                    />
+                  </div>
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label className="form-label">Panjang</label>
+                    <input 
+                      type="number" 
+                      className="form-input" 
+                      min="1" max="16"
+                      value={editPresetFormData.panjang_user}
+                      onChange={e => setEditPresetFormData({...editPresetFormData, panjang_user: parseInt(e.target.value) || 6, panjang_pass: parseInt(e.target.value) || 6})}
+                    />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Server / Outlet</label>
+                  <select 
+                    className="form-input"
+                    value={editPresetFormData.server}
+                    onChange={e => setEditPresetFormData({...editPresetFormData, server: e.target.value})}
+                  >
+                    <option value="">-- All Server --</option>
+                    {outlets.map(o => <option key={o.id} value={o.name}>{o.name}</option>)}
+                  </select>
+                </div>
+              </div>
+              
+              <div className="modal-footer" style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                <button type="button" className="btn-glass-premium btn-red" onClick={() => { setIsEditPresetModalOpen(false); setIsPresetModalOpen(true); }}>Batal</button>
+                <button type="submit" className="btn-glass-premium btn-warning" disabled={isSavingPreset} style={{ color: '#fff', borderColor: '#f59e0b', background: 'rgba(245, 158, 11, 0.1)' }}>
+                  <span className="material-symbols-rounded">save</span>
+                  {isSavingPreset ? 'Menyimpan...' : 'Simpan Perubahan'}
+                </button>
+              </div>
+            </form>
+          )}
         </div>
       </div>
 

@@ -756,6 +756,27 @@ router.post('/presets', async (req, res) => {
   }
 });
 
+// PUT /api/vouchers/presets/:id
+router.put('/presets/:id', async (req, res) => {
+  const { preset_name, jenis, profile, prefix, charset_type, panjang_user, panjang_pass, server } = req.body;
+  if (!preset_name || !profile) {
+    return res.status(400).json({ error: 'Preset Name and Profile are required' });
+  }
+  
+  try {
+    await db.query(
+      `UPDATE generate_presets SET 
+       preset_name = ?, jenis = ?, profile = ?, prefix = ?, charset_type = ?, panjang_user = ?, panjang_pass = ?, server = ? 
+       WHERE id = ?`,
+      [preset_name, jenis || 'UP', profile, prefix || '', charset_type || 'mix', panjang_user || 6, panjang_pass || 6, server || 'all', req.params.id]
+    );
+    res.json({ message: 'Preset updated successfully' });
+  } catch (error) {
+    console.error('Error updating preset:', error);
+    res.status(500).json({ error: 'Failed to update preset' });
+  }
+});
+
 // DELETE /api/vouchers/presets/:id
 router.delete('/presets/:id', async (req, res) => {
   try {
