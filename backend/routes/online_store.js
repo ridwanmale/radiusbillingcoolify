@@ -21,19 +21,6 @@ function getPublicUrl(req) {
         }
 
 
-const ensurePppoeColumns = async () => {
-  const cols = [
-    ['pppoe_enable_payment_bridge', 'TINYINT(1) DEFAULT 1'],
-    ['pppoe_enable_midtrans', 'TINYINT(1) DEFAULT 0'],
-    ['pppoe_enable_duitku', 'TINYINT(1) DEFAULT 0'],
-    ['pppoe_enable_tripay', 'TINYINT(1) DEFAULT 0']
-  ];
-  for (const [colName, colType] of cols) {
-    try {
-      await db.query(`ALTER TABLE portal_settings ADD COLUMN ${colName} ${colType}`);
-    } catch (err) {}
-  }
-};
       }
     } catch (e) {
       console.error('Error reading sync file for public URL:', e.message);
@@ -175,8 +162,7 @@ const checkSpamProtection = async (req, res, next) => {
 
 // 1. Ambil Pengaturan Portal
 router.get('/settings', async (req, res) => {
-  await ensurePppoeColumns();
-  try {
+    try {
     const [rows] = await db.query(`
       SELECT p.*, s.dns_name as hotspot_login_url
       FROM portal_settings p
@@ -205,8 +191,7 @@ router.get('/settings', async (req, res) => {
 
 // 2. Simpan Pengaturan Portal
 router.post('/settings', async (req, res) => {
-  await ensurePppoeColumns();
-  console.log('[DEBUG] Received settings update request:', req.body);
+    console.log('[DEBUG] Received settings update request:', req.body);
   try {
     // 1. Ambil data pengaturan yang ada saat ini
     const [existingRows] = await db.query('SELECT * FROM portal_settings WHERE id = 1');
