@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 const { logActivity } = require('./logs');
@@ -727,7 +727,7 @@ module.exports = router;
 // GET /api/vouchers/presets
 router.get('/presets', async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT * FROM generate_presets ORDER BY created_at DESC');
+    const [rows] = await db.query('SELECT * FROM generate_presets ORDER BY created_at DESC');
     res.json(rows);
   } catch (error) {
     console.error('Error fetching presets:', error);
@@ -743,7 +743,7 @@ router.post('/presets', async (req, res) => {
   }
   
   try {
-    await pool.query(
+    await db.query(
       \INSERT INTO generate_presets 
       (preset_name, jenis, profile, prefix, charset_type, panjang_user, panjang_pass, qty, server) 
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)\,
@@ -759,11 +759,10 @@ router.post('/presets', async (req, res) => {
 // DELETE /api/vouchers/presets/:id
 router.delete('/presets/:id', async (req, res) => {
   try {
-    await pool.query('DELETE FROM generate_presets WHERE id = ?', [req.params.id]);
+    await db.query('DELETE FROM generate_presets WHERE id = ?', [req.params.id]);
     res.json({ message: 'Preset deleted successfully' });
   } catch (error) {
     console.error('Error deleting preset:', error);
     res.status(500).json({ error: 'Failed to delete preset' });
   }
 });
-
