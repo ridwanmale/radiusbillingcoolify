@@ -154,7 +154,7 @@ const StockVoucher = ({ user }) => {
 
   const handleExecutePresetClick = (preset) => {
     setPresetToExecute(preset);
-    setExecuteQtyInput(preset.qty || 1);
+    setExecuteQtyInput('');
     setIsPresetModalOpen(false);
     setIsExecutePresetModalOpen(true);
   };
