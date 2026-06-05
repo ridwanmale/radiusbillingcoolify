@@ -744,9 +744,9 @@ router.post('/presets', async (req, res) => {
   
   try {
     await db.query(
-      \INSERT INTO generate_presets 
+      `INSERT INTO generate_presets 
       (preset_name, jenis, profile, prefix, charset_type, panjang_user, panjang_pass, qty, server) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)\,
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [preset_name, jenis || 'UP', profile, prefix || '', charset_type || 'mix', panjang_user || 6, panjang_pass || 6, qty, server || 'all']
     );
     res.json({ message: 'Preset saved successfully' });
