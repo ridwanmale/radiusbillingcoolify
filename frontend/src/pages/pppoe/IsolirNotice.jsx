@@ -35,51 +35,23 @@ const IsolirNotice = () => {
   };
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      minHeight: '100vh',
-      backgroundColor: '#0f172a',
-      padding: '20px',
-      fontFamily: 'system-ui, -apple-system, sans-serif'
-    }}>
-      <div style={{
-        background: '#1e293b',
-        padding: '40px',
-        borderRadius: '16px',
-        boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-        maxWidth: '500px',
-        width: '100%',
-        textAlign: 'center',
-        borderTop: `6px solid ${settings.accent_color || '#ef4444'}`,
-        border: '1px solid rgba(255,255,255,0.05)'
-      }}>
-        <div style={{
-          width: '80px',
-          height: '80px',
-          background: `${settings.accent_color || '#ef4444'}22`,
-          borderRadius: '50%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          margin: '0 auto 20px'
-        }}>
+    <div className="isolir-container">
+      <div className="isolir-card" style={{ borderTop: `6px solid ${settings.accent_color || '#ef4444'}` }}>
+        <div className="isolir-icon-wrapper" style={{ background: `${settings.accent_color || '#ef4444'}22` }}>
           <span className="material-symbols-rounded" style={{ color: settings.accent_color || '#ef4444', fontSize: '40px' }}>
             wifi_off
           </span>
         </div>
         
-        <h1 style={{ color: 'white', fontSize: '24px', marginBottom: '10px', fontWeight: '800' }}>
+        <h1 className="isolir-title">
           {settings.redirect_message}
         </h1>
         
-        <p style={{ color: '#94a3b8', fontSize: '15px', lineHeight: '1.6', marginBottom: '25px' }}>
+        <p className="isolir-desc">
           {settings.custom_message}
         </p>
         
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '30px' }}>
+        <div className="isolir-actions">
           <button 
             onClick={() => navigate('/pay-invoice')}
             className="btn-glass"
@@ -127,8 +99,8 @@ const IsolirNotice = () => {
           </button>
         </div>
         
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px', marginTop: '30px' }}>
-          <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>
+        <div className="isolir-footer">
+          <p>
             {settings.redirect_footer}
           </p>
         </div>

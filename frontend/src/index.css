@@ -1209,3 +1209,159 @@ body {
 .btn-glass-info:hover {
   background: rgba(94, 106, 210, 0.2);
 }
+
+
+/* Premium Store & Dashboard UI Classes (Refactored from inline) */
+.label-premium {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.title-premium {
+  margin: 0 0 20px 0;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.table-premium {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.th-premium {
+  padding: 12px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: left;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.th-premium-center {
+  padding: 12px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.td-premium {
+  padding: 12px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.td-premium-center {
+  padding: 12px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+}
+
+.card-store {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+}
+
+.card-store:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.card-store-header {
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  padding: 12px 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.card-store-body {
+  padding: 20px;
+  text-align: center;
+  color: #64748b;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* Isolir Notice UI Classes */
+.isolir-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #0f172a;
+  padding: 20px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.isolir-card {
+  background: #1e293b;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.isolir-icon-wrapper {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.isolir-title {
+  color: white;
+  font-size: 24px;
+  margin-bottom: 10px;
+  font-weight: 800;
+}
+
+.isolir-desc {
+  color: #94a3b8;
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 25px;
+}
+
+.isolir-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.isolir-footer {
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 20px;
+  margin-top: 30px;
+}
+
+.isolir-footer p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}

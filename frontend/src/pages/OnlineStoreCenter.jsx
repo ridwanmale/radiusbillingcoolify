@@ -190,24 +190,24 @@ const OnlineStoreCenter = () => {
               </div>
               
               <div className="form-group" style={{ marginBottom: '20px' }}>
-                <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Judul Portal</label>
+                <label className="label-premium">Judul Portal</label>
                 <input type="text" className="form-input-premium" value={settings.portal_title} onChange={e => setSettings({...settings, portal_title: e.target.value})} required />
               </div>
 
               <div className="form-group" style={{ marginBottom: '20px' }}>
-                <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Deskripsi Toko</label>
+                <label className="label-premium">Deskripsi Toko</label>
                 <textarea className="form-input-premium" style={{ height: '80px', resize: 'none' }} value={settings.portal_description} onChange={e => setSettings({...settings, portal_description: e.target.value})} />
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
                 <div className="form-group">
-                  <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Warna Utama</label>
+                  <label className="label-premium">Warna Utama</label>
                   <input type="color" className="form-input-premium" style={{ height: '42px', padding: '2px' }} value={settings.primary_color} onChange={e => setSettings({...settings, primary_color: e.target.value})} />
                 </div>
               </div>
 
               <div className="form-group" style={{ marginBottom: '20px' }}>
-                <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Pesan Sukses (Setelah Pembayaran)</label>
+                <label className="label-premium">Pesan Sukses (Setelah Pembayaran)</label>
                 <div className="quill-dark">
                   <ReactQuill 
                     theme="snow" 
@@ -227,7 +227,7 @@ const OnlineStoreCenter = () => {
               </div>
 
               <div className="form-group" style={{ marginBottom: '20px' }}>
-                <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Pesan Luar Jaringan (HTML)</label>
+                <label className="label-premium">Pesan Luar Jaringan (HTML)</label>
                 <div className="quill-dark">
                   <ReactQuill 
                     theme="snow" 
@@ -247,21 +247,21 @@ const OnlineStoreCenter = () => {
               </div>
 
               <div className="form-group">
-                <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>IP MikroTik / DNS Hotspot</label>
+                <label className="label-premium">IP MikroTik / DNS Hotspot</label>
                 <input type="text" className="form-input-premium" placeholder="Contoh: 10.5.50.1 atau wifi.hotspot" value={settings.hotspot_login_url} onChange={e => setSettings({...settings, hotspot_login_url: e.target.value})} />
               </div>
               <p style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '-10px', marginBottom: '20px' }}>* Cukup isi IP atau DNS saja (Contoh: 10.5.50.1). Sistem akan otomatis mengarahkan ke /login.</p>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
                 <div className="form-group">
-                  <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Status Toko</label>
+                  <label className="label-premium">Status Toko</label>
                   <select className="form-input-premium" value={settings.is_active ? '1' : '0'} onChange={e => setSettings({...settings, is_active: e.target.value === '1'})}>
                     <option value="1">Buka (Aktif)</option>
                     <option value="0">Tutup (Maintenance)</option>
                   </select>
                 </div>
                 <div className="form-group">
-                  <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Scheduler Operasional</label>
+                  <label className="label-premium">Scheduler Operasional</label>
                   <select className="form-input-premium" value={settings.enable_schedule ? '1' : '0'} onChange={e => setSettings({...settings, enable_schedule: e.target.value === '1'})}>
                     <option value="0">Nonaktif</option>
                     <option value="1">Aktif</option>
@@ -272,11 +272,11 @@ const OnlineStoreCenter = () => {
               {!!settings.enable_schedule && (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px', padding: '15px', background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
                   <div className="form-group">
-                    <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Jam Buka</label>
+                    <label className="label-premium">Jam Buka</label>
                     <input type="time" className="form-input-premium" value={settings.open_time || '08:00'} onChange={e => setSettings({...settings, open_time: e.target.value})} required />
                   </div>
                   <div className="form-group">
-                    <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Jam Tutup</label>
+                    <label className="label-premium">Jam Tutup</label>
                     <input type="time" className="form-input-premium" value={settings.close_time || '22:00'} onChange={e => setSettings({...settings, close_time: e.target.value})} required />
                   </div>
                 </div>
@@ -406,19 +406,19 @@ const OnlineStoreCenter = () => {
                 </div>
 
                 <h4 style={{ margin: '0 0 15px 0', fontSize: '1rem', color: '#fca5a5' }}>Daftar Perangkat Terblokir</h4>
-                <div style={{ background: 'rgba(0,0,0,0.2)', borderRadius: '10px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+                <div className="card-store">
+                  <table className="table-premium">
                     <thead style={{ background: 'rgba(255,255,255,0.05)', color: '#94a3b8' }}>
                       <tr>
-                        <th style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>IP Address</th>
-                        <th style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Device ID</th>
-                        <th style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Waktu Blokir</th>
-                        <th style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>Aksi</th>
+                        <th className="td-premium">IP Address</th>
+                        <th className="td-premium">Device ID</th>
+                        <th className="td-premium">Waktu Blokir</th>
+                        <th className="td-premium-center">Aksi</th>
                       </tr>
                     </thead>
                     <tbody>
                       {spamBlocklist.length === 0 ? (
-                        <tr><td colSpan="4" style={{ padding: '20px', textAlign: 'center', color: '#64748b' }}>Belum ada perangkat yang terblokir.</td></tr>
+                        <tr><td colSpan="4" className="card-store-body">Belum ada perangkat yang terblokir.</td></tr>
                       ) : (
                         spamBlocklist.map(b => (
                           <tr key={b.id}>
@@ -468,18 +468,18 @@ const OnlineStoreCenter = () => {
             </h3>
             <p style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '15px' }}>Tabel ini menampilkan rekam jejak perangkat (UUID) yang paling sering terkena blokir otomatis (Auto-Block) sepanjang waktu, dan belum masuk ke Blacklist Permanen.</p>
             
-            <div style={{ background: 'rgba(0,0,0,0.2)', borderRadius: '10px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+            <div className="card-store">
+              <table className="table-premium">
                 <thead style={{ background: 'rgba(255,255,255,0.05)', color: '#94a3b8' }}>
                   <tr>
-                    <th style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Device ID (UUID)</th>
-                    <th style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Total Pelanggaran (Terblokir)</th>
-                    <th style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>Aksi</th>
+                    <th className="td-premium">Device ID (UUID)</th>
+                    <th className="td-premium">Total Pelanggaran (Terblokir)</th>
+                    <th className="td-premium-center">Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
                   {topSpammers.length === 0 ? (
-                    <tr><td colSpan="3" style={{ padding: '20px', textAlign: 'center', color: '#64748b' }}>Belum ada aktivitas spammer terdeteksi.</td></tr>
+                    <tr><td colSpan="3" className="card-store-body">Belum ada aktivitas spammer terdeteksi.</td></tr>
                   ) : (
                     topSpammers.map((ts, idx) => (
                       <tr key={idx}>
@@ -522,18 +522,18 @@ const OnlineStoreCenter = () => {
               </button>
             </div>
 
-            <div style={{ background: 'rgba(0,0,0,0.2)', borderRadius: '10px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+            <div className="card-store">
+              <table className="table-premium">
                 <thead style={{ background: 'rgba(255,255,255,0.05)', color: '#94a3b8' }}>
                   <tr>
-                    <th style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Device ID (UUID)</th>
-                    <th style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>Tanggal Diblokir</th>
-                    <th style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>Aksi</th>
+                    <th className="td-premium">Device ID (UUID)</th>
+                    <th className="td-premium">Tanggal Diblokir</th>
+                    <th className="td-premium-center">Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
                   {permanentBlocklist.length === 0 ? (
-                    <tr><td colSpan="3" style={{ padding: '20px', textAlign: 'center', color: '#64748b' }}>Belum ada perangkat di daftar hitam permanen.</td></tr>
+                    <tr><td colSpan="3" className="card-store-body">Belum ada perangkat di daftar hitam permanen.</td></tr>
                   ) : (
                     permanentBlocklist.map(b => (
                       <tr key={b.id}>
@@ -556,13 +556,13 @@ const OnlineStoreCenter = () => {
       {isQrisModalOpen && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', backdropFilter: 'blur(5px)' }}>
           <div className="glass-card fade-in" style={{ width: '100%', maxWidth: '450px', padding: '25px', background: '#1e1e24', border: '1px solid rgba(255,255,255,0.1)' }}>
-            <h3 style={{ margin: '0 0 20px 0', fontSize: '1.2rem', fontWeight: '800', color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <h3 className="title-premium">
               <span className="material-symbols-rounded" style={{ color: '#38bdf8' }}>qr_code_2</span>
               {editingQrisIndex >= 0 ? 'Edit QRIS' : 'Tambah QRIS Baru'}
             </h3>
             
             <div className="form-group" style={{ marginBottom: '15px' }}>
-              <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Nama Pengenal</label>
+              <label className="label-premium">Nama Pengenal</label>
               <input 
                 type="text" 
                 className="form-input-premium" 
@@ -574,7 +574,7 @@ const OnlineStoreCenter = () => {
             </div>
             
             <div className="form-group" style={{ marginBottom: '25px' }}>
-              <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>String Payload (000201...)</label>
+              <label className="label-premium">String Payload (000201...)</label>
               <textarea 
                 className="form-input-premium" 
                 style={{ height: '100px', fontSize: '0.75rem', fontFamily: 'monospace' }} 
@@ -616,17 +616,17 @@ const OnlineStoreCenter = () => {
             <p style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '20px' }}>Informasi ini akan ditampilkan di bagian footer halaman portal untuk membantu pelanggan Anda.</p>
 
             <div className="form-group" style={{ marginBottom: '15px' }}>
-              <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Email Support</label>
+              <label className="label-premium">Email Support</label>
               <input type="email" className="form-input-premium" value={settings.support_email || ''} onChange={e => setSettings({...settings, support_email: e.target.value})} placeholder="support@armradiusapp.com" />
             </div>
 
             <div className="form-group" style={{ marginBottom: '15px' }}>
-              <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Telepon / WA</label>
+              <label className="label-premium">Telepon / WA</label>
               <input type="text" className="form-input-premium" value={settings.support_phone || ''} onChange={e => setSettings({...settings, support_phone: e.target.value})} placeholder="+62 812-3456-7890" />
             </div>
 
             <div className="form-group" style={{ marginBottom: '25px' }}>
-              <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Alamat Usaha</label>
+              <label className="label-premium">Alamat Usaha</label>
               <textarea className="form-input-premium" style={{ height: '80px', resize: 'none' }} value={settings.support_address || ''} onChange={e => setSettings({...settings, support_address: e.target.value})} placeholder="Jl. Contoh Nama Jalan No. 123, Kota, Provinsi" />
             </div>
 
@@ -662,7 +662,7 @@ const OnlineStoreCenter = () => {
               {settings.spam_protection_enabled && (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                   <div className="form-group">
-                    <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Batas Maksimal Transaksi PENDING</label>
+                    <label className="label-premium">Batas Maksimal Transaksi PENDING</label>
                     <input 
                       type="number" 
                       className="form-input-premium" 
@@ -671,7 +671,7 @@ const OnlineStoreCenter = () => {
                     />
                   </div>
                   <div className="form-group">
-                    <label style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: '700', marginBottom: '8px', display: 'block' }}>Auto Unblock Setelah (Menit)</label>
+                    <label className="label-premium">Auto Unblock Setelah (Menit)</label>
                     <input 
                       type="number" 
                       className="form-input-premium" 
