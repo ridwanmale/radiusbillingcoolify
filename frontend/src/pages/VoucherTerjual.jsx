@@ -687,65 +687,11 @@ const VoucherTerjual = () => {
           <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)' }}>
             Menampilkan {filteredVouchers.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} - {Math.min(filteredVouchers.length, currentPage * itemsPerPage)} dari {filteredVouchers.length} Voucher
           </p>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            background: 'rgba(255, 255, 255, 0.03)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            borderRadius: '12px',
-            padding: '4px'
-          }}>
-            <button 
-              className="btn-glass-premium" 
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-              style={{
-                padding: '6px 16px',
-                background: currentPage === 1 ? 'transparent' : 'rgba(255, 255, 255, 0.05)',
-                border: 'none',
-                borderRadius: '8px',
-                color: 'white',
-                opacity: currentPage === 1 ? 0.2 : 1,
-                cursor: currentPage === 1 ? 'default' : 'pointer',
-                transition: 'all 0.3s ease',
-                fontWeight: '600',
-                fontSize: '0.9rem',
-                boxShadow: 'none'
-              }}
-            >
-              Prev
-            </button>
-            <div style={{
-              padding: '0 16px',
-              color: 'white',
-              fontWeight: '700',
-              fontSize: '0.95rem',
-              letterSpacing: '1px',
-              fontFamily: 'monospace'
-            }}>
-              {currentPage} / {totalPages}
-            </div>
-            <button 
-              className="btn-glass-premium" 
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-              disabled={currentPage >= totalPages}
-              style={{
-                padding: '6px 16px',
-                background: currentPage >= totalPages ? 'transparent' : 'rgba(255, 255, 255, 0.05)',
-                border: 'none',
-                borderRadius: '8px',
-                color: 'white',
-                opacity: currentPage >= totalPages ? 0.2 : 1,
-                cursor: currentPage >= totalPages ? 'default' : 'pointer',
-                transition: 'all 0.3s ease',
-                fontWeight: '600',
-                fontSize: '0.9rem',
-                boxShadow: 'none'
-              }}
-            >
-              Next
-            </button>
-          </div>
+          <div className="pagination-wrapper">
+  <button className="pagination-btn" onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1}>Prev</button>
+  <div className="pagination-text">{currentPage} / {totalPages}</div>
+  <button className="pagination-btn" onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage >= totalPages}>Next</button>
+</div>
         </div>
       </div>
 

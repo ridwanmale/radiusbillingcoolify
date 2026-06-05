@@ -364,27 +364,11 @@ const VoucherOnline = () => {
           <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)' }}>
             Terpilih: {selectedSessions.length} | Menampilkan {filteredSessions.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} - {Math.min(filteredSessions.length, currentPage * itemsPerPage)} dari {filteredSessions.length} Sesi Online
           </p>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <button 
-              className="btn" 
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-              style={{ padding: '8px 16px', background: 'rgba(255,255,255,0.05)', color: 'white', opacity: currentPage === 1 ? 0.3 : 1 }}
-            >
-              Prev
-            </button>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0 10px' }}>
-              {currentPage} / {totalPages}
-            </div>
-            <button 
-              className="btn" 
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-              disabled={currentPage >= totalPages}
-              style={{ padding: '8px 16px', background: 'rgba(255,255,255,0.05)', color: 'white', opacity: currentPage >= totalPages ? 0.3 : 1 }}
-            >
-              Next
-            </button>
-          </div>
+          <div className="pagination-wrapper">
+  <button className="pagination-btn" onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1}>Prev</button>
+  <div className="pagination-text">{currentPage} / {totalPages}</div>
+  <button className="pagination-btn" onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage >= totalPages}>Next</button>
+</div>
         </div>
       </div>
     </div>

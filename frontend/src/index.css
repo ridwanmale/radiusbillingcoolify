@@ -1133,3 +1133,61 @@ body {
 .btn-glass-delete:hover {
   background: rgba(239, 68, 68, 0.2);
 }
+
+/* GLOBAL PAGINATION CLASSES */
+.pagination-wrapper {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 4px;
+}
+
+.pagination-btn {
+  padding: 6px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 0.9rem;
+  box-shadow: none;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.pagination-btn:disabled {
+  background: transparent;
+  opacity: 0.2;
+  cursor: default;
+}
+
+.pagination-text {
+  padding: 0 16px;
+  color: white;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+  font-family: monospace;
+}
+
+@media (max-width: 600px) {
+  .pagination-wrapper {
+    padding: 2px;
+    border-radius: 8px;
+  }
+  .pagination-btn {
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    border-radius: 6px;
+  }
+  .pagination-text {
+    padding: 0 10px;
+    font-size: 0.85rem;
+  }
+}

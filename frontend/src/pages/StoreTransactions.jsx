@@ -332,10 +332,11 @@ const StoreTransactions = () => {
                 {totalPages > 1 && (
                     <div style={{ padding: '15px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.1)' }}>
                         <div style={{ color: '#64748b', fontSize: '0.8rem' }}>Halaman {currentPage} dari {totalPages}</div>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                            <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)} style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid #334155', background: '#0f172a', color: 'white', cursor: 'pointer' }}>Prev</button>
-                            <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)} style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid #334155', background: '#0f172a', color: 'white', cursor: 'pointer' }}>Next</button>
-                        </div>
+                        <div className="pagination-wrapper">
+  <button className="pagination-btn" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1}>Prev</button>
+  <div className="pagination-text">{currentPage} / {totalPages}</div>
+  <button className="pagination-btn" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage === totalPages}>Next</button>
+</div>
                     </div>
                 )}
             </div>
