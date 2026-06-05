@@ -91,6 +91,9 @@ const StockVoucher = ({ user }) => {
   const [isSavingPreset, setIsSavingPreset] = useState(false);
   const [isSavePresetPromptOpen, setIsSavePresetPromptOpen] = useState(false);
   const [presetNameInput, setPresetNameInput] = useState('');
+  const [isExecutePresetModalOpen, setIsExecutePresetModalOpen] = useState(false);
+  const [presetToExecute, setPresetToExecute] = useState(null);
+  const [executeQtyInput, setExecuteQtyInput] = useState(1);
 
   const fetchPresets = async () => {
     try {
@@ -149,8 +152,20 @@ const StockVoucher = ({ user }) => {
     } catch(err) {}
   };
 
-  const handleExecutePreset = async (preset) => {
+  const handleExecutePresetClick = (preset) => {
+    setPresetToExecute(preset);
+    setExecuteQtyInput(preset.qty || 1);
     setIsPresetModalOpen(false);
+    setIsExecutePresetModalOpen(true);
+  };
+
+  const executePreset = async (e) => {
+    e.preventDefault();
+    if (!presetToExecute || !executeQtyInput) return;
+    setIsExecutePresetModalOpen(false);
+    const preset = presetToExecute;
+    const qtyToGenerate = parseInt(executeQtyInput);
+    
     setIsGenerating(true);
     const toastId = toast.loading('🚀 Menjalankan Preset: Generate Vouchers...');
     try {
@@ -159,7 +174,7 @@ const StockVoucher = ({ user }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           admin_username: user?.username || 'admin',
-          qty: preset.qty,
+          qty: qtyToGenerate,
           profile: preset.profile,
           length: preset.panjang_user,
           prefix: preset.prefix,
@@ -1078,7 +1093,6 @@ const StockVoucher = ({ user }) => {
                 <tr>
                   <th>Nama Preset</th>
                   <th>Profile</th>
-                  <th>QTY</th>
                   <th>Prefix / Panjang</th>
                   <th>Server</th>
                   <th>Aksi</th>
@@ -1086,17 +1100,16 @@ const StockVoucher = ({ user }) => {
               </thead>
               <tbody>
                 {presets.length === 0 ? (
-                  <tr><td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>Belum ada preset tersimpan. Anda bisa menyimpan preset dari form Generate Voucher.</td></tr>
+                  <tr><td colSpan="5" style={{ textAlign: 'center', padding: '2rem' }}>Belum ada preset tersimpan. Anda bisa menyimpan preset dari form Generate Voucher.</td></tr>
                 ) : (
                   presets.map((p, i) => (
                     <tr key={i} className="hoverable-row">
                       <td style={{ fontWeight: '700', color: 'white' }}>{p.preset_name}</td>
                       <td><span className="badge" style={{ background: 'var(--accent-primary)', fontWeight: '700' }}>{p.profile}</span></td>
-                      <td style={{ fontWeight: '700', color: '#10b981' }}>{p.qty} Pcs</td>
                       <td>{p.prefix || '-'} / {p.panjang_user} char</td>
                       <td>{p.server || 'All'}</td>
                       <td style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                        <button type="button" className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '4px' }} onClick={() => handleExecutePreset(p)}>
+                        <button type="button" className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '4px' }} onClick={() => handleExecutePresetClick(p)}>
                           <span className="material-symbols-rounded" style={{ fontSize: '1.1rem' }}>rocket_launch</span> Generate & Print
                         </button>
                         <button type="button" className="btn btn-danger" style={{ padding: '6px' }} onClick={() => handleDeletePreset(p.id)}>
@@ -1539,6 +1552,47 @@ const StockVoucher = ({ user }) => {
               <button type="submit" className="btn-glass-premium btn-green">
                 <span className="material-symbols-rounded">save</span>
                 Simpan
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {/* MODAL EXECUTE PRESET */}
+      <div className={`modal-overlay ${isExecutePresetModalOpen ? 'open' : ''}`} onClick={() => setIsExecutePresetModalOpen(false)}>
+        <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px' }}>
+          <div className="modal-header">
+            <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span className="material-symbols-rounded" style={{ color: '#10b981' }}>rocket_launch</span>
+              Generate Voucher
+            </h2>
+            <button className="modal-close" onClick={() => setIsExecutePresetModalOpen(false)}>&times;</button>
+          </div>
+          
+          <form onSubmit={executePreset}>
+            <div style={{ padding: '1.5rem 0' }}>
+              <label className="form-label">Berapa jumlah voucher yang ingin di-generate?</label>
+              <input 
+                type="number" 
+                className="form-input" 
+                min="1"
+                max="1000"
+                value={executeQtyInput}
+                onChange={e => setExecuteQtyInput(e.target.value)}
+                autoFocus
+                required 
+                style={{ fontSize: '1.2rem', padding: '12px', textAlign: 'center' }}
+              />
+              <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)', marginTop: '12px', textAlign: 'center' }}>
+                Preset: <strong>{presetToExecute?.preset_name}</strong>
+              </p>
+            </div>
+            
+            <div className="modal-footer" style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+              <button type="button" className="btn-glass-premium btn-red" onClick={() => setIsExecutePresetModalOpen(false)}>Batal</button>
+              <button type="submit" className="btn-glass-premium btn-green" disabled={isGenerating}>
+                <span className="material-symbols-rounded">play_arrow</span>
+                {isGenerating ? 'Memproses...' : 'Generate'}
               </button>
             </div>
           </form>
