@@ -302,7 +302,7 @@ const upgradePool = async (pool, name) => {
       ) ENGINE=InnoDB;
     `);
 
-    await pool.query(
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS generate_presets (
         id INT AUTO_INCREMENT PRIMARY KEY,
         preset_name VARCHAR(100) NOT NULL,
@@ -316,7 +316,7 @@ const upgradePool = async (pool, name) => {
         server VARCHAR(100) DEFAULT 'all',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       ) ENGINE=InnoDB;
-    );
+    `);
 
     // 10. Create Spam History (Long-term Memory) Table
     await pool.query(`
