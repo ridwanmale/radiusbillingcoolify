@@ -1141,7 +1141,7 @@ const StockVoucher = ({ user }) => {
                   <th style={{ width: '25%' }}>Nama Preset</th>
                   <th style={{ width: '20%' }}>Profile</th>
                   <th style={{ width: '15%' }}>Prefix / Panjang</th>
-                  <th style={{ width: '15%' }}>Server</th>
+                  <th style={{ width: '15%' }}>Outlet</th>
                   <th style={{ width: '25%', textAlign: 'center' }}>Aksi</th>
                 </tr>
               </thead>
@@ -1154,7 +1154,7 @@ const StockVoucher = ({ user }) => {
                       <td style={{ fontWeight: '700', color: 'white' }}>{p.preset_name}</td>
                       <td><span className="badge" style={{ background: 'var(--accent-primary)', fontWeight: '700' }}>{p.profile}</span></td>
                       <td>{p.prefix || '-'} <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>({p.panjang_user} char)</span></td>
-                      <td>{p.server || 'All'}</td>
+                      <td>{p.server || 'Semua'}</td>
                       <td style={{ display: 'flex', gap: '8px', justifyContent: 'center', whiteSpace: 'nowrap' }}>
                         <button type="button" className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '4px' }} onClick={() => handleExecutePresetClick(p)}>
                           <span className="material-symbols-rounded" style={{ fontSize: '1.1rem' }}>rocket_launch</span> Generate & Print
@@ -1721,13 +1721,13 @@ const StockVoucher = ({ user }) => {
                   </div>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Server / Outlet</label>
+                  <label className="form-label">Outlet Pemilik</label>
                   <select 
                     className="form-input"
                     value={editPresetFormData.server}
                     onChange={e => setEditPresetFormData({...editPresetFormData, server: e.target.value})}
                   >
-                    <option value="">-- All Server --</option>
+                    <option value="">-- Semua Outlet --</option>
                     {outlets.map(o => <option key={o.id} value={o.name}>{o.name}</option>)}
                   </select>
                 </div>
