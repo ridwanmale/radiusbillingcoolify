@@ -1122,7 +1122,7 @@ const StockVoucher = ({ user }) => {
 
       {/* MODAL PRINT CEPAT (PRESET) */}
       <div className={`modal-overlay ${isPresetModalOpen ? 'open' : ''}`} onClick={() => setIsPresetModalOpen(false)}>
-        <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '800px' }}>
+        <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '1100px', width: '95%' }}>
           <div className="modal-header">
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span className="material-symbols-rounded" style={{ color: '#10b981' }}>bolt</span>
@@ -1137,11 +1137,11 @@ const StockVoucher = ({ user }) => {
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Nama Preset</th>
-                  <th>Profile</th>
-                  <th>Prefix / Panjang</th>
-                  <th>Server</th>
-                  <th>Aksi</th>
+                  <th style={{ width: '25%' }}>Nama Preset</th>
+                  <th style={{ width: '20%' }}>Profile</th>
+                  <th style={{ width: '15%' }}>Prefix / Panjang</th>
+                  <th style={{ width: '15%' }}>Server</th>
+                  <th style={{ width: '25%', textAlign: 'center' }}>Aksi</th>
                 </tr>
               </thead>
               <tbody>
@@ -1152,16 +1152,16 @@ const StockVoucher = ({ user }) => {
                     <tr key={i} className="hoverable-row">
                       <td style={{ fontWeight: '700', color: 'white' }}>{p.preset_name}</td>
                       <td><span className="badge" style={{ background: 'var(--accent-primary)', fontWeight: '700' }}>{p.profile}</span></td>
-                      <td>{p.prefix || '-'} / {p.panjang_user} char</td>
+                      <td>{p.prefix || '-'} <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>({p.panjang_user} char)</span></td>
                       <td>{p.server || 'All'}</td>
-                      <td style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                      <td style={{ display: 'flex', gap: '8px', justifyContent: 'center', whiteSpace: 'nowrap' }}>
                         <button type="button" className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '4px' }} onClick={() => handleExecutePresetClick(p)}>
                           <span className="material-symbols-rounded" style={{ fontSize: '1.1rem' }}>rocket_launch</span> Generate & Print
                         </button>
-                        <button type="button" className="btn btn-warning" style={{ padding: '6px', background: '#f59e0b', color: 'white', border: 'none' }} onClick={() => handleEditPresetClick(p)}>
+                        <button type="button" className="btn btn-warning" style={{ padding: '6px', background: '#f59e0b', color: 'white', border: 'none' }} title="Edit Preset" onClick={() => handleEditPresetClick(p)}>
                           <span className="material-symbols-rounded" style={{ fontSize: '1.1rem' }}>edit</span>
                         </button>
-                        <button type="button" className="btn btn-danger" style={{ padding: '6px' }} onClick={() => handleDeletePreset(p.id)}>
+                        <button type="button" className="btn btn-danger" style={{ padding: '6px' }} title="Hapus Preset" onClick={() => handleDeletePreset(p.id)}>
                           <span className="material-symbols-rounded" style={{ fontSize: '1.1rem' }}>delete</span>
                         </button>
                       </td>
