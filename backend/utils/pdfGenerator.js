@@ -58,10 +58,23 @@ const generateVoucherPDF = async (batchId, templateId) => {
     // Generate PDF (A4 format, no margins since the template handles it)
     console.log(`[PDF Generator] Rendering PDF...`);
     const renderStartTime = Date.now();
+    // Extract actual body width and height to force PDF size to match
+    const dimensions = await page.evaluate(() => {
+      // Find the template wrapper to get exact dimensions if available
+      const wrapper = document.querySelector('.grid-25') || document.body;
+      return {
+        width: wrapper.scrollWidth,
+        height: wrapper.scrollHeight
+      };
+    });
+
+    console.log(`[PDF Generator] Extracted dimensions from DOM: ${dimensions.width}px x ${dimensions.height}px`);
+
     const pdfBuffer = await page.pdf({
+      width: `${dimensions.width}px`,
+      height: `${dimensions.height}px`,
       printBackground: true,
-      margin: { top: '0px', right: '0px', bottom: '0px', left: '0px' },
-      preferCSSPageSize: true // Respects @page { size: landscape; } if defined in CSS
+      margin: { top: '0px', right: '0px', bottom: '0px', left: '0px' }
     });
 
     console.log(`[PDF Generator] PDF successfully generated (${pdfBuffer.length} bytes) in ${Date.now() - renderStartTime}ms. Total time: ${Date.now() - startTime}ms`);
