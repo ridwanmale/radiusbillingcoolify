@@ -65,12 +65,16 @@ const sendTelegramDocument = async (token, chatId, documentBuffer, filename, cap
     form.append('chat_id', chatId);
     form.append('caption', caption);
     form.append('parse_mode', 'HTML');
-    form.append('document', documentBuffer, { filename, contentType: 'application/pdf' });
+    
+    // Puppeteer returns Uint8Array, form-data expects a proper Node Buffer
+    const buffer = Buffer.isBuffer(documentBuffer) ? documentBuffer : Buffer.from(documentBuffer);
+    
+    form.append('document', buffer, { filename, contentType: 'application/pdf', knownLength: buffer.length });
 
     const response = await fetch(`https://api.telegram.org/bot${token}/sendDocument`, {
       method: 'POST',
       body: form,
-      timeout: 30000 // 30s timeout for large uploads
+      timeout: 60000 // 60s timeout for large uploads
     });
     
     const result = await response.json();
