@@ -154,6 +154,7 @@ const StockVoucher = ({ user }) => {
       server: preset.server || '',
       template_id: preset.template_id || '',
       prefix: preset.prefix || '',
+      charset_type: preset.charset_type || 'mix',
       panjang_user: preset.panjang_user || 6,
       panjang_pass: preset.panjang_pass || 6
     });
@@ -1693,6 +1694,22 @@ const StockVoucher = ({ user }) => {
                       value={editPresetFormData.prefix}
                       onChange={e => setEditPresetFormData({...editPresetFormData, prefix: e.target.value})}
                     />
+                  </div>
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label className="form-label">Kombinasi Karakter</label>
+                    <select 
+                      className="form-input" 
+                      value={editPresetFormData.charset_type}
+                      onChange={e => setEditPresetFormData({...editPresetFormData, charset_type: e.target.value})}
+                      required
+                    >
+                      <option value="numeric">Hanya Angka</option>
+                      <option value="alpha">Huruf Kecil</option>
+                      <option value="uppercase">Huruf Besar</option>
+                      <option value="upalpha">Huruf Besar & Angka</option>
+                      <option value="alphanumeric">Huruf Kecil & Angka</option>
+                      <option value="mix">Acak Campuran</option>
+                    </select>
                   </div>
                   <div className="form-group" style={{ flex: 1 }}>
                     <label className="form-label">Panjang</label>
