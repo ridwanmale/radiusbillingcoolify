@@ -39,8 +39,8 @@ const generateVoucherPDF = async (batchId, templateId) => {
     // Set a realistic viewport
     await page.setViewport({ width: 1200, height: 800 });
 
-    // Go to the URL and wait for the network to be mostly idle
-    await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
+    // Go to the URL and wait for the DOM to load
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
 
     // Wait for the specific print template layout to be rendered to be totally sure
     await page.waitForSelector('.print-page-layout', { timeout: 10000 }).catch(() => console.log('Timeout waiting for .print-page-layout'));
