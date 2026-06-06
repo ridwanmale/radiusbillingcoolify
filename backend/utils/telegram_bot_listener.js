@@ -271,8 +271,8 @@ const handleGenerateCommands = async (token, chatId, commandText) => {
       const presetId = parts[1];
       const qty = parseInt(parts[2]) || 1;
       
-      if (!presetId || isNaN(qty) || qty < 1 || qty > 100) {
-        return await sendTelegramNotification(token, chatId, `⚠️ <b>Format Salah.</b>\nGunakan: <code>/gen [ID_PRESET] [JUMLAH]</code>\nMaksimal 100 voucher sekali generate.`);
+      if (!presetId || isNaN(qty) || qty < 1 || qty > 1000) {
+        return await sendTelegramNotification(token, chatId, `⚠️ <b>Format Salah.</b>\nGunakan: <code>/gen [ID_PRESET] [JUMLAH]</code>\nMaksimal 1000 voucher sekali generate.`);
       }
       
       // Fetch preset
