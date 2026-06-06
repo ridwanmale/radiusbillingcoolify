@@ -1695,20 +1695,18 @@ const StockVoucher = ({ user }) => {
                       onChange={e => setEditPresetFormData({...editPresetFormData, prefix: e.target.value})}
                     />
                   </div>
-                  <div className="form-group" style={{ flex: 1 }}>
-                    <label className="form-label">Kombinasi Karakter</label>
+                  <div className="form-group" style={{ flex: 2 }}>
+                    <label className="form-label">Kode Kombinasi</label>
                     <select 
                       className="form-input" 
                       value={editPresetFormData.charset_type}
                       onChange={e => setEditPresetFormData({...editPresetFormData, charset_type: e.target.value})}
                       required
                     >
-                      <option value="numeric">Hanya Angka</option>
-                      <option value="alpha">Huruf Kecil</option>
-                      <option value="uppercase">Huruf Besar</option>
-                      <option value="upalpha">Huruf Besar & Angka</option>
-                      <option value="alphanumeric">Huruf Kecil & Angka</option>
-                      <option value="mix">Acak Campuran</option>
+                      <option value="lower">Huruf Kecil (abcdefg...)</option>
+                      <option value="upper">Huruf Kapital (ABCDEFG...)</option>
+                      <option value="numeric">Angka Saja (123456...)</option>
+                      <option value="alpha_num">Angka & Huruf</option>
                     </select>
                   </div>
                   <div className="form-group" style={{ flex: 1 }}>
