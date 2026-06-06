@@ -59,8 +59,6 @@ const generateVoucherPDF = async (batchId, templateId) => {
     console.log(`[PDF Generator] Rendering PDF...`);
     const renderStartTime = Date.now();
     const pdfBuffer = await page.pdf({
-      format: 'A4',
-      landscape: true,
       printBackground: true,
       margin: { top: '0px', right: '0px', bottom: '0px', left: '0px' },
       preferCSSPageSize: true // Respects @page { size: landscape; } if defined in CSS
