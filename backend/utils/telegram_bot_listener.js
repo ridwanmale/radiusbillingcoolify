@@ -66,6 +66,7 @@ const initTelegramBotListener = () => {
                 '🎟 Penjualan Hari Ini': '/penjualan_hari_ini',
                 '📆 Penjualan Bulan Ini': '/penjualan_bulan_ini',
                 '👥 User Aktif': '/user_aktif',
+                '🖨 Generate Voucher': '/preset_menu',
                 '❓ Bantuan': '/help'
               };
 
@@ -85,22 +86,26 @@ const initTelegramBotListener = () => {
                                 `📅 <code>/pendapatan_bulan_ini</code>\n` +
                                 `🎟 <code>/penjualan_hari_ini</code>\n` +
                                 `📆 <code>/penjualan_bulan_ini</code>\n` +
-                                `👥 <code>/user_aktif</code>\n`;
+                                `👥 <code>/user_aktif</code>\n` +
+                                `🖨 <code>/preset_menu</code>\n`;
                   
                   replyMarkup = {
                     keyboard: [
                       [{ text: '💰 Pendapatan Hari Ini' }, { text: '📅 Pendapatan Bulan Ini' }],
                       [{ text: '🎟 Penjualan Hari Ini' }, { text: '📆 Penjualan Bulan Ini' }],
-                      [{ text: '👥 User Aktif' }, { text: '❓ Bantuan' }]
+                      [{ text: '🖨 Generate Voucher' }, { text: '👥 User Aktif' }],
+                      [{ text: '❓ Bantuan' }]
                     ],
                     resize_keyboard: true,
                     one_time_keyboard: false
                   };
                 }
                 welcomeMsg += `\n❓ <code>/help</code> - Bantuan`;
-                await sendTelegramNotification(token, chatId, welcomeMsg, replyMarkup);
+                await require('./telegram').sendTelegramNotification(token, chatId, welcomeMsg, replyMarkup);
               } else if (isAdminBot && (cleanText.startsWith('/pendapatan') || cleanText.startsWith('/penjualan') || cleanText === '/user_aktif')) {
                 await handleAdminCommands(token, chatId, cleanText);
+              } else if (isAdminBot && (cleanText === '/preset_menu' || cleanText.startsWith('/gen'))) {
+                await handleGenerateCommands(token, chatId, cleanText);
               } else {
                 let voucherCode = '';
                 if (cleanText.startsWith('/cek ') || cleanText.startsWith('/status ')) voucherCode = cleanText.split(/\s+/)[1];
@@ -234,6 +239,126 @@ const handleAdminCommands = async (token, chatId, commandText) => {
     }
   } catch (err) {
     console.error(err.message);
+    await sendTelegramNotification(token, chatId, `⚠️ <b>GAGAL:</b> ${err.message}`);
+  }
+};
+
+const handleGenerateCommands = async (token, chatId, commandText) => {
+  try {
+    const { sendTelegramNotification, sendTelegramDocument } = require('./telegram');
+    
+    if (commandText === '/preset_menu') {
+      const [presets] = await db.query('SELECT * FROM generate_presets ORDER BY id ASC');
+      if (presets.length === 0) {
+        return await sendTelegramNotification(token, chatId, `⚠️ <b>Belum ada Preset.</b>\nSilakan buat Preset di menu Print Cepat terlebih dahulu.`);
+      }
+      
+      let msg = `🖨 <b>DAFTAR PRESET VOUCHER</b>\n\n`;
+      presets.forEach(p => {
+        msg += `<b>ID: ${p.id}</b> - ${p.preset_name}\n`;
+        msg += `└ Profile: ${p.profile} | Panjang: ${p.panjang_user}\n`;
+      });
+      
+      msg += `\n👉 <b>CARA GENERATE & PRINT:</b>\n`;
+      msg += `Ketik perintah: <code>/gen [ID_PRESET] [JUMLAH]</code>\n`;
+      msg += `Contoh (bikin 10 pcs dari Preset ID 1): <code>/gen 1 10</code>`;
+      
+      return await sendTelegramNotification(token, chatId, msg);
+    }
+    
+    if (commandText.startsWith('/gen')) {
+      const parts = commandText.split(/\s+/);
+      const presetId = parts[1];
+      const qty = parseInt(parts[2]) || 1;
+      
+      if (!presetId || isNaN(qty) || qty < 1 || qty > 100) {
+        return await sendTelegramNotification(token, chatId, `⚠️ <b>Format Salah.</b>\nGunakan: <code>/gen [ID_PRESET] [JUMLAH]</code>\nMaksimal 100 voucher sekali generate.`);
+      }
+      
+      // Fetch preset
+      const [presets] = await db.query('SELECT * FROM generate_presets WHERE id = ?', [presetId]);
+      if (presets.length === 0) {
+        return await sendTelegramNotification(token, chatId, `⚠️ <b>Preset ID ${presetId} tidak ditemukan.</b>`);
+      }
+      
+      const p = presets[0];
+      await sendTelegramNotification(token, chatId, `⏳ <b>Memproses...</b>\nMembuat ${qty} Voucher dari Preset: ${p.preset_name}...`);
+      
+      // Generate Logic (Copied from backend/routes/vouchers.js)
+      const generateCode = (length, charsetType) => {
+        let charset = '';
+        switch (charsetType) {
+          case 'lower': charset = 'abcdefghjkmnpqrstuvwxyz'; break;
+          case 'upper': charset = 'ABCDEFGHJKMNPQRSTUVWXYZ'; break;
+          case 'numeric': charset = '123456789'; break;
+          case 'alpha_num': default: charset = '123456789abcdefghjkmnpqrstuvwxyz'; break;
+        }
+        let result = '';
+        for (let i = 0; i < length; i++) {
+          if (charsetType === 'alpha_num' && i === 0) {
+            result += '123456789'.charAt(Math.floor(Math.random() * 9));
+          } else {
+            result += charset.charAt(Math.floor(Math.random() * charset.length));
+          }
+        }
+        return result;
+      };
+
+      const connection = await db.getConnection();
+      try {
+        await connection.beginTransaction();
+        const batch_id = 'TGBOT-' + Date.now().toString().slice(-6) + Math.floor(Math.random() * 1000);
+        let successCount = 0;
+        
+        for (let i = 0; i < qty; i++) {
+          let uniqueCode = '';
+          let isUnique = false;
+          let attempts = 0;
+          while (!isUnique && attempts < 10) {
+            const rawCode = generateCode(p.panjang_user || 6, p.charset_type || 'alpha_num');
+            uniqueCode = (p.prefix || '') + rawCode;
+            const [exist] = await connection.query('SELECT 1 FROM radcheck WHERE username = ?', [uniqueCode]);
+            if (exist.length === 0) isUnique = true;
+            attempts++;
+          }
+          if (!isUnique) continue;
+          
+          await connection.query('INSERT INTO radcheck (username, attribute, op, value) VALUES (?, "Cleartext-Password", ":=", ?)', [uniqueCode, uniqueCode]);
+          await connection.query('INSERT INTO radusergroup (username, groupname, priority) VALUES (?, ?, ?)', [uniqueCode, p.profile, 1]);
+          await connection.query('INSERT INTO rincian_transaksi_voucher (username, batch_id, outlet_name, status) VALUES (?, ?, ?, "Aktif")', [uniqueCode, batch_id, p.server === 'all' ? '' : (p.server || '')]);
+          successCount++;
+        }
+        await connection.commit();
+        connection.release();
+
+        if (successCount === 0) {
+          return await sendTelegramNotification(token, chatId, `⚠️ <b>Gagal membuat voucher.</b> Silakan coba lagi.`);
+        }
+        
+        // Notify success and start generating PDF
+        await sendTelegramNotification(token, chatId, `✅ <b>Berhasil Membuat ${successCount} Voucher!</b>\nSedang menyiapkan berkas PDF untuk dicetak, mohon tunggu sebentar...`);
+        
+        const { generateVoucherPDF } = require('./pdfGenerator');
+        try {
+          const pdfBuffer = await generateVoucherPDF(batch_id, p.template_id);
+          const filename = `Vouchers_${p.preset_name.replace(/\\s+/g, '_')}_${successCount}pcs.pdf`;
+          
+          await sendTelegramDocument(token, chatId, pdfBuffer, filename, `📄 Berikut adalah file siap cetak untuk ${successCount} Voucher Anda.\nBatch ID: ${batch_id}`);
+        } catch (pdfErr) {
+          console.error('PDF Gen Error:', pdfErr);
+          await sendTelegramNotification(token, chatId, `⚠️ <b>Berhasil membuat voucher, namun gagal generate PDF.</b>\nCetak manual via Web di Print Cepat.`);
+        }
+
+      } catch (genErr) {
+        await connection.rollback();
+        connection.release();
+        console.error('Generate Vouchers Error:', genErr);
+        await sendTelegramNotification(token, chatId, `⚠️ <b>Error:</b> ${genErr.message}`);
+      }
+    }
+  } catch (err) {
+    console.error(err.message);
+    const { sendTelegramNotification } = require('./telegram');
     await sendTelegramNotification(token, chatId, `⚠️ <b>GAGAL:</b> ${err.message}`);
   }
 };

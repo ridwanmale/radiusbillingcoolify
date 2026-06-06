@@ -54,7 +54,39 @@ const notifyTelegram = async (message, outletName = 'Global') => {
   }
 };
 
+const FormData = require('form-data');
+
+/**
+ * Send a Document (e.g. PDF buffer) via Telegram Bot
+ */
+const sendTelegramDocument = async (token, chatId, documentBuffer, filename, caption = '') => {
+  try {
+    const form = new FormData();
+    form.append('chat_id', chatId);
+    form.append('caption', caption);
+    form.append('parse_mode', 'HTML');
+    form.append('document', documentBuffer, { filename, contentType: 'application/pdf' });
+
+    const response = await fetch(`https://api.telegram.org/bot${token}/sendDocument`, {
+      method: 'POST',
+      body: form,
+      timeout: 30000 // 30s timeout for large uploads
+    });
+    
+    const result = await response.json();
+    if (!result.ok) {
+      console.error('[Telegram] API Error (sendDocument):', result.description);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('[Telegram] Connection Error (sendDocument):', err.message);
+    return false;
+  }
+};
+
 module.exports = {
   sendTelegramNotification,
-  notifyTelegram
+  notifyTelegram,
+  sendTelegramDocument
 };

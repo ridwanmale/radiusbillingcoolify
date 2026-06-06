@@ -147,8 +147,10 @@ const generateCode = (length, charsetType) => {
 // Get all vouchers
 router.get('/', async (req, res) => {
   const connection = await db.getConnection();
+  const filterPrintCode = req.query.filterPrintCode;
+  
   try {
-    const [rows] = await connection.query(`
+    let sql = `
       SELECT 
         vm.username as voucher_code,
         vm.batch_id as kode_print,
@@ -167,8 +169,17 @@ router.get('/', async (req, res) => {
       LEFT JOIN profiles_metadata pm ON rug.groupname = pm.groupname
       LEFT JOIN users_device_policy udp ON vm.username = udp.username
       WHERE COALESCE(vm.status, 'Aktif') IN ('Aktif', 'Nonaktif')
-      ORDER BY vm.created_at DESC
-    `);
+    `;
+    let params = [];
+    
+    if (filterPrintCode) {
+      sql += ` AND vm.batch_id = ? `;
+      params.push(filterPrintCode);
+    }
+    
+    sql += ` ORDER BY vm.created_at DESC`;
+
+    const [rows] = await connection.query(sql, params);
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
