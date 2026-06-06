@@ -19,6 +19,7 @@ const generateVoucherPDF = async (batchId, templateId) => {
       url += `&template_id=${encodeURIComponent(templateId)}`;
     }
 
+    const startTime = Date.now();
     console.log(`[PDF Generator] Launching Chromium to generate PDF for URL: ${url}`);
     
     // Launch headless Chromium (using the one installed in Alpine)
@@ -29,34 +30,41 @@ const generateVoucherPDF = async (batchId, templateId) => {
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage', // Helps with low RAM
         '--disable-gpu',
-        '--no-zygote'
+        '--no-zygote',
+        '--single-process'
       ],
       headless: 'new'
     });
 
+    console.log(`[PDF Generator] Browser launched in ${Date.now() - startTime}ms`);
+    const pageStartTime = Date.now();
     const page = await browser.newPage();
     
     // Set a realistic viewport
     await page.setViewport({ width: 1200, height: 800 });
 
     // Go to the URL and wait for the DOM to load
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 }).catch(e => console.log('Goto timeout/error:', e.message));
+    console.log(`[PDF Generator] Page loaded in ${Date.now() - pageStartTime}ms`);
 
     // Wait for the specific print template layout to be rendered to be totally sure
+    const waitStartTime = Date.now();
     await page.waitForSelector('.print-page-layout', { timeout: 10000 }).catch(() => console.log('Timeout waiting for .print-page-layout'));
+    console.log(`[PDF Generator] Selector found in ${Date.now() - waitStartTime}ms`);
 
     // We add an artificial delay to allow any fonts or images to finish rendering completely
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     // Generate PDF (A4 format, no margins since the template handles it)
     console.log(`[PDF Generator] Rendering PDF...`);
+    const renderStartTime = Date.now();
     const pdfBuffer = await page.pdf({
       format: 'A4',
       printBackground: true,
       margin: { top: '0px', right: '0px', bottom: '0px', left: '0px' }
     });
 
-    console.log(`[PDF Generator] PDF successfully generated (${pdfBuffer.length} bytes).`);
+    console.log(`[PDF Generator] PDF successfully generated (${pdfBuffer.length} bytes) in ${Date.now() - renderStartTime}ms. Total time: ${Date.now() - startTime}ms`);
     return pdfBuffer;
 
   } catch (error) {
