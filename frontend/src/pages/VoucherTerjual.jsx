@@ -197,12 +197,19 @@ const VoucherTerjual = () => {
 
   const formatSisaWaktu = (seconds) => {
     const s = parseInt(seconds);
-    if (isNaN(s) || s <= 0) return '00:00:00:00';
+    if (isNaN(s) || s <= 0) return '0 Dtk';
     const d = Math.floor(s / 86400);
     const h = Math.floor((s % 86400) / 3600);
     const m = Math.floor((s % 3600) / 60);
     const sec = s % 60;
-    return `${String(d).padStart(2, '0')}:${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+    
+    let parts = [];
+    if (d > 0) parts.push(`${d} Hari`);
+    if (h > 0 || d > 0) parts.push(`${h} Jam`);
+    if (m > 0 || h > 0 || d > 0) parts.push(`${m} Mnt`);
+    parts.push(`${sec} Dtk`);
+    
+    return parts.join(' ');
   };
 
   const formatRupiah = (number) => {
