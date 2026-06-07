@@ -4,6 +4,8 @@ import { formatDateTime } from '../utils/dateFormatter';
 
 const RekapVoucher = () => {
   const [rekapList, setRekapList] = useState([]);
+  const [templates, setTemplates] = useState([]);
+  const [selectedTemplate, setSelectedTemplate] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const today = new Date();
@@ -24,7 +26,6 @@ const RekapVoucher = () => {
   const fetchRekap = async () => {
     setIsLoading(true);
     try {
-      const host = window.location.hostname;
       const res = await fetch(`/api/rekap`);
       const data = await res.json();
       if (Array.isArray(data)) {
@@ -40,8 +41,22 @@ const RekapVoucher = () => {
     }
   };
 
+  const fetchTemplates = async () => {
+    try {
+      const res = await fetch(`/api/settings/templates`);
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setTemplates(data);
+        if (data.length > 0) setSelectedTemplate(data[0].id);
+      }
+    } catch (err) {
+      console.error('Failed to fetch templates', err);
+    }
+  };
+
   useEffect(() => {
     fetchRekap();
+    fetchTemplates();
   }, []);
 
   const openModal = (batch) => {
@@ -288,23 +303,52 @@ const RekapVoucher = () => {
                 <li><strong>Total Laba (Potensi):</strong> <span style={{ color: 'var(--accent-primary)', fontWeight: 'bold' }}>{formatRupiah(selectedBatch.total_laba)}</span></li>
               </ul>
 
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
-                <button 
-                  className="btn btn-danger" 
-                  style={{ flex: 1, padding: '1rem', background: '#d97706' }} 
-                  onClick={() => handleDelete('sisa')}
-                  disabled={selectedBatch.sisa_stock === 0}
-                >
-                  🗑️ Hapus Sisa Stock
-                </button>
-                <button 
-                  className="btn btn-danger" 
-                  style={{ flex: 1, padding: '1rem' }} 
-                  onClick={() => handleDelete('terjual')}
-                  disabled={selectedBatch.terjual === 0}
-                >
-                  🗑️ Hapus Terjual
-                </button>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '2rem' }}>
+                <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  <label style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Cetak Ulang (Reprint)</label>
+                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    <select 
+                      className="form-input" 
+                      value={selectedTemplate} 
+                      onChange={e => setSelectedTemplate(e.target.value)}
+                      style={{ flex: 1, background: 'rgba(255,255,255,0.05)', fontSize: '0.9rem', padding: '0.6rem' }}
+                    >
+                      {templates.length === 0 && <option value="">Memuat template...</option>}
+                      {templates.map(t => (
+                        <option key={t.id} value={t.id} style={{ background: '#1e1b1e' }}>{t.name}</option>
+                      ))}
+                    </select>
+                    <button 
+                      className="btn btn-primary" 
+                      style={{ padding: '0.6rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                      onClick={() => {
+                        window.open(`/print?batch_id=${encodeURIComponent(selectedBatch.kode_print)}&template_id=${selectedTemplate}`, '_blank');
+                      }}
+                      disabled={!selectedTemplate}
+                    >
+                      <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>print</span> Print
+                    </button>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <button 
+                    className="btn btn-danger" 
+                    style={{ flex: 1, padding: '1rem', background: '#d97706' }} 
+                    onClick={() => handleDelete('sisa')}
+                    disabled={selectedBatch.sisa_stock === 0}
+                  >
+                    🗑️ Hapus Sisa Stock
+                  </button>
+                  <button 
+                    className="btn btn-danger" 
+                    style={{ flex: 1, padding: '1rem' }} 
+                    onClick={() => handleDelete('terjual')}
+                    disabled={selectedBatch.terjual === 0}
+                  >
+                    🗑️ Hapus Terjual
+                  </button>
+                </div>
               </div>
             </div>
           )}
