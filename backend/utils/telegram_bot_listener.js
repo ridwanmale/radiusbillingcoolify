@@ -329,6 +329,14 @@ const handleGenerateCommands = async (token, chatId, commandText) => {
           
           successCount++;
         }
+        
+        if (successCount > 0) {
+          await connection.query(
+            'INSERT INTO activity_log (admin_username, action, details, ip_address) VALUES (?, ?, ?, ?)', 
+            ['Bot Telegram', 'GENERATE_VOUCHER', `Berhasil generate ${successCount} Voucher untuk profile ${p.profile} via Bot Telegram`, chatId.toString()]
+          );
+        }
+
         await connection.commit();
         connection.release();
 
