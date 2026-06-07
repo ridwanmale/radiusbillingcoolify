@@ -154,17 +154,20 @@ router.get('/', async (req, res) => {
       SELECT 
         vm.username as voucher_code,
         vm.batch_id as kode_print,
-        (SELECT value FROM radcheck WHERE username = vm.username AND attribute = 'Cleartext-Password' LIMIT 1) as password,
-        rug.groupname as profile,
+        MAX(rc_pass.value) as password,
+        MAX(rug.groupname) as profile,
         vm.created_at,
         vm.outlet_name,
         COALESCE(vm.status, 'Aktif') as status,
-        CASE WHEN EXISTS(SELECT 1 FROM radcheck rc2 WHERE rc2.username = vm.username AND rc2.attribute = 'Calling-Station-Id') THEN 1 ELSE 0 END as is_locked,
-        CASE WHEN EXISTS(SELECT 1 FROM radreply rr WHERE rr.username = vm.username AND rr.value = 'MAC_LOCK_ENABLED') THEN 1 ELSE 0 END as mac_lock_enabled,
-        COALESCE(pm.shared_users, 1) as shared_users,
-        udp.device_mode,
-        udp.max_shared_session
+        MAX(CASE WHEN rc_mac.username IS NOT NULL THEN 1 ELSE 0 END) as is_locked,
+        MAX(CASE WHEN rr_mac.username IS NOT NULL THEN 1 ELSE 0 END) as mac_lock_enabled,
+        COALESCE(MAX(pm.shared_users), 1) as shared_users,
+        MAX(udp.device_mode) as device_mode,
+        MAX(udp.max_shared_session) as max_shared_session
       FROM rincian_transaksi_voucher vm
+      LEFT JOIN radcheck rc_pass ON vm.username = rc_pass.username AND rc_pass.attribute = 'Cleartext-Password'
+      LEFT JOIN radcheck rc_mac ON vm.username = rc_mac.username AND rc_mac.attribute = 'Calling-Station-Id'
+      LEFT JOIN radreply rr_mac ON vm.username = rr_mac.username AND rr_mac.value = 'MAC_LOCK_ENABLED'
       LEFT JOIN radusergroup rug ON vm.username = rug.username
       LEFT JOIN profiles_metadata pm ON rug.groupname = pm.groupname
       LEFT JOIN users_device_policy udp ON vm.username = udp.username
@@ -177,7 +180,7 @@ router.get('/', async (req, res) => {
       params.push(filterPrintCode);
     }
     
-    sql += ` ORDER BY vm.created_at DESC`;
+    sql += ` GROUP BY vm.username, vm.batch_id, vm.created_at, vm.outlet_name, vm.status ORDER BY vm.created_at DESC`;
 
     const [rows] = await connection.query(sql, params);
     res.json(rows);
