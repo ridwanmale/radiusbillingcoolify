@@ -15,7 +15,7 @@ const WhatsAppGateway = () => {
   
   const [isLoading, setIsLoading] = useState(false);
   const [testPhone, setTestPhone] = useState('');
-  const [testMessage, setTestMessage] = useState('Halo dari RadiusBilling WhatsApp Gateway!');
+  const [testMessage, setTestMessage] = useState('Halo dari ARMRADIUS WhatsApp Gateway!');
 
   useEffect(() => {
     fetchSettings();
