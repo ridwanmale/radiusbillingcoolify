@@ -309,6 +309,7 @@ const handleGenerateCommands = async (token, chatId, commandText) => {
         await connection.beginTransaction();
         const batch_id = 'TGBOT-' + Date.now().toString().slice(-6) + Math.floor(Math.random() * 1000);
         let successCount = 0;
+        const generatedCodes = [];
         
         for (let i = 0; i < qty; i++) {
           let uniqueCode = '';
@@ -326,6 +327,8 @@ const handleGenerateCommands = async (token, chatId, commandText) => {
           await connection.query('INSERT INTO radcheck (username, attribute, op, value) VALUES (?, "Cleartext-Password", ":=", ?)', [uniqueCode, uniqueCode]);
           await connection.query('INSERT INTO radusergroup (username, groupname, priority) VALUES (?, ?, ?)', [uniqueCode, p.profile, 1]);
           await connection.query('INSERT INTO rincian_transaksi_voucher (username, batch_id, outlet_name, status) VALUES (?, ?, ?, "Aktif")', [uniqueCode, batch_id, p.server === 'all' ? '' : (p.server || '')]);
+          
+          generatedCodes.push(uniqueCode);
           successCount++;
         }
         await connection.commit();
@@ -344,6 +347,16 @@ const handleGenerateCommands = async (token, chatId, commandText) => {
           const filename = `Vouchers_${p.preset_name.replace(/\\s+/g, '_')}_${successCount}pcs.pdf`;
           
           await sendTelegramDocument(token, chatId, pdfBuffer, filename, `📄 Berikut adalah file siap cetak untuk ${successCount} Voucher Anda.\nBatch ID: ${batch_id}`);
+          
+          // Send the actual text codes
+          const codesText = generatedCodes.map((c, i) => `${i+1}. ${c}`).join('\n');
+          if (generatedCodes.length <= 100) {
+            const codesMsg = `🎟 <b>Daftar Kode Voucher:</b>\n<code>${codesText}</code>`;
+            await sendTelegramNotification(token, chatId, codesMsg);
+          } else {
+            const txtBuffer = Buffer.from(`Daftar Kode Voucher (${successCount} pcs) - Batch ID: ${batch_id}\n\n${codesText}`);
+            await sendTelegramDocument(token, chatId, txtBuffer, `Kode_Voucher_${batch_id}.txt`, `📄 File Teks daftar kode voucher (${successCount} pcs)`);
+          }
         } catch (pdfErr) {
           console.error('PDF Gen Error:', pdfErr);
           await sendTelegramNotification(token, chatId, `⚠️ <b>Berhasil membuat voucher, namun gagal generate PDF.</b>\nCetak manual via Web di Print Cepat.`);
