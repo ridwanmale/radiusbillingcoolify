@@ -117,179 +117,416 @@ const WhatsAppGateway = () => {
   };
 
   return (
-    <div className="settings-container" style={{ padding: '2rem' }}>
-      <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <span className="material-symbols-rounded" style={{ fontSize: '2rem', color: '#10b981' }}>forum</span>
-        WhatsApp Gateway Hub
-      </h1>
-      <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>
-        Pilih engine pengiriman WhatsApp Anda. Gunakan <b>API Pihak Ketiga</b> untuk meringankan server, atau gunakan <b>Internal Engine (Baileys)</b> untuk pengiriman gratis dari nomor Anda sendiri.
-      </p>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+    <div style={{ 
+      backgroundColor: '#010102', 
+      minHeight: '100vh', 
+      color: '#f7f8f8', 
+      fontFamily: 'Inter, SF Pro Display, -apple-system, sans-serif',
+      padding: '48px 32px'
+    }}>
+      <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
         
-        {/* Settings Panel */}
-        <div className="card glass-card" style={{ padding: '1.5rem' }}>
-          <h2 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span className="material-symbols-rounded" style={{ color: 'var(--accent-primary)' }}>settings</span>
-            Konfigurasi Utama
-          </h2>
+        <header style={{ marginBottom: '48px' }}>
+          <h1 style={{ 
+            fontSize: '40px', 
+            fontWeight: 600, 
+            lineHeight: 1.15, 
+            letterSpacing: '-1.0px', 
+            margin: 0,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <span className="material-symbols-rounded" style={{ color: '#5e6ad2', fontSize: '36px' }}>forum</span>
+            WhatsApp Gateway Hub
+          </h1>
+          <p style={{ 
+            color: '#d0d6e0', 
+            fontSize: '20px', 
+            fontWeight: 400, 
+            lineHeight: 1.4, 
+            letterSpacing: '-0.2px',
+            marginTop: '16px',
+            maxWidth: '600px'
+          }}>
+            Pilih engine pengiriman pesan. Gunakan API Pihak Ketiga untuk server ringan, atau Internal Engine untuk pengiriman gratis dari nomor Anda sendiri.
+          </p>
+        </header>
 
-          <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
-              <input 
-                type="checkbox" 
-                checked={settings.is_enabled === 1}
-                onChange={(e) => setSettings({...settings, is_enabled: e.target.checked ? 1 : 0})}
-                style={{ width: '20px', height: '20px', accentColor: '#10b981' }}
-              />
-              <span style={{ fontWeight: 'bold' }}>Aktifkan WhatsApp Gateway</span>
-            </label>
-          </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px' }}>
+          
+          {/* Settings Panel */}
+          <div style={{ 
+            backgroundColor: '#0f1011', 
+            border: '1px solid #23252a', 
+            borderRadius: '12px', 
+            padding: '24px' 
+          }}>
+            <h2 style={{ 
+              fontSize: '22px', 
+              fontWeight: 500, 
+              lineHeight: 1.25, 
+              letterSpacing: '-0.4px', 
+              margin: '0 0 24px 0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <span className="material-symbols-rounded" style={{ color: '#8a8f98', fontSize: '20px' }}>settings</span>
+              Konfigurasi Utama
+            </h2>
 
-          <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-            <label>Pilih Provider Engine</label>
-            <select 
-              value={settings.provider_type} 
-              onChange={(e) => setSettings({...settings, provider_type: e.target.value})}
-              className="form-control"
-              style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.2)', color: 'white', width: '100%' }}
-            >
-              <option value="baileys">Internal Engine (Baileys - Gratis)</option>
-              <option value="fonnte">API Fonnte (Ringan di Server)</option>
-            </select>
-          </div>
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '12px', 
+                cursor: 'pointer',
+                fontSize: '16px',
+                color: '#f7f8f8'
+              }}>
+                <input 
+                  type="checkbox" 
+                  checked={settings.is_enabled === 1}
+                  onChange={(e) => setSettings({...settings, is_enabled: e.target.checked ? 1 : 0})}
+                  style={{ 
+                    width: '18px', 
+                    height: '18px', 
+                    accentColor: '#5e6ad2',
+                    cursor: 'pointer'
+                  }}
+                />
+                Aktifkan WhatsApp Gateway
+              </label>
+            </div>
 
-          {settings.provider_type === 'fonnte' && (
-            <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '1.5rem' }}>
-              <div className="form-group">
-                <label>Fonnte API Token</label>
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{ 
+                display: 'block', 
+                fontSize: '14px', 
+                fontWeight: 500, 
+                color: '#d0d6e0', 
+                marginBottom: '8px' 
+              }}>Pilih Provider Engine</label>
+              <select 
+                value={settings.provider_type} 
+                onChange={(e) => setSettings({...settings, provider_type: e.target.value})}
+                style={{ 
+                  width: '100%', 
+                  padding: '8px 12px', 
+                  backgroundColor: '#0f1011', 
+                  color: '#f7f8f8', 
+                  border: '1px solid #34343a', 
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  lineHeight: 1.5,
+                  outline: 'none'
+                }}
+                onFocus={(e) => e.target.style.border = '1px solid #5e69d1'}
+                onBlur={(e) => e.target.style.border = '1px solid #34343a'}
+              >
+                <option value="baileys">Internal Engine (Baileys - Gratis)</option>
+                <option value="fonnte">API Fonnte (Ringan di Server)</option>
+              </select>
+            </div>
+
+            {settings.provider_type === 'fonnte' && (
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{ 
+                  display: 'block', 
+                  fontSize: '14px', 
+                  fontWeight: 500, 
+                  color: '#d0d6e0', 
+                  marginBottom: '8px' 
+                }}>Fonnte API Token</label>
                 <input 
                   type="text" 
                   value={settings.api_token}
                   onChange={(e) => setSettings({...settings, api_token: e.target.value})}
-                  className="form-control"
                   placeholder="Masukkan Token dari fonnte.com"
+                  style={{ 
+                    width: '100%', 
+                    padding: '8px 12px', 
+                    backgroundColor: '#0f1011', 
+                    color: '#f7f8f8', 
+                    border: '1px solid #34343a', 
+                    borderRadius: '8px',
+                    fontSize: '16px',
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.border = '1px solid #5e69d1';
+                    e.target.style.boxShadow = '0 0 0 2px rgba(94, 105, 209, 0.5)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.border = '1px solid #34343a';
+                    e.target.style.boxShadow = 'none';
+                  }}
                 />
               </div>
+            )}
+
+            <button 
+              onClick={handleSave} 
+              disabled={isLoading}
+              style={{ 
+                width: '100%', 
+                padding: '8px 14px', 
+                backgroundColor: '#5e6ad2', 
+                color: '#ffffff', 
+                border: 'none', 
+                borderRadius: '8px', 
+                fontSize: '14px', 
+                fontWeight: 500,
+                cursor: isLoading ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                transition: 'background-color 0.2s'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#828fff'}
+              onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#5e6ad2'}
+            >
+              <span className="material-symbols-rounded" style={{ fontSize: '18px' }}>save</span>
+              {isLoading ? 'Menyimpan...' : 'Simpan Pengaturan'}
+            </button>
+          </div>
+
+          {/* Engine Status Panel */}
+          {settings.provider_type === 'baileys' ? (
+            <div style={{ 
+              backgroundColor: '#0f1011', 
+              border: '1px solid #23252a', 
+              borderRadius: '12px', 
+              padding: '24px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center'
+            }}>
+              <h2 style={{ 
+                fontSize: '22px', 
+                fontWeight: 500, 
+                lineHeight: 1.25, 
+                letterSpacing: '-0.4px', 
+                margin: '0 0 24px 0',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                width: '100%'
+              }}>
+                <span className="material-symbols-rounded" style={{ color: '#8a8f98', fontSize: '20px' }}>memory</span>
+                Internal Engine Status
+              </h2>
+              
+              <div style={{ 
+                padding: '12px', 
+                borderRadius: '6px', 
+                backgroundColor: status.isConnected ? 'rgba(39, 166, 68, 0.1)' : '#141516',
+                border: status.isConnected ? '1px solid rgba(39, 166, 68, 0.3)' : '1px solid #34343a',
+                color: status.isConnected ? '#27a644' : '#8a8f98',
+                width: '100%',
+                textAlign: 'center',
+                fontWeight: 500,
+                fontSize: '14px',
+                marginBottom: '24px'
+              }}>
+                {status.isConnected ? '● TERHUBUNG' : '○ TERPUTUS'}
+              </div>
+
+              {!status.isConnected && !status.qrBase64 && (
+                <button 
+                  onClick={handleStartBaileys}
+                  style={{ 
+                    backgroundColor: '#0f1011', 
+                    color: '#f7f8f8', 
+                    border: '1px solid #34343a', 
+                    padding: '8px 14px', 
+                    borderRadius: '8px', 
+                    fontSize: '14px', 
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                    transition: 'border 0.2s'
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.border = '1px solid #62666d'}
+                  onMouseOut={(e) => e.currentTarget.style.border = '1px solid #34343a'}
+                >
+                  Nyalakan Engine & Minta QR
+                </button>
+              )}
+
+              {status.qrBase64 && !status.isConnected && (
+                <div style={{ 
+                  backgroundColor: '#ffffff', 
+                  padding: '16px', 
+                  borderRadius: '12px', 
+                  marginBottom: '16px' 
+                }}>
+                  <img src={status.qrBase64} alt="QR Code" style={{ width: '240px', height: '240px', display: 'block' }} />
+                  <p style={{ 
+                    color: '#010102', 
+                    textAlign: 'center', 
+                    fontSize: '13px', 
+                    marginTop: '12px', 
+                    fontWeight: 500 
+                  }}>
+                    Scan QR via WhatsApp perangkat tautan
+                  </p>
+                </div>
+              )}
+
+              {status.isConnected && (
+                <button 
+                  onClick={handleStopBaileys}
+                  style={{ 
+                    backgroundColor: '#141516', 
+                    color: '#d0d6e0', 
+                    border: '1px solid #3e3e44', 
+                    padding: '8px 14px', 
+                    borderRadius: '8px', 
+                    fontSize: '14px', 
+                    fontWeight: 500,
+                    cursor: 'pointer'
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#18191a'}
+                  onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#141516'}
+                >
+                  Logout & Matikan Engine
+                </button>
+              )}
+            </div>
+          ) : (
+            <div style={{ 
+              backgroundColor: '#0f1011', 
+              border: '1px solid #23252a', 
+              borderRadius: '12px', 
+              padding: '48px 32px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              textAlign: 'center'
+            }}>
+              <span className="material-symbols-rounded" style={{ fontSize: '48px', color: '#62666d', marginBottom: '16px' }}>cloud_done</span>
+              <h3 style={{ fontSize: '20px', fontWeight: 400, color: '#f7f8f8', margin: '0 0 8px 0' }}>API Pihak Ketiga Aktif</h3>
+              <p style={{ color: '#8a8f98', fontSize: '14px', lineHeight: 1.5, margin: 0 }}>
+                Mesin WhatsApp tidak berjalan di server ini. Semua pesan akan didelegasikan ke provider pilihan Anda. VPS Anda 100% aman dari beban background process.
+              </p>
             </div>
           )}
 
-          <button 
-            className="btn btn-primary" 
-            onClick={handleSave} 
-            disabled={isLoading}
-            style={{ width: '100%', padding: '1rem', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontWeight: 'bold' }}
-          >
-            <span className="material-symbols-rounded">save</span>
-            {isLoading ? 'Menyimpan...' : 'Simpan Pengaturan'}
-          </button>
         </div>
 
-        {/* Engine Status Panel */}
-        {settings.provider_type === 'baileys' ? (
-          <div className="card glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <h2 style={{ fontSize: '1.2rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
-              <span className="material-symbols-rounded" style={{ color: '#3b82f6' }}>memory</span>
-              Internal Engine Status
-            </h2>
-            
-            <div style={{ 
-              padding: '1rem', 
-              borderRadius: '8px', 
-              background: status.isConnected ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-              border: `1px solid ${status.isConnected ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
-              color: status.isConnected ? '#10b981' : '#ef4444',
-              width: '100%',
-              textAlign: 'center',
-              fontWeight: 'bold',
-              marginBottom: '1.5rem'
-            }}>
-              {status.isConnected ? '✅ TERHUBUNG' : '❌ TERPUTUS'}
+        {/* Test Message Panel */}
+        <div style={{ 
+          backgroundColor: '#0f1011', 
+          border: '1px solid #23252a', 
+          borderRadius: '12px', 
+          padding: '24px', 
+          marginTop: '24px' 
+        }}>
+          <h2 style={{ 
+            fontSize: '22px', 
+            fontWeight: 500, 
+            lineHeight: 1.25, 
+            letterSpacing: '-0.4px', 
+            margin: '0 0 24px 0',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <span className="material-symbols-rounded" style={{ color: '#8a8f98', fontSize: '20px' }}>send</span>
+            Kirim Pesan Uji Coba
+          </h2>
+          
+          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+            <div style={{ flex: '1 1 200px' }}>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#d0d6e0', marginBottom: '8px' }}>Nomor Tujuan</label>
+              <input 
+                type="text" 
+                value={testPhone}
+                onChange={e => setTestPhone(e.target.value)}
+                placeholder="08xxxxxxxxxx"
+                style={{ 
+                  width: '100%', 
+                  padding: '8px 12px', 
+                  backgroundColor: '#0f1011', 
+                  color: '#f7f8f8', 
+                  border: '1px solid #34343a', 
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => {
+                  e.target.style.border = '1px solid #5e69d1';
+                  e.target.style.boxShadow = '0 0 0 2px rgba(94, 105, 209, 0.5)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.border = '1px solid #34343a';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
             </div>
-
-            {!status.isConnected && !status.qrBase64 && (
+            <div style={{ flex: '2 1 400px' }}>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#d0d6e0', marginBottom: '8px' }}>Pesan</label>
+              <input 
+                type="text" 
+                value={testMessage}
+                onChange={e => setTestMessage(e.target.value)}
+                style={{ 
+                  width: '100%', 
+                  padding: '8px 12px', 
+                  backgroundColor: '#0f1011', 
+                  color: '#f7f8f8', 
+                  border: '1px solid #34343a', 
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => {
+                  e.target.style.border = '1px solid #5e69d1';
+                  e.target.style.boxShadow = '0 0 0 2px rgba(94, 105, 209, 0.5)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.border = '1px solid #34343a';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+            </div>
+            <div>
               <button 
-                onClick={handleStartBaileys}
-                className="btn"
-                style={{ background: '#3b82f6', color: 'white', padding: '0.8rem 2rem', borderRadius: '8px', fontWeight: 'bold' }}
+                onClick={handleSendTest}
+                disabled={isLoading || settings.is_enabled === 0}
+                style={{ 
+                  padding: '8px 14px', 
+                  backgroundColor: '#0f1011', 
+                  color: '#f7f8f8', 
+                  border: '1px solid #34343a', 
+                  borderRadius: '8px', 
+                  fontSize: '14px', 
+                  fontWeight: 500,
+                  cursor: (isLoading || settings.is_enabled === 0) ? 'not-allowed' : 'pointer',
+                  opacity: settings.is_enabled === 0 ? 0.5 : 1,
+                  height: '38px',
+                  transition: 'border 0.2s'
+                }}
+                onMouseOver={(e) => { if (settings.is_enabled !== 0 && !isLoading) e.currentTarget.style.border = '1px solid #62666d'; }}
+                onMouseOut={(e) => { if (settings.is_enabled !== 0 && !isLoading) e.currentTarget.style.border = '1px solid #34343a'; }}
               >
-                Nyalakan Engine & Minta QR
+                Kirim Test
               </button>
-            )}
-
-            {status.qrBase64 && !status.isConnected && (
-              <div style={{ background: 'white', padding: '1rem', borderRadius: '12px', marginBottom: '1rem' }}>
-                <img src={status.qrBase64} alt="QR Code" style={{ width: '250px', height: '250px' }} />
-                <p style={{ color: 'black', textAlign: 'center', fontSize: '0.9rem', marginTop: '10px', fontWeight: 'bold' }}>Scan QR via WhatsApp Tersambung</p>
-              </div>
-            )}
-
-            {status.isConnected && (
-              <button 
-                onClick={handleStopBaileys}
-                className="btn"
-                style={{ background: '#ef4444', color: 'white', padding: '0.8rem 2rem', borderRadius: '8px', fontWeight: 'bold' }}
-              >
-                Logout & Matikan Engine
-              </button>
-            )}
+            </div>
           </div>
-        ) : (
-          <div className="card glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
-            <span className="material-symbols-rounded" style={{ fontSize: '4rem', color: '#10b981', opacity: 0.8 }}>cloud_done</span>
-            <h3 style={{ marginTop: '1rem' }}>API Pihak Ketiga Aktif</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.5rem' }}>
-              Mesin WhatsApp tidak berjalan di server ini. Semua pesan akan didelegasikan ke provider pilihan Anda. VPS Anda 100% aman dari beban *background process*.
+          {settings.is_enabled === 0 && (
+            <p style={{ color: '#62666d', fontSize: '13px', marginTop: '12px', marginBottom: 0 }}>
+              * WA Gateway harus diaktifkan dan disimpan terlebih dahulu sebelum mengirim test.
             </p>
-          </div>
-        )}
-
-      </div>
-
-      {/* Test Message Panel */}
-      <div className="card glass-card" style={{ padding: '1.5rem', marginTop: '2rem' }}>
-        <h2 style={{ fontSize: '1.2rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span className="material-symbols-rounded" style={{ color: '#f59e0b' }}>send</span>
-          Kirim Pesan Uji Coba
-        </h2>
-        
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <div className="form-group" style={{ flex: '1 1 200px' }}>
-            <label>Nomor Tujuan (Contoh: 08123...)</label>
-            <input 
-              type="text" 
-              value={testPhone}
-              onChange={e => setTestPhone(e.target.value)}
-              className="form-control"
-              placeholder="08xxxxxxxxxx"
-            />
-          </div>
-          <div className="form-group" style={{ flex: '2 1 400px' }}>
-            <label>Pesan</label>
-            <input 
-              type="text" 
-              value={testMessage}
-              onChange={e => setTestMessage(e.target.value)}
-              className="form-control"
-            />
-          </div>
-          <div className="form-group" style={{ display: 'flex', alignItems: 'flex-end' }}>
-            <button 
-              onClick={handleSendTest}
-              disabled={isLoading || settings.is_enabled === 0}
-              className="btn btn-primary"
-              style={{ padding: '0.8rem 2rem', borderRadius: '8px', height: '42px', opacity: settings.is_enabled === 0 ? 0.5 : 1 }}
-            >
-              Kirim Test
-            </button>
-          </div>
+          )}
         </div>
-        {settings.is_enabled === 0 && (
-          <p style={{ color: '#ef4444', fontSize: '0.85rem', marginTop: '10px' }}>* WA Gateway harus diaktifkan dan disimpan terlebih dahulu sebelum mengirim test.</p>
-        )}
       </div>
-
     </div>
   );
 };
