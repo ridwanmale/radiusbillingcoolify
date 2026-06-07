@@ -315,7 +315,7 @@ const RekapVoucher = () => {
                     >
                       {templates.length === 0 && <option value="">Memuat template...</option>}
                       {templates.map(t => (
-                        <option key={t.id} value={t.id} style={{ background: '#1e1b1e' }}>{t.name}</option>
+                        <option key={t.id} value={t.id} style={{ background: '#1e1b1e' }}>{t.template_name || `Template ${t.id}`}</option>
                       ))}
                     </select>
                     <button 
