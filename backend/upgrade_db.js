@@ -1,15 +1,24 @@
 const db = require('./config/db');
 
-async function upgradePackageId() {
+async function upgrade() {
   try {
-    console.log('Mengubah tipe data package_id...');
-    await db.query('ALTER TABLE transactions MODIFY COLUMN package_id varchar(64) NOT NULL');
-    console.log('Berhasil! Sekarang package_id bisa menampung nama profile.');
-    process.exit(0);
-  } catch (err) {
-    console.error('Gagal mengubah tipe data:', err.message);
-    process.exit(1);
+    const connection = await db.getConnection();
+    try {
+      await connection.query('ALTER TABLE generate_presets ADD COLUMN template_id VARCHAR(50) DEFAULT NULL');
+      console.log('Successfully added template_id column to generate_presets');
+    } catch (err) {
+      if (err.code === 'ER_DUP_FIELDNAME') {
+        console.log('Column template_id already exists.');
+      } else {
+        console.error('Error:', err.message);
+      }
+    } finally {
+      connection.release();
+    }
+  } catch(err) {
+    console.error('DB connect error:', err);
   }
+  process.exit();
 }
 
-upgradePackageId();
+upgrade();

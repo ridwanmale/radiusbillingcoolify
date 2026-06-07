@@ -48,6 +48,7 @@ import PppoeIsolirDesign from './pages/pppoe/IsolirDesign';
 import PaymentBridgeCenter from './pages/PaymentBridgeCenter';
 import MikrotikScriptTemplate from './pages/MikrotikScriptTemplate';
 import Backup from './pages/Backup';
+import WhatsAppGateway from './pages/WhatsAppGateway';
 
 
 
@@ -164,6 +165,7 @@ const App = () => {
                 <Route path="/audit-trail" element={<AuditTrail user={user} />} />
                 <Route path="/settings" element={<AppSettings user={user} />} />
                 <Route path="/backup" element={<Backup user={user} />} />
+                <Route path="/whatsapp-gateway" element={<WhatsAppGateway user={user} />} />
                 <Route path="/settings-telegram" element={<SettingTelegram user={user} />} />
                 <Route path="/setting-midtrans" element={<SettingMidtrans user={user} />} />
                 <Route path="/setting-duitku" element={<SettingDuitku user={user} />} />

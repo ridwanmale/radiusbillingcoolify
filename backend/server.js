@@ -39,6 +39,7 @@ const paymentDetectionRoutes = require('./routes/payment_detections');
 const voucherTypesRoutes = require('./routes/voucher_types');
 const mikrotikScriptRoutes = require('./routes/mikrotik_scripts');
 const backupRoutes = require('./routes/backup');
+const whatsappRoutes = require('./routes/whatsapp');
 
 
 // API Routes (Dahulukan API)
@@ -67,6 +68,7 @@ app.use('/api/payment-detections', paymentDetectionRoutes);
 app.use('/api/voucher-types', voucherTypesRoutes);
 app.use('/api/mikrotik-scripts', mikrotikScriptRoutes);
 app.use('/api/backup', backupRoutes);
+app.use('/api/whatsapp', whatsappRoutes);
 
 
 // Health check endpoint

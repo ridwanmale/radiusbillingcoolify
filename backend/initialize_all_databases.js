@@ -169,6 +169,25 @@ async function initializeAllDatabases() {
     // await db.query('UPDATE telegram_settings SET last_notified_radacctid = ? WHERE last_notified_radacctid = 0', [currentMaxId]);
     console.log('✔ Telegram notification settings initialized.\n');
 
+    // 4.5 WHATSAPP GATEWAY SETTINGS TABLE
+    console.log('[4.5/9] Initializing WhatsApp Gateway settings...');
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS wa_gateway_settings (
+        id INT PRIMARY KEY DEFAULT 1,
+        provider_type VARCHAR(32) DEFAULT 'baileys',
+        api_url VARCHAR(255),
+        api_token VARCHAR(255),
+        is_enabled TINYINT(1) DEFAULT 0
+      ) ENGINE=InnoDB;
+    `);
+
+    // Insert a default WhatsApp configuration row if missing
+    await db.query(`
+      INSERT IGNORE INTO wa_gateway_settings (id, provider_type, is_enabled)
+      VALUES (1, 'baileys', 0)
+    `);
+    console.log('✔ WhatsApp Gateway settings initialized.\n');
+
     // 5. PPPoE EXTENSIONS (nas table)
     console.log('[5/9] Extending RADIUS client (nas) table for MikroTik API...');
     const [nasCols] = await db.query('SHOW COLUMNS FROM nas');

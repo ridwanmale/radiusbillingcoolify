@@ -361,6 +361,11 @@ const Sidebar = ({ onLogout, user, appSettings, onCloseMobile }) => {
                       User Admin
                    </Link>
                 )}
+                {isAllowed('admin_users') && (
+                  <Link to="/whatsapp-gateway" className={`nav-link nested-link ${isPathActive('/whatsapp-gateway') ? 'active' : ''}`}>
+                     WhatsApp Gateway
+                  </Link>
+                )}
                 {isAllowed('gdrive_backup') && (
                   <Link to="/backup" className={`nav-link nested-link ${isPathActive('/backup') ? 'active' : ''}`}>
                      Backup System
