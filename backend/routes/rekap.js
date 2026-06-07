@@ -10,22 +10,19 @@ router.get('/', async (req, res) => {
         vm.batch_id as kode_print,
         MIN(vm.created_at) as created_at,
         vm.outlet_name,
-        COALESCE(rug.groupname, 'Unknown') as profile,
+        COALESCE(MAX(rug.groupname), 'Unknown') as profile,
         COUNT(DISTINCT vm.username) as qty,
         SUM(CASE WHEN COALESCE(vm.status, 'Aktif') = 'Aktif' THEN 1 ELSE 0 END) as sisa_stock,
         SUM(CASE WHEN vm.status = 'Terjual' THEN 1 ELSE 0 END) as terjual,
         SUM(CASE WHEN vm.status = 'Expired' THEN 1 ELSE 0 END) as expired,
-        pm.harga,
-        pm.komisi,
-        SUM(pm.harga) as total_harga,
-        SUM(pm.hpp) as total_hpp,
-        SUM(pm.harga - pm.hpp) as total_laba
+        MAX(pm.harga) as harga,
+        MAX(pm.komisi) as komisi
       FROM rincian_transaksi_voucher vm
       LEFT JOIN radcheck rc ON vm.username = rc.username AND rc.attribute = 'Cleartext-Password'
       LEFT JOIN radusergroup rug ON vm.username = rug.username
       LEFT JOIN profiles_metadata pm ON rug.groupname = pm.groupname
-      WHERE vm.batch_id != 'ONLINE-STORE' AND COALESCE(vm.status, 'Aktif') != 'Dibatalkan'
-      GROUP BY vm.batch_id, vm.outlet_name, COALESCE(rug.groupname, 'Unknown'), pm.harga, pm.komisi
+      WHERE vm.batch_id != 'ONLINE-STORE'
+      GROUP BY vm.batch_id, vm.outlet_name
       ORDER BY created_at DESC
     `);
     
