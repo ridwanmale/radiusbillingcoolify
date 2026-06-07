@@ -195,6 +195,16 @@ const VoucherTerjual = () => {
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
+  const formatSisaWaktu = (seconds) => {
+    const s = parseInt(seconds);
+    if (isNaN(s) || s <= 0) return '00:00:00:00';
+    const d = Math.floor(s / 86400);
+    const h = Math.floor((s % 86400) / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    return `${String(d).padStart(2, '0')}:${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+  };
+
   const formatRupiah = (number) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
   };
@@ -777,7 +787,7 @@ const VoucherTerjual = () => {
                   <div style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px' }}>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>SISA WAKTU</div>
                     <div style={{ fontWeight: '700', color: '#38bdf8', fontFamily: 'monospace' }}>
-                      {viewVoucher.acctstarttime ? formatDuration(calculateTimeLeft(viewVoucher.acctstarttime, viewVoucher.value, viewVoucher.satuan)) : '-'}
+                      {viewVoucher.acctstarttime ? formatSisaWaktu(calculateTimeLeft(viewVoucher.acctstarttime, viewVoucher.value, viewVoucher.satuan)) : '-'}
                     </div>
                   </div>
                   <div style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px' }}>

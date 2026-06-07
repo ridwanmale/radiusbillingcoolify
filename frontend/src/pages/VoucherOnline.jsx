@@ -75,6 +75,16 @@ const VoucherOnline = () => {
     return `${sec}s`;
   };
 
+  const formatSisaWaktu = (seconds) => {
+    const s = parseInt(seconds);
+    if (isNaN(s) || s <= 0) return '00:00:00:00';
+    const d = Math.floor(s / 86400);
+    const h = Math.floor((s % 86400) / 3600);
+    const m = Math.floor((s % 3600) / 60);
+    const sec = s % 60;
+    return `${String(d).padStart(2, '0')}:${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+  };
+
   const calculateTimeLeft = (expirationDateStr, startTimeStr, masaAktif, satuan) => {
     if (expirationDateStr) {
       const expiryTime = new Date(expirationDateStr).getTime();
@@ -346,7 +356,7 @@ const VoucherOnline = () => {
                         <td style={{ color: '#f43f5e', fontWeight: 'bold' }}>↑ {formatBytes(s.upload)}</td>
                         <td style={{ fontFamily: 'monospace' }}>{formatDuration(realDuration > 0 ? realDuration : s.duration)}</td>
                         <td style={{ fontFamily: 'monospace', fontWeight: 'bold', color: '#38bdf8' }}>
-                          {formatDuration(calculateTimeLeft(s.expiration_date, s.acctstarttime, s.masa_aktif, s.satuan))}
+                          {formatSisaWaktu(calculateTimeLeft(s.expiration_date, s.acctstarttime, s.masa_aktif, s.satuan))}
                         </td>
                         <td>{formatDate(s.acctstarttime)}</td>
                         <td>{formatDate(s.acctupdatetime)}</td>
