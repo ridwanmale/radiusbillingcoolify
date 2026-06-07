@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
       LEFT JOIN radcheck rc ON vm.username = rc.username AND rc.attribute = 'Cleartext-Password'
       LEFT JOIN radusergroup rug ON vm.username = rug.username
       LEFT JOIN profiles_metadata pm ON rug.groupname = pm.groupname
-      WHERE vm.batch_id != 'ONLINE-STORE'
+      WHERE vm.batch_id != 'ONLINE-STORE' AND COALESCE(vm.status, 'Aktif') != 'Dibatalkan'
       GROUP BY vm.batch_id, vm.outlet_name, COALESCE(rug.groupname, 'Unknown'), pm.harga, pm.komisi
       ORDER BY created_at DESC
     `);
