@@ -10,6 +10,36 @@ let waSocket = null;
 let currentQrBase64 = null;
 let isConnected = false;
 
+// Auto-initialize table
+const initializeTable = async () => {
+  try {
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS wa_gateway_settings (
+        id INT PRIMARY KEY DEFAULT 1,
+        provider_type VARCHAR(32) DEFAULT 'baileys',
+        api_url VARCHAR(255),
+        api_token VARCHAR(255),
+        is_enabled TINYINT(1) DEFAULT 0
+      ) ENGINE=InnoDB;
+    `);
+
+    // Ensure api_url column exists for existing tables
+    const [cols] = await db.query('SHOW COLUMNS FROM wa_gateway_settings');
+    const colNames = cols.map(c => c.Field);
+    if (!colNames.includes('api_url')) {
+      await db.query('ALTER TABLE wa_gateway_settings ADD COLUMN api_url VARCHAR(255) AFTER provider_type');
+    }
+
+    await db.query(`
+      INSERT IGNORE INTO wa_gateway_settings (id, provider_type, is_enabled)
+      VALUES (1, 'baileys', 0)
+    `);
+  } catch (err) {
+    console.error('Failed to init wa_gateway_settings table', err);
+  }
+};
+initializeTable();
+
 // Initialize Baileys Engine
 const initBaileys = async () => {
   const authDir = path.join(__dirname, '..', '..', 'baileys_auth_info');
