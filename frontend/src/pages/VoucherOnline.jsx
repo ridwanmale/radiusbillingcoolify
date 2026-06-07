@@ -66,13 +66,19 @@ const VoucherOnline = () => {
 
   const formatDuration = (seconds) => {
     const s = parseInt(seconds);
-    if (isNaN(s) || s < 0) return '0s';
-    const h = Math.floor(s / 3600);
+    if (isNaN(s) || s < 0) return '0 Dtk';
+    const d = Math.floor(s / 86400);
+    const h = Math.floor((s % 86400) / 3600);
     const m = Math.floor((s % 3600) / 60);
     const sec = s % 60;
-    if (h > 0) return `${h}h ${m}m ${sec}s`;
-    if (m > 0) return `${m}m ${sec}s`;
-    return `${sec}s`;
+    
+    let parts = [];
+    if (d > 0) parts.push(`${d} Hari`);
+    if (h > 0 || d > 0) parts.push(`${h} Jam`);
+    if (m > 0 || h > 0 || d > 0) parts.push(`${m} Mnt`);
+    parts.push(`${sec} Dtk`);
+    
+    return parts.join(' ');
   };
 
   const formatSisaWaktu = (seconds) => {
