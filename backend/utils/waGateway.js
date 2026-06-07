@@ -116,6 +116,55 @@ const sendViaFonnte = async (phone, message, token) => {
   }
 };
 
+const sendViaWablas = async (phone, message, token, apiUrl) => {
+  if (!apiUrl) throw new Error('Wablas API URL is required');
+  const url = `${apiUrl}/api/send-message`;
+  try {
+    const response = await axios.post(url, {
+      phone: phone,
+      message: message
+    }, {
+      headers: {
+        'Authorization': token
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(`Wablas API Error: ${error.message}`);
+  }
+};
+
+const sendViaWatzap = async (phone, message, token) => {
+  const url = 'https://api.watzap.id/v1/send_message';
+  try {
+    const response = await axios.post(url, {
+      api_key: token,
+      number_key: phone,
+      message: message
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(`Watzap API Error: ${error.message}`);
+  }
+};
+
+const sendViaRuangwa = async (phone, message, token) => {
+  const url = 'https://app.ruangwa.id/api/send_message';
+  try {
+    // Ruangwa typically uses form data but axios handles basic urlencoded or json if accepted
+    const response = await axios.post(url, {
+      token: token,
+      number: phone,
+      message: message
+    }, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(`RuangWA API Error: ${error.message}`);
+  }
+};
+
 // Global Send Message Hub
 const sendMessage = async (phone, message) => {
   try {
@@ -131,6 +180,12 @@ const sendMessage = async (phone, message) => {
       await sendViaBaileys(phone, message);
     } else if (settings.provider_type === 'fonnte') {
       await sendViaFonnte(phone, message, settings.api_token);
+    } else if (settings.provider_type === 'wablas') {
+      await sendViaWablas(phone, message, settings.api_token, settings.api_url);
+    } else if (settings.provider_type === 'watzap') {
+      await sendViaWatzap(phone, message, settings.api_token);
+    } else if (settings.provider_type === 'ruangwa') {
+      await sendViaRuangwa(phone, message, settings.api_token);
     } else {
       console.log(`Unsupported WA provider: ${settings.provider_type}`);
       return false;

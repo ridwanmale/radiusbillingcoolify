@@ -227,44 +227,86 @@ const WhatsAppGateway = () => {
               >
                 <option value="baileys">Internal Engine (Baileys - Gratis)</option>
                 <option value="fonnte">API Fonnte (Ringan di Server)</option>
+                <option value="wablas">API Wablas</option>
+                <option value="watzap">API Watzap</option>
+                <option value="ruangwa">API RuangWA</option>
               </select>
             </div>
 
-            {settings.provider_type === 'fonnte' && (
-              <div style={{ marginBottom: '24px' }}>
-                <label style={{ 
-                  display: 'block', 
-                  fontSize: '14px', 
-                  fontWeight: 500, 
-                  color: '#d0d6e0', 
-                  marginBottom: '8px' 
-                }}>Fonnte API Token</label>
-                <input 
-                  type="text" 
-                  value={settings.api_token}
-                  onChange={(e) => setSettings({...settings, api_token: e.target.value})}
-                  placeholder="Masukkan Token dari fonnte.com"
-                  style={{ 
-                    width: '100%', 
-                    padding: '8px 12px', 
-                    backgroundColor: '#0f1011', 
-                    color: '#f7f8f8', 
-                    border: '1px solid #34343a', 
-                    borderRadius: '8px',
-                    fontSize: '16px',
-                    outline: 'none',
-                    boxSizing: 'border-box'
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.border = '1px solid #5e69d1';
-                    e.target.style.boxShadow = '0 0 0 2px rgba(94, 105, 209, 0.5)';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.border = '1px solid #34343a';
-                    e.target.style.boxShadow = 'none';
-                  }}
-                />
-              </div>
+            {settings.provider_type !== 'baileys' && (
+              <>
+                {settings.provider_type === 'wablas' && (
+                  <div style={{ marginBottom: '24px' }}>
+                    <label style={{ 
+                      display: 'block', 
+                      fontSize: '14px', 
+                      fontWeight: 500, 
+                      color: '#d0d6e0', 
+                      marginBottom: '8px' 
+                    }}>API URL Endpoint (Khusus Wablas)</label>
+                    <input 
+                      type="text" 
+                      value={settings.api_url}
+                      onChange={(e) => setSettings({...settings, api_url: e.target.value})}
+                      placeholder="Contoh: https://kudus.wablas.com"
+                      style={{ 
+                        width: '100%', 
+                        padding: '8px 12px', 
+                        backgroundColor: '#0f1011', 
+                        color: '#f7f8f8', 
+                        border: '1px solid #34343a', 
+                        borderRadius: '8px',
+                        fontSize: '16px',
+                        outline: 'none',
+                        boxSizing: 'border-box'
+                      }}
+                      onFocus={(e) => {
+                        e.target.style.border = '1px solid #5e69d1';
+                        e.target.style.boxShadow = '0 0 0 2px rgba(94, 105, 209, 0.5)';
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.border = '1px solid #34343a';
+                        e.target.style.boxShadow = 'none';
+                      }}
+                    />
+                  </div>
+                )}
+                
+                <div style={{ marginBottom: '24px' }}>
+                  <label style={{ 
+                    display: 'block', 
+                    fontSize: '14px', 
+                    fontWeight: 500, 
+                    color: '#d0d6e0', 
+                    marginBottom: '8px' 
+                  }}>API Token / Key</label>
+                  <input 
+                    type="text" 
+                    value={settings.api_token}
+                    onChange={(e) => setSettings({...settings, api_token: e.target.value})}
+                    placeholder="Masukkan Token / Key dari Provider"
+                    style={{ 
+                      width: '100%', 
+                      padding: '8px 12px', 
+                      backgroundColor: '#0f1011', 
+                      color: '#f7f8f8', 
+                      border: '1px solid #34343a', 
+                      borderRadius: '8px',
+                      fontSize: '16px',
+                      outline: 'none',
+                      boxSizing: 'border-box'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.border = '1px solid #5e69d1';
+                      e.target.style.boxShadow = '0 0 0 2px rgba(94, 105, 209, 0.5)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.border = '1px solid #34343a';
+                      e.target.style.boxShadow = 'none';
+                    }}
+                  />
+                </div>
+              </>
             )}
 
             <button 
