@@ -325,7 +325,7 @@ const handleGenerateCommands = async (token, chatId, commandText) => {
           
           await connection.query('INSERT INTO radcheck (username, attribute, op, value) VALUES (?, "Cleartext-Password", ":=", ?)', [uniqueCode, uniqueCode]);
           await connection.query('INSERT INTO radusergroup (username, groupname, priority) VALUES (?, ?, ?)', [uniqueCode, p.profile, 1]);
-          await connection.query('INSERT INTO rincian_transaksi_voucher (username, batch_id, outlet_name, status) VALUES (?, ?, ?, "Aktif")', [uniqueCode, batch_id, p.server === 'all' ? '' : (p.server || '')]);
+          await connection.query('INSERT INTO rincian_transaksi_voucher (username, batch_id, outlet_name, status, profile) VALUES (?, ?, ?, "Aktif", ?)', [uniqueCode, batch_id, p.server === 'all' ? '' : (p.server || ''), p.profile]);
           
           successCount++;
         }

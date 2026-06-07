@@ -10,7 +10,7 @@ router.get('/', async (req, res) => {
         vm.batch_id as kode_print,
         MIN(vm.created_at) as created_at,
         vm.outlet_name,
-        COALESCE(MAX(rug.groupname), 'Unknown') as profile,
+        COALESCE(MAX(vm.profile), MAX(rug.groupname), 'Unknown') as profile,
         COUNT(DISTINCT vm.username) as qty,
         SUM(CASE WHEN COALESCE(vm.status, 'Aktif') = 'Aktif' THEN 1 ELSE 0 END) as sisa_stock,
         SUM(CASE WHEN vm.status = 'Terjual' THEN 1 ELSE 0 END) as terjual,

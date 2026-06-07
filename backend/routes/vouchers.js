@@ -369,8 +369,8 @@ router.post('/generate', async (req, res) => {
       
       // Insert into metadata for tracking Print Code and Date
       await connection.query(
-        'INSERT INTO rincian_transaksi_voucher (username, batch_id, outlet_name) VALUES (?, ?, ?)',
-        [code, batchId, outletName]
+        'INSERT INTO rincian_transaksi_voucher (username, batch_id, outlet_name, profile) VALUES (?, ?, ?, ?)',
+        [code, batchId, outletName, profile]
       );
       
       generatedVouchers.push({ voucher_code: code, password, profile, kode_print: batchId, outlet_name: outletName });
