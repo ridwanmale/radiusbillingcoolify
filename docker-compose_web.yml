@@ -8,12 +8,12 @@ services:
     security_opt:
       - apparmor:unconfined
     environment:
-      DB_HOST: ${DB_HOST:?} # IP dari Core Server
+      DB_HOST: ${DB_HOST:-password} # IP dari Core Server
       DB_USER: ${MYSQL_USER:-radius}
-      DB_PASSWORD: ${MYSQL_PASSWORD:?}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-password}
       DB_NAME: ${MYSQL_DATABASE:-radius}
       ENABLE_TELEGRAM_BOT_LISTENER: ${ENABLE_TELEGRAM_BOT_LISTENER:-true}
-      RADIUS_CONTAINER_PREFIX: ${RADIUS_CONTAINER_PREFIX:?}
+      RADIUS_CONTAINER_PREFIX: ${RADIUS_CONTAINER_PREFIX:-password}
       TZ: Asia/Jakarta
     expose:
       - "5000"

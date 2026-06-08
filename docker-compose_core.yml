@@ -7,10 +7,10 @@ services:
       - apparmor:unconfined
     user: "root"
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-password}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-radius}
       MYSQL_USER: ${MYSQL_USER:-radius}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-password}
     command: ["mysqld", "--default-time-zone=+07:00", "--log_bin_trust_function_creators=1", "--default-authentication-plugin=mysql_native_password"]
     ports:
       - "3306:3306" # Dibuka agar Web Server bisa connect
@@ -27,7 +27,7 @@ services:
     environment:
       TZ: Asia/Jakarta
       MYSQL_USER: ${MYSQL_USER:-radius}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-password}
     ports:
       - "8080:8080" # Webhook port for radius reload
       - "1812:1812/udp"
