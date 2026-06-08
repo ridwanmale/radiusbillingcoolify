@@ -5,10 +5,10 @@ services:
     image: mysql:8.0
     user: "root"
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-password}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-radius}
       MYSQL_USER: ${MYSQL_USER:-radius}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-password}
       TZ: Asia/Jakarta
     command: ["mysqld", "--default-time-zone=+07:00", "--log_bin_trust_function_creators=1"]
     privileged: true
@@ -42,10 +42,10 @@ services:
     environment:
       DB_HOST: db
       DB_USER: ${MYSQL_USER:-radius}
-      DB_PASSWORD: ${MYSQL_PASSWORD:?}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-password}
       DB_NAME: ${MYSQL_DATABASE:-radius}
       ENABLE_TELEGRAM_BOT_LISTENER: ${ENABLE_TELEGRAM_BOT_LISTENER:-true}
-      RADIUS_CONTAINER_PREFIX: ${RADIUS_CONTAINER_PREFIX:?}
+      RADIUS_CONTAINER_PREFIX: ${RADIUS_CONTAINER_PREFIX:-password}
       TZ: Asia/Jakarta
     expose:
       - "5000"
