@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hacker Log Monitor</title>
+    <title>Log Monitor</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Xterm.js for Terminal Output -->
@@ -28,7 +28,7 @@
         <div class="container mx-auto flex items-center justify-between">
             <h1 class="text-xl font-bold text-emerald-400 flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg>
-                Hacker Command Center
+                Log Command Center
             </h1>
             <button id="btn-add-terminal" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 px-4 rounded transition duration-200 flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
@@ -50,7 +50,26 @@
         const btnAddTerminal = document.getElementById('btn-add-terminal');
         let terminalCount = 0;
 
-        function createTerminalBlock() {
+        // Fungsi untuk menyimpan seluruh settingan form ke LocalStorage
+        function saveSettingsToLocal() {
+            const configs = [];
+            for (let i = 1; i <= terminalCount; i++) {
+                const wrapper = document.getElementById(`wrapper-term-${i}`);
+                if (wrapper) {
+                    configs.push({
+                        ip: document.getElementById(`ip-term-${i}`).value,
+                        pass: document.getElementById(`pass-term-${i}`).value,
+                        dir: document.getElementById(`dir-term-${i}`).value,
+                        cmp: document.getElementById(`cmp-term-${i}`).value,
+                        svc: document.getElementById(`svc-term-${i}`).value
+                    });
+                }
+            }
+            localStorage.setItem('radiusBillingLogMonSettings', JSON.stringify(configs));
+        }
+
+        // Modifikasi fungsi pembuatan terminal untuk menerima nilai awal (config)
+        function createTerminalBlock(config = {}) {
             terminalCount++;
             const tId = `term-${terminalCount}`;
 
@@ -58,6 +77,13 @@
             const wrapper = document.createElement('div');
             wrapper.className = "flex flex-col bg-slate-800 rounded-lg shadow-lg border border-slate-700 overflow-hidden";
             wrapper.id = `wrapper-${tId}`;
+
+            // Fallback ke nilai default jika config kosong
+            const defIp = config.ip || '';
+            const defPass = config.pass || '';
+            const defDir = config.dir || '/opt/radiusbilling-core';
+            const defCmp = config.cmp || 'docker-compose_core.yml';
+            const defSvc = config.svc || 'db';
 
             // Template HTML for single terminal block
             wrapper.innerHTML = `
@@ -74,13 +100,13 @@
                     
                     <form id="form-${tId}" class="grid grid-cols-2 lg:grid-cols-6 gap-2">
                         <div class="col-span-1 lg:col-span-1">
-                            <input type="text" id="ip-${tId}" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="IP VPS" required>
+                            <input type="text" id="ip-${tId}" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="IP VPS" value="${defIp}" required>
                         </div>
                         <div class="col-span-1 lg:col-span-1">
-                            <input type="password" id="pass-${tId}" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="Password" required>
+                            <input type="password" id="pass-${tId}" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="Password" value="${defPass}" required>
                         </div>
                         <div class="col-span-1 lg:col-span-2">
-                            <input list="dir-opts-${tId}" id="dir-${tId}" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="/opt/radiusbilling-core" value="/opt/radiusbilling-core" required>
+                            <input list="dir-opts-${tId}" id="dir-${tId}" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="/opt/radiusbilling-core" value="${defDir}" required>
                             <datalist id="dir-opts-${tId}">
                                 <option value="/opt/radiusbilling-core">
                                 <option value="/opt/radiusbilling-web">
@@ -89,7 +115,7 @@
                             </datalist>
                         </div>
                         <div class="col-span-1 lg:col-span-1">
-                            <input list="cmp-opts-${tId}" id="cmp-${tId}" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="Compose File" value="docker-compose_core.yml" required>
+                            <input list="cmp-opts-${tId}" id="cmp-${tId}" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="Compose File" value="${defCmp}" required>
                             <datalist id="cmp-opts-${tId}">
                                 <option value="docker-compose_core.yml">
                                 <option value="docker-compose_web.yml">
@@ -97,9 +123,10 @@
                             </datalist>
                         </div>
                         <div class="col-span-1 lg:col-span-1">
-                            <input type="text" id="svc-${tId}" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="Service" value="db" required>
+                            <input type="text" id="svc-${tId}" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="Service" value="${defSvc}" required>
                         </div>
                         <div class="col-span-2 lg:col-span-6 flex gap-2 mt-1">
+                            <button type="button" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-1.5 px-3 rounded transition" onclick="saveSettingsToLocal()" title="Simpan settingan ke Browser">💾 Save</button>
                             <button type="submit" id="btn-conn-${tId}" class="flex-grow bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold py-1.5 px-3 rounded transition">Connect</button>
                             <button type="button" id="btn-disc-${tId}" class="hidden flex-grow bg-red-600 hover:bg-red-500 text-white text-xs font-semibold py-1.5 px-3 rounded transition">Stop</button>
                             <button type="button" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold py-1.5 px-3 rounded transition" onclick="clearTerm('${tId}')">Clear</button>
@@ -141,6 +168,9 @@
             // Form Submit Logic
             document.getElementById(`form-${tId}`).addEventListener('submit', (e) => {
                 e.preventDefault();
+                
+                // Auto-save settingan setiap kali connect ditekan
+                saveSettingsToLocal();
                 
                 const host = document.getElementById(`ip-${tId}`).value;
                 const password = document.getElementById(`pass-${tId}`).value;
@@ -189,6 +219,8 @@
             socket.emit('stop-log', tId);
             const wrapper = document.getElementById(`wrapper-${tId}`);
             if (wrapper) wrapper.remove();
+            // Optional: Auto-save setelah menghapus
+            saveSettingsToLocal();
         }
 
         // Clear Terminal Logic
@@ -197,8 +229,24 @@
             if (term) term.clear();
         }
 
-        // Init with 1 terminal
-        createTerminalBlock();
+        // --- Inisialisasi Saat Halaman Dimuat ---
+        const savedData = localStorage.getItem('radiusBillingLogMonSettings');
+        if (savedData) {
+            try {
+                const configs = JSON.parse(savedData);
+                if (configs.length > 0) {
+                    // Buat terminal sebanyak data yang tersimpan
+                    configs.forEach(cfg => createTerminalBlock(cfg));
+                } else {
+                    createTerminalBlock(); // Minimal 1 layar kosong
+                }
+            } catch(e) {
+                createTerminalBlock();
+            }
+        } else {
+            // Baru pertama kali buka, buat 1 layar kosong
+            createTerminalBlock();
+        }
 
         // Add Terminal Button
         btnAddTerminal.addEventListener('click', () => {
