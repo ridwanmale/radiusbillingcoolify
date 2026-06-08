@@ -17,6 +17,11 @@ RUN ln -sf /etc/raddb/mods-available/sql /etc/raddb/mods-enabled/sql
 RUN sed -i 's/^[[:space:]]*#[[:space:]]*sql\([[:space:]]*\)$/	sql\1/g' /etc/raddb/sites-available/default && \
     sed -i 's/^[[:space:]]*#[[:space:]]*-sql\([[:space:]]*\)$/	-sql\1/g' /etc/raddb/sites-available/default
 
+# Enable Authentication Logging in radiusd.conf
+RUN sed -i 's/auth = no/auth = yes/g' /etc/raddb/radiusd.conf && \
+    sed -i 's/auth_badpass = no/auth_badpass = yes/g' /etc/raddb/radiusd.conf && \
+    sed -i 's/auth_goodpass = no/auth_goodpass = yes/g' /etc/raddb/radiusd.conf
+
 # Allow Reply-Message to pass through Access-Reject packets
 RUN sed -i '/^DEFAULT/a \	Reply-Message =* ANY,' /etc/raddb/mods-config/attr_filter/access_reject
 
