@@ -46,12 +46,13 @@
 
                 <div class="md:col-span-2">
                     <label class="block text-xs text-slate-400 mb-1">Project Directory</label>
-                    <select id="directory" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-emerald-500">
-                        <option value="/opt/radiusbilling-core">Core Server (/opt/radiusbilling-core)</option>
-                        <option value="/opt/radiusbilling-web">Web Admin (/opt/radiusbilling-web)</option>
-                        <option value="/opt/radiusbilling-portal">Portal (/opt/radiusbilling-portal)</option>
-                        <option value="/home/armradius">Portal (Custom /home/armradius)</option>
-                    </select>
+                    <input list="dir-options" id="directory" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-emerald-500" placeholder="/opt/radiusbilling-core" value="/opt/radiusbilling-core" required>
+                    <datalist id="dir-options">
+                        <option value="/opt/radiusbilling-core">
+                        <option value="/opt/radiusbilling-web">
+                        <option value="/opt/radiusbilling-portal">
+                        <option value="/home/armradius">
+                    </datalist>
                 </div>
 
                 <div class="md:col-span-1">
