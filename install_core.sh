@@ -15,16 +15,10 @@ CURRENT_DIR=$(pwd)
 
 # --- SESI INPUT DARI USER ---
 read -p "Masukkan link GitHub repositori (Kosongkan jika ingin pakai file lokal): " GITHUB_URL
-read -p "Masukkan path file backup database .sql (kosongkan jika install database kosong/baru): " DB_BACKUP_FILE
 
 read -p "Masukkan path direktori instalasi (tekan Enter untuk default: /opt/radiusbilling-core): " INSTALL_DIR
 INSTALL_DIR=${INSTALL_DIR:-/opt/radiusbilling-core}
 INSTALL_DIR=${INSTALL_DIR%/}
-
-# Konversi DB_BACKUP_FILE ke absolute path agar tidak error setelah cd
-if [[ -n "$DB_BACKUP_FILE" && "$DB_BACKUP_FILE" != /* ]]; then
-    DB_BACKUP_FILE="$CURRENT_DIR/$DB_BACKUP_FILE"
-fi
 
 while [[ -z "$MYSQL_ROOT_PASSWORD" ]]; do
     read -p "Masukkan MySQL Root Password: " MYSQL_ROOT_PASSWORD
@@ -65,15 +59,52 @@ fi
 cd "$INSTALL_DIR" || exit 1
 
 # ---------- Persiapan Database ----------
+echo ""
+echo "=== PEMILIHAN DATABASE ==="
+echo "Pilih opsi database yang ingin Anda gunakan:"
+echo "0) Instalasi Baru (Gunakan database kosong bawaan)"
+echo "1) Pilih file backup dari dalam repositori (db-init/)"
+echo "2) Masukkan path file backup secara manual"
+read -p "Masukkan pilihan Anda [0/1/2] (Default: 0): " DB_OPTION
+
+DB_BACKUP_FILE=""
+
+if [ "$DB_OPTION" = "1" ]; then
+    echo ""
+    echo "Daftar file backup yang tersedia di db-init/ :"
+    # Cari file .sql selain schema utama
+    sql_files=($(ls db-init/*.sql 2>/dev/null | grep -v "schema_clean.sql" | grep -v "trigger.sql"))
+    if [ ${#sql_files[@]} -eq 0 ]; then
+        echo "Tidak ada file backup tambahan yang ditemukan. Menggunakan instalasi baru."
+    else
+        for i in "${!sql_files[@]}"; do
+            echo "$((i+1))) ${sql_files[$i]}"
+        done
+        read -p "Pilih nomor file: " file_num
+        if [[ "$file_num" =~ ^[0-9]+$ ]] && [ "$file_num" -ge 1 ] && [ "$file_num" -le "${#sql_files[@]}" ]; then
+            DB_BACKUP_FILE="${sql_files[$((file_num-1))]}"
+            echo "Memilih: $DB_BACKUP_FILE"
+        else
+            echo "Pilihan tidak valid, fallback ke instalasi baru."
+        fi
+    fi
+elif [ "$DB_OPTION" = "2" ]; then
+    read -p "Masukkan absolute path ke file .sql Anda (contoh: /root/backup.sql): " DB_BACKUP_FILE
+    if [ ! -f "$DB_BACKUP_FILE" ]; then
+        echo "Peringatan: File tidak ditemukan! Fallback ke instalasi baru."
+        DB_BACKUP_FILE=""
+    fi
+fi
+
 if [[ -n "$DB_BACKUP_FILE" && -f "$DB_BACKUP_FILE" ]]; then
-    echo "Cleaning previous DB volume and importing backup..."
+    echo "Membersihkan volume DB sebelumnya dan mengimpor backup..."
     docker compose -f docker-compose_core.yml down -v
     # Amankan file backup dulu ke /tmp jika letaknya di dalam db-init/
     cp "$DB_BACKUP_FILE" /tmp/00-restore.sql
     rm -rf db-init/*
     mv /tmp/00-restore.sql db-init/00-restore.sql
 else
-    echo "No backup provided – starting with fresh database."
+    echo "Memulai dengan fresh database bawaan."
     docker compose -f docker-compose_core.yml down -v
     
     # Amankan schema default bawaan aplikasi sebelum folder dibersihkan
