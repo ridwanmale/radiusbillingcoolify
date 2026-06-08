@@ -56,8 +56,19 @@
                 </div>
 
                 <div class="md:col-span-1">
+                    <label class="block text-xs text-slate-400 mb-1">Compose File</label>
+                    <input list="compose-options" id="compose" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-emerald-500" placeholder="docker-compose.yml" value="docker-compose_web.yml" required>
+                    <datalist id="compose-options">
+                        <option value="docker-compose.yml">
+                        <option value="docker-compose_core.yml">
+                        <option value="docker-compose_web.yml">
+                        <option value="docker-compose_portalonlinevoucher.yml">
+                    </datalist>
+                </div>
+
+                <div class="md:col-span-1">
                     <label class="block text-xs text-slate-400 mb-1">Service Name</label>
-                    <input type="text" id="service" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-emerald-500" placeholder="db / backend / portal" value="db" required>
+                    <input type="text" id="service" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-emerald-500" placeholder="db / backend / portal" value="backend" required>
                 </div>
 
                 <div class="md:col-span-1 flex items-end gap-2">
@@ -115,6 +126,7 @@
             const host = document.getElementById('ip').value;
             const password = document.getElementById('password').value;
             const containerDir = document.getElementById('directory').value;
+            const composeFile = document.getElementById('compose').value;
             const serviceName = document.getElementById('service').value;
 
             term.clear();
@@ -126,6 +138,7 @@
                 username: 'root',
                 password: password,
                 containerDir: containerDir,
+                composeFile: composeFile,
                 serviceName: serviceName
             });
 

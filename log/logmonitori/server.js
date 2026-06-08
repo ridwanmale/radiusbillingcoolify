@@ -16,7 +16,7 @@ io.on('connection', (socket) => {
     let stream = null;
 
     socket.on('start-log', (data) => {
-        const { host, port, username, password, containerDir, serviceName } = data;
+            const { host, port, username, password, containerDir, composeFile, serviceName } = data;
 
         if (sshClient) {
             sshClient.end();
@@ -29,14 +29,9 @@ io.on('connection', (socket) => {
         sshClient.on('ready', () => {
             socket.emit('log-data', `\x1b[32m[SYSTEM]\x1b[0m Connected to ${host}. Executing docker compose logs...\r\n`);
 
-            // Tentukan file docker-compose berdasarkan direktori
-            let composeFile = '';
-            if (containerDir.includes('core')) composeFile = '-f docker-compose_core.yml';
-            else if (containerDir.includes('web')) composeFile = '-f docker-compose_web.yml';
-            else if (containerDir.includes('portal') || containerDir.includes('armradius')) composeFile = '-f docker-compose_portalonlinevoucher.yml';
-            
             // Build command
-            const command = `cd ${containerDir} && docker compose ${composeFile} logs -f ${serviceName}`;
+            const composeFlag = composeFile ? `-f ${composeFile}` : '';
+            const command = `cd ${containerDir} && docker compose ${composeFlag} logs -f ${serviceName}`;
 
             sshClient.exec(command, { pty: true }, (err, sshStream) => {
                 if (err) {
