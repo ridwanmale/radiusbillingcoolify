@@ -3,6 +3,8 @@ version: '3.8'
 services:
   db:
     image: mysql:8.0
+    security_opt:
+      - apparmor:unconfined
     user: "root"
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?}
