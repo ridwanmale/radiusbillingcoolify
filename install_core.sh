@@ -101,6 +101,10 @@ if [[ -n "$DB_BACKUP_FILE" && -f "$DB_BACKUP_FILE" ]]; then
     docker compose -f docker-compose_core.yml down -v
     # Amankan file backup dulu ke /tmp jika letaknya di dalam db-init/
     cp "$DB_BACKUP_FILE" /tmp/00-restore.sql
+    
+    # Menghapus DEFINER dari file backup agar tidak terjadi error hak akses saat import
+    sed -i 's/DEFINER=[^*]*\*/\*/g' /tmp/00-restore.sql
+    
     rm -rf db-init/*
     mv /tmp/00-restore.sql db-init/00-restore.sql
 else

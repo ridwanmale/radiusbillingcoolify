@@ -157,6 +157,10 @@ if [[ -n "$DB_BACKUP_FILE" && -f "$DB_BACKUP_FILE" ]]; then
     echo "Membersihkan volume DB sebelumnya dan mengimpor backup..."
     docker compose down -v
     cp "$DB_BACKUP_FILE" /tmp/00-restore.sql
+    
+    # Menghapus DEFINER dari file backup agar tidak terjadi error hak akses saat import
+    sed -i 's/DEFINER=[^*]*\*/\*/g' /tmp/00-restore.sql
+    
     rm -rf db-init/*
     mv /tmp/00-restore.sql db-init/00-restore.sql
 else
