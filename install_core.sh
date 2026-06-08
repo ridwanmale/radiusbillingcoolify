@@ -106,6 +106,9 @@ if [[ -n "$DB_BACKUP_FILE" && -f "$DB_BACKUP_FILE" ]]; then
     # Menghapus DEFINER dari file backup agar tidak terjadi error hak akses saat import
     sed -i 's/DEFINER=[^*]*\*/\*/g' /tmp/00-restore.sql
     
+    # Konversi Collation MySQL 8 (utf8mb4_0900_ai_ci) ke standar MariaDB (utf8mb4_unicode_ci)
+    sed -i 's/utf8mb4_0900_ai_ci/utf8mb4_unicode_ci/g' /tmp/00-restore.sql
+    
     rm -rf db-init/*
     mv /tmp/00-restore.sql db-init/00-restore.sql
 else
