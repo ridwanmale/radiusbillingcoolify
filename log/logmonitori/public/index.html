@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Server Log Monitor</title>
+    <title>Hacker Log Monitor</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Xterm.js for Terminal Output -->
@@ -14,153 +14,197 @@
     <script src="/socket.io/socket.io.js"></script>
     <style>
         body { background-color: #0f172a; color: #f8fafc; }
-        .terminal-container { height: calc(100vh - 280px); width: 100%; padding: 10px; background-color: #000; border-radius: 8px; overflow: hidden; }
+        .terminal-container { height: 350px; width: 100%; padding: 10px; background-color: #000; border-radius: 8px; overflow: hidden; }
+        /* Scrollbar styles for terminals */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col font-sans">
     
-    <header class="bg-slate-800 border-b border-slate-700 p-4 shadow-md">
+    <header class="bg-slate-900 border-b border-slate-700 p-4 shadow-md sticky top-0 z-50">
         <div class="container mx-auto flex items-center justify-between">
             <h1 class="text-xl font-bold text-emerald-400 flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg>
-                Radius Billing Command Center
+                Hacker Command Center
             </h1>
-            <span class="text-sm text-slate-400" id="status-badge">🟢 Ready</span>
+            <button id="btn-add-terminal" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 px-4 rounded transition duration-200 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                Add Terminal
+            </button>
         </div>
     </header>
 
-    <main class="container mx-auto p-4 flex-grow flex flex-col">
-        <div class="bg-slate-800 p-5 rounded-lg shadow-lg mb-4 border border-slate-700">
-            <h2 class="text-lg font-semibold mb-4 text-slate-200">Server Connection</h2>
-            <form id="connect-form" class="grid grid-cols-1 md:grid-cols-6 gap-4">
-                
-                <div class="md:col-span-1">
-                    <label class="block text-xs text-slate-400 mb-1">VPS IP Address</label>
-                    <input type="text" id="ip" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-emerald-500" placeholder="192.168.1.1" required>
-                </div>
-
-                <div class="md:col-span-1">
-                    <label class="block text-xs text-slate-400 mb-1">Password</label>
-                    <input type="password" id="password" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-emerald-500" placeholder="••••••••" required>
-                </div>
-
-                <div class="md:col-span-2">
-                    <label class="block text-xs text-slate-400 mb-1">Project Directory</label>
-                    <input list="dir-options" id="directory" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-emerald-500" placeholder="/opt/radiusbilling-core" value="/opt/radiusbilling-core" required>
-                    <datalist id="dir-options">
-                        <option value="/opt/radiusbilling-core">
-                        <option value="/opt/radiusbilling-web">
-                        <option value="/opt/radiusbilling-portal">
-                        <option value="/home/armradius">
-                    </datalist>
-                </div>
-
-                <div class="md:col-span-1">
-                    <label class="block text-xs text-slate-400 mb-1">Compose File</label>
-                    <input list="compose-options" id="compose" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-emerald-500" placeholder="docker-compose.yml" value="docker-compose_web.yml" required>
-                    <datalist id="compose-options">
-                        <option value="docker-compose.yml">
-                        <option value="docker-compose_core.yml">
-                        <option value="docker-compose_web.yml">
-                        <option value="docker-compose_portalonlinevoucher.yml">
-                    </datalist>
-                </div>
-
-                <div class="md:col-span-1">
-                    <label class="block text-xs text-slate-400 mb-1">Service Name</label>
-                    <input type="text" id="service" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-emerald-500" placeholder="db / backend / portal" value="backend" required>
-                </div>
-
-                <div class="md:col-span-1 flex items-end gap-2">
-                    <button type="submit" id="btn-connect" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 px-4 rounded transition duration-200">
-                        Connect
-                    </button>
-                    <button type="button" id="btn-disconnect" class="hidden w-full bg-red-600 hover:bg-red-500 text-white font-semibold py-2 px-4 rounded transition duration-200">
-                        Stop
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        <div class="flex-grow flex flex-col bg-slate-800 rounded-lg shadow-lg border border-slate-700 p-2">
-            <div class="flex justify-between items-center px-2 py-1 mb-2 bg-slate-900 rounded border border-slate-700">
-                <span class="text-xs font-mono text-slate-400" id="terminal-title">Terminal - Not Connected</span>
-                <button id="btn-clear" class="text-xs text-slate-400 hover:text-white">Clear</button>
-            </div>
-            <div id="terminal" class="terminal-container"></div>
+    <main class="p-4 flex-grow">
+        <!-- Grid layout for terminals -->
+        <div id="grid-container" class="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
+            <!-- Terminals will be injected here -->
         </div>
     </main>
 
     <script>
         const socket = io();
-        const form = document.getElementById('connect-form');
-        const btnConnect = document.getElementById('btn-connect');
-        const btnDisconnect = document.getElementById('btn-disconnect');
-        const statusBadge = document.getElementById('status-badge');
-        const terminalTitle = document.getElementById('terminal-title');
+        const gridContainer = document.getElementById('grid-container');
+        const btnAddTerminal = document.getElementById('btn-add-terminal');
+        let terminalCount = 0;
 
-        // Initialize XTerm.js
-        const term = new Terminal({
-            theme: { background: '#000000', foreground: '#f8fafc' },
-            fontFamily: 'Menlo, Monaco, "Courier New", monospace',
-            fontSize: 13,
-            convertEol: true
-        });
-        const fitAddon = new FitAddon.FitAddon();
-        term.loadAddon(fitAddon);
-        term.open(document.getElementById('terminal'));
-        fitAddon.fit();
+        function createTerminalBlock() {
+            terminalCount++;
+            const tId = `term-${terminalCount}`;
 
-        window.addEventListener('resize', () => { fitAddon.fit(); });
+            // Create wrapper
+            const wrapper = document.createElement('div');
+            wrapper.className = "flex flex-col bg-slate-800 rounded-lg shadow-lg border border-slate-700 overflow-hidden";
+            wrapper.id = `wrapper-${tId}`;
 
-        term.writeln('\x1b[36mWelcome to Radius Billing Local Log Monitor!\x1b[0m');
-        term.writeln('Enter your VPS details above and click Connect.');
+            // Template HTML for single terminal block
+            wrapper.innerHTML = `
+                <!-- Top Form Section -->
+                <div class="bg-slate-800 p-4 border-b border-slate-700">
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-sm font-semibold text-emerald-400 flex items-center gap-2">
+                            <span id="status-${tId}">🔴 Offline</span>
+                        </h2>
+                        <button class="text-slate-400 hover:text-red-400 transition" onclick="removeTerminal('${tId}')">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                        </button>
+                    </div>
+                    
+                    <form id="form-${tId}" class="grid grid-cols-2 lg:grid-cols-6 gap-2">
+                        <div class="col-span-1 lg:col-span-1">
+                            <input type="text" id="ip-${tId}" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="IP VPS" required>
+                        </div>
+                        <div class="col-span-1 lg:col-span-1">
+                            <input type="password" id="pass-${tId}" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="Password" required>
+                        </div>
+                        <div class="col-span-1 lg:col-span-2">
+                            <input list="dir-opts-${tId}" id="dir-${tId}" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="/opt/radiusbilling-core" value="/opt/radiusbilling-core" required>
+                            <datalist id="dir-opts-${tId}">
+                                <option value="/opt/radiusbilling-core">
+                                <option value="/opt/radiusbilling-web">
+                                <option value="/opt/radiusbilling-portal">
+                                <option value="/home/armradius">
+                            </datalist>
+                        </div>
+                        <div class="col-span-1 lg:col-span-1">
+                            <input list="cmp-opts-${tId}" id="cmp-${tId}" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="Compose File" value="docker-compose_core.yml" required>
+                            <datalist id="cmp-opts-${tId}">
+                                <option value="docker-compose_core.yml">
+                                <option value="docker-compose_web.yml">
+                                <option value="docker-compose_portalonlinevoucher.yml">
+                            </datalist>
+                        </div>
+                        <div class="col-span-1 lg:col-span-1">
+                            <input type="text" id="svc-${tId}" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="Service" value="db" required>
+                        </div>
+                        <div class="col-span-2 lg:col-span-6 flex gap-2 mt-1">
+                            <button type="submit" id="btn-conn-${tId}" class="flex-grow bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold py-1.5 px-3 rounded transition">Connect</button>
+                            <button type="button" id="btn-disc-${tId}" class="hidden flex-grow bg-red-600 hover:bg-red-500 text-white text-xs font-semibold py-1.5 px-3 rounded transition">Stop</button>
+                            <button type="button" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold py-1.5 px-3 rounded transition" onclick="clearTerm('${tId}')">Clear</button>
+                        </div>
+                    </form>
+                </div>
 
-        socket.on('log-data', (data) => {
-            term.write(data);
-        });
+                <!-- Terminal Section -->
+                <div class="flex-grow p-2 bg-slate-900">
+                    <div id="xterm-${tId}" class="terminal-container"></div>
+                </div>
+            `;
 
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            const host = document.getElementById('ip').value;
-            const password = document.getElementById('password').value;
-            const containerDir = document.getElementById('directory').value;
-            const composeFile = document.getElementById('compose').value;
-            const serviceName = document.getElementById('service').value;
+            gridContainer.appendChild(wrapper);
 
-            term.clear();
-            term.writeln(`\x1b[36mInitiating connection to ${host}...\x1b[0m`);
-            
-            socket.emit('start-log', {
-                host: host,
-                port: 22,
-                username: 'root',
-                password: password,
-                containerDir: containerDir,
-                composeFile: composeFile,
-                serviceName: serviceName
+            // Initialize Xterm
+            const term = new Terminal({
+                theme: { background: '#000000', foreground: '#10b981' }, // Hacker green text
+                fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+                fontSize: 12,
+                convertEol: true
+            });
+            const fitAddon = new FitAddon.FitAddon();
+            term.loadAddon(fitAddon);
+            term.open(document.getElementById(`xterm-${tId}`));
+            setTimeout(() => fitAddon.fit(), 100);
+
+            // Store instance
+            window[`termInstance_${tId}`] = term;
+            window[`fitAddon_${tId}`] = fitAddon;
+
+            term.writeln('\x1b[32mTerminal Ready.\x1b[0m');
+
+            // Socket Listeners for this specific terminal
+            socket.on(`log-data-${tId}`, (data) => {
+                term.write(data);
             });
 
-            btnConnect.classList.add('hidden');
-            btnDisconnect.classList.remove('hidden');
-            statusBadge.innerHTML = '🔴 Monitoring';
-            statusBadge.classList.replace('text-slate-400', 'text-red-400');
-            terminalTitle.innerText = `${host} -> ${serviceName}`;
+            // Form Submit Logic
+            document.getElementById(`form-${tId}`).addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const host = document.getElementById(`ip-${tId}`).value;
+                const password = document.getElementById(`pass-${tId}`).value;
+                const containerDir = document.getElementById(`dir-${tId}`).value;
+                const composeFile = document.getElementById(`cmp-${tId}`).value;
+                const serviceName = document.getElementById(`svc-${tId}`).value;
+
+                term.clear();
+                term.writeln(`\x1b[36mInitiating connection to ${host}...\x1b[0m`);
+                
+                socket.emit('start-log', {
+                    terminalId: tId,
+                    host: host,
+                    port: 22,
+                    username: 'root',
+                    password: password,
+                    containerDir: containerDir,
+                    composeFile: composeFile,
+                    serviceName: serviceName
+                });
+
+                document.getElementById(`btn-conn-${tId}`).classList.add('hidden');
+                document.getElementById(`btn-disc-${tId}`).classList.remove('hidden');
+                document.getElementById(`status-${tId}`).innerHTML = '🟢 Monitoring: ' + host;
+            });
+
+            // Disconnect Logic
+            document.getElementById(`btn-disc-${tId}`).addEventListener('click', () => {
+                socket.emit('stop-log', tId);
+                document.getElementById(`btn-conn-${tId}`).classList.remove('hidden');
+                document.getElementById(`btn-disc-${tId}`).classList.add('hidden');
+                document.getElementById(`status-${tId}`).innerHTML = '🔴 Offline';
+            });
+        }
+
+        // Global Window Resizer
+        window.addEventListener('resize', () => {
+            for (let i = 1; i <= terminalCount; i++) {
+                const fit = window[`fitAddon_term-${i}`];
+                if (fit) fit.fit();
+            }
         });
 
-        btnDisconnect.addEventListener('click', () => {
-            socket.emit('stop-log');
-            btnConnect.classList.remove('hidden');
-            btnDisconnect.classList.add('hidden');
-            statusBadge.innerHTML = '🟢 Ready';
-            statusBadge.classList.replace('text-red-400', 'text-slate-400');
-            terminalTitle.innerText = `Terminal - Disconnected`;
+        // Remove Terminal Logic
+        window.removeTerminal = function(tId) {
+            socket.emit('stop-log', tId);
+            const wrapper = document.getElementById(`wrapper-${tId}`);
+            if (wrapper) wrapper.remove();
+        }
+
+        // Clear Terminal Logic
+        window.clearTerm = function(tId) {
+            const term = window[`termInstance_${tId}`];
+            if (term) term.clear();
+        }
+
+        // Init with 1 terminal
+        createTerminalBlock();
+
+        // Add Terminal Button
+        btnAddTerminal.addEventListener('click', () => {
+            createTerminalBlock();
         });
 
-        document.getElementById('btn-clear').addEventListener('click', () => {
-            term.clear();
-        });
     </script>
 </body>
 </html>
