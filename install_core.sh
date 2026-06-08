@@ -75,7 +75,16 @@ if [[ -n "$DB_BACKUP_FILE" && -f "$DB_BACKUP_FILE" ]]; then
 else
     echo "No backup provided – starting with fresh database."
     docker compose -f docker-compose_core.yml down -v
+    
+    # Amankan schema default bawaan aplikasi sebelum folder dibersihkan
+    cp db-init/schema_clean.sql /tmp/01-schema.sql 2>/dev/null || true
+    cp db-init/trigger.sql /tmp/02-trigger.sql 2>/dev/null || true
+    
     rm -rf db-init/*
+    
+    # Kembalikan schema default ke dalam folder db-init agar MariaDB meng-initnya
+    mv /tmp/01-schema.sql db-init/01-schema.sql 2>/dev/null || true
+    mv /tmp/02-trigger.sql db-init/02-trigger.sql 2>/dev/null || true
 fi
 
 if ! command -v docker &> /dev/null; then
