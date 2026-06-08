@@ -12,7 +12,8 @@ fi
 CURRENT_DIR=$(pwd)
 
 # --- SESI INPUT DARI USER ---
-read -p "Masukkan link GitHub repositori (Kosongkan untuk default ridwanmale): " GITHUB_URL
+read -p "Masukkan link GitHub repositori (Kosongkan untuk default: https://github.com/ridwanmale/radiusbillingcoolify.git): " GITHUB_URL
+GITHUB_URL=${GITHUB_URL:-https://github.com/ridwanmale/radiusbillingcoolify.git}
 GITHUB_URL=${GITHUB_URL:-https://github.com/ridwanmale/radiusbillingcoolify.git}
 
 # Jika dijalankan di dalam repositori, jadikan direktori saat ini sebagai default

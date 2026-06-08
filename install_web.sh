@@ -14,7 +14,8 @@ echo ""
 CURRENT_DIR=$(pwd)
 
 # --- SESI INPUT DARI USER ---
-read -p "Masukkan link GitHub repositori (Kosongkan jika ingin pakai file lokal): " GITHUB_URL
+read -p "Masukkan link GitHub repositori (Kosongkan untuk default: https://github.com/ridwanmale/radiusbillingcoolify.git): " GITHUB_URL
+GITHUB_URL=${GITHUB_URL:-https://github.com/ridwanmale/radiusbillingcoolify.git}
 
 read -p "Masukkan path direktori instalasi (tekan Enter untuk default: /opt/radiusbilling-web): " INSTALL_DIR
 INSTALL_DIR=${INSTALL_DIR:-/opt/radiusbilling-web}
