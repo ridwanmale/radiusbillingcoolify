@@ -157,7 +157,11 @@ fi
 if [[ -n "$DB_BACKUP_FILE" && -f "$DB_BACKUP_FILE" ]]; then
     echo "Membersihkan volume DB sebelumnya dan mengimpor backup..."
     docker compose down -v
-    cp "$DB_BACKUP_FILE" /tmp/00-restore.sql
+    
+    if ! cp "$DB_BACKUP_FILE" /tmp/00-restore.sql; then
+        echo "FATAL ERROR: Gagal membaca file backup $DB_BACKUP_FILE!"
+        exit 1
+    fi
     
     # Menghapus DEFINER dari file backup agar tidak terjadi error hak akses saat import
     sed -i 's/DEFINER=[^*]*\*/\*/g' /tmp/00-restore.sql
@@ -166,7 +170,10 @@ if [[ -n "$DB_BACKUP_FILE" && -f "$DB_BACKUP_FILE" ]]; then
     sed -i 's/utf8mb4_0900_ai_ci/utf8mb4_unicode_ci/g' /tmp/00-restore.sql
     
     rm -rf db-init/*
-    mv /tmp/00-restore.sql db-init/00-restore.sql
+    if ! mv /tmp/00-restore.sql db-init/00-restore.sql; then
+        echo "FATAL ERROR: Gagal memindahkan file backup ke db-init!"
+        exit 1
+    fi
 else
     echo "Memulai dengan fresh database bawaan."
     docker compose down -v
