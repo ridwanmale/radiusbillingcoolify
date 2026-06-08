@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Server Log Monitor</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Xterm.js for Terminal Output -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css" />
+    <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js"></script>
+    <!-- Socket.io -->
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; }
+        .terminal-container { height: calc(100vh - 280px); width: 100%; padding: 10px; background-color: #000; border-radius: 8px; overflow: hidden; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans">
+    
+    <header class="bg-slate-800 border-b border-slate-700 p-4 shadow-md">
+        <div class="container mx-auto flex items-center justify-between">
+            <h1 class="text-xl font-bold text-emerald-400 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" /></svg>
+                Radius Billing Command Center
+            </h1>
+            <span class="text-sm text-slate-400" id="status-badge">🟢 Ready</span>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 flex-grow flex flex-col">
+        <div class="bg-slate-800 p-5 rounded-lg shadow-lg mb-4 border border-slate-700">
+            <h2 class="text-lg font-semibold mb-4 text-slate-200">Server Connection</h2>
+            <form id="connect-form" class="grid grid-cols-1 md:grid-cols-6 gap-4">
+                
+                <div class="md:col-span-1">
+                    <label class="block text-xs text-slate-400 mb-1">VPS IP Address</label>
+                    <input type="text" id="ip" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-emerald-500" placeholder="192.168.1.1" required>
+                </div>
+
+                <div class="md:col-span-1">
+                    <label class="block text-xs text-slate-400 mb-1">Password</label>
+                    <input type="password" id="password" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-emerald-500" placeholder="••••••••" required>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-xs text-slate-400 mb-1">Project Directory</label>
+                    <select id="directory" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-emerald-500">
+                        <option value="/opt/radiusbilling-core">Core Server (/opt/radiusbilling-core)</option>
+                        <option value="/opt/radiusbilling-web">Web Admin (/opt/radiusbilling-web)</option>
+                        <option value="/opt/radiusbilling-portal">Portal (/opt/radiusbilling-portal)</option>
+                        <option value="/home/armradius">Portal (Custom /home/armradius)</option>
+                    </select>
+                </div>
+
+                <div class="md:col-span-1">
+                    <label class="block text-xs text-slate-400 mb-1">Service Name</label>
+                    <input type="text" id="service" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-emerald-500" placeholder="db / backend / portal" value="db" required>
+                </div>
+
+                <div class="md:col-span-1 flex items-end gap-2">
+                    <button type="submit" id="btn-connect" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 px-4 rounded transition duration-200">
+                        Connect
+                    </button>
+                    <button type="button" id="btn-disconnect" class="hidden w-full bg-red-600 hover:bg-red-500 text-white font-semibold py-2 px-4 rounded transition duration-200">
+                        Stop
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="flex-grow flex flex-col bg-slate-800 rounded-lg shadow-lg border border-slate-700 p-2">
+            <div class="flex justify-between items-center px-2 py-1 mb-2 bg-slate-900 rounded border border-slate-700">
+                <span class="text-xs font-mono text-slate-400" id="terminal-title">Terminal - Not Connected</span>
+                <button id="btn-clear" class="text-xs text-slate-400 hover:text-white">Clear</button>
+            </div>
+            <div id="terminal" class="terminal-container"></div>
+        </div>
+    </main>
+
+    <script>
+        const socket = io();
+        const form = document.getElementById('connect-form');
+        const btnConnect = document.getElementById('btn-connect');
+        const btnDisconnect = document.getElementById('btn-disconnect');
+        const statusBadge = document.getElementById('status-badge');
+        const terminalTitle = document.getElementById('terminal-title');
+
+        // Initialize XTerm.js
+        const term = new Terminal({
+            theme: { background: '#000000', foreground: '#f8fafc' },
+            fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+            fontSize: 13,
+            convertEol: true
+        });
+        const fitAddon = new FitAddon.FitAddon();
+        term.loadAddon(fitAddon);
+        term.open(document.getElementById('terminal'));
+        fitAddon.fit();
+
+        window.addEventListener('resize', () => { fitAddon.fit(); });
+
+        term.writeln('\x1b[36mWelcome to Radius Billing Local Log Monitor!\x1b[0m');
+        term.writeln('Enter your VPS details above and click Connect.');
+
+        socket.on('log-data', (data) => {
+            term.write(data);
+        });
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const host = document.getElementById('ip').value;
+            const password = document.getElementById('password').value;
+            const containerDir = document.getElementById('directory').value;
+            const serviceName = document.getElementById('service').value;
+
+            term.clear();
+            term.writeln(`\x1b[36mInitiating connection to ${host}...\x1b[0m`);
+            
+            socket.emit('start-log', {
+                host: host,
+                port: 22,
+                username: 'root',
+                password: password,
+                containerDir: containerDir,
+                serviceName: serviceName
+            });
+
+            btnConnect.classList.add('hidden');
+            btnDisconnect.classList.remove('hidden');
+            statusBadge.innerHTML = '🔴 Monitoring';
+            statusBadge.classList.replace('text-slate-400', 'text-red-400');
+            terminalTitle.innerText = `${host} -> ${serviceName}`;
+        });
+
+        btnDisconnect.addEventListener('click', () => {
+            socket.emit('stop-log');
+            btnConnect.classList.remove('hidden');
+            btnDisconnect.classList.add('hidden');
+            statusBadge.innerHTML = '🟢 Ready';
+            statusBadge.classList.replace('text-red-400', 'text-slate-400');
+            terminalTitle.innerText = `Terminal - Disconnected`;
+        });
+
+        document.getElementById('btn-clear').addEventListener('click', () => {
+            term.clear();
+        });
+    </script>
+</body>
+</html>
