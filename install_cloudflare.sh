@@ -9,14 +9,19 @@ sudo apt-get update
 echo "Installing curl if not present..."
 sudo apt-get install -y curl
 
-echo "Downloading Cloudflare Tunnel (cloudflared)..."
-curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+echo "Adding Cloudflare package repository..."
+sudo mkdir -p --mode=0755 /usr/share/keyrings
+curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
 
-echo "Installing cloudflared..."
-sudo dpkg -i cloudflared.deb
+# Get OS codename (e.g. jammy, focal)
+OS_CODENAME=$(lsb_release -cs)
+echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared $OS_CODENAME main" | sudo tee /etc/apt/sources.list.d/cloudflared.list
 
-echo "Cleaning up..."
-rm cloudflared.deb
+echo "Updating package list with Cloudflare repo..."
+sudo apt-get update
+
+echo "Installing cloudflared via apt..."
+sudo apt-get install -y cloudflared
 
 echo "======================================================="
 echo "Cloudflare Tunnel (cloudflared) installed successfully!"
