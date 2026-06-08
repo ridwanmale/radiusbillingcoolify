@@ -16,12 +16,11 @@
         html { color-scheme: dark; }
         body { background-color: #0f172a; color: #f8fafc; }
         .terminal-container { height: 350px; width: 100%; padding: 10px; background-color: #000; border-radius: 8px; overflow: hidden; }
-        /* Small, sleek, semi-transparent scrollbar so text is visible */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(71, 85, 105, 0.6); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.9); }
-        .xterm .xterm-viewport { z-index: 10; } /* Ensure scrollbar is clickable on top of canvas */
+        /* Small, sleek scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #000000; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col font-sans">
