@@ -62,7 +62,7 @@ async function performBackup() {
 
     console.log(`Starting mysqldump to ${filePath}...`);
     // Pass password via MYSQL_PWD environment variable to safely handle special characters
-    const dumpCmd = `mysqldump -h ${dbHost} -u ${dbUser} ${dbName} > "${filePath}"`;
+    const dumpCmd = `mysqldump --skip-ssl -h ${dbHost} -u ${dbUser} ${dbName} > "${filePath}"`;
     
     await execAsync(dumpCmd, {
       env: { ...process.env, MYSQL_PWD: dbPass }

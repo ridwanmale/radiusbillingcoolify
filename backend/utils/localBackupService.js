@@ -26,7 +26,7 @@ async function generateLocalBackup() {
     const dbHost = process.env.DB_HOST || 'localhost';
 
     console.log(`[Local Backup] Starting mysqldump to ${filePath}...`);
-    const dumpCmd = `mysqldump -h ${dbHost} -u ${dbUser} ${dbName} > "${filePath}"`;
+    const dumpCmd = `mysqldump --skip-ssl -h ${dbHost} -u ${dbUser} ${dbName} > "${filePath}"`;
     
     await execAsync(dumpCmd, {
       env: { ...process.env, MYSQL_PWD: dbPass }
