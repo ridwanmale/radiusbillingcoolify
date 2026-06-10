@@ -1274,7 +1274,7 @@ router.get('/:order_id', async (req, res) => {
       });
     }
 
-    res.status(404).json({ error: 'Data tidak ditemukan' });
+    res.status(404).json({ error: 'Data transaksi tidak ditemukan (V2)' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
