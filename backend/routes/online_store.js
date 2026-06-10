@@ -980,52 +980,7 @@ router.delete('/spam-blocklist/:id', async (req, res) => {
 
 
 
-// 11. Cek Status Transaksi (Untuk Polling di Portal)
-router.get('/:order_id', async (req, res) => {
-  const { order_id } = req.params;
-  try {
-    // 1. Coba cari di Jurnal Keuangan (Transaksi Online)
-    let [rows] = await db.query(`
-      SELECT j.*, rc.value as password
-      FROM jurnal_keuangan j
-      LEFT JOIN radcheck rc ON j.voucher_code = rc.username AND rc.attribute = 'Cleartext-Password'
-      WHERE j.order_id = ?
-    `, [order_id]);
-    
-    if (rows.length > 0) {
-      return res.json(rows[0]);
-    }
 
-    // 2. Fallback: Coba cari di Rincian Transaksi Voucher (Voucher Fisik/Manual)
-    const [vRows] = await db.query(`
-      SELECT 
-        v.username as voucher_code,
-        v.status,
-        v.created_at,
-        rc.value as password
-      FROM rincian_transaksi_voucher v
-      LEFT JOIN radcheck rc ON v.username = rc.username AND rc.attribute = 'Cleartext-Password'
-      WHERE v.username = ?
-    `, [order_id]);
-
-    if (vRows.length > 0) {
-      const v = vRows[0];
-      return res.json({
-        order_id: v.voucher_code,
-        voucher_code: v.voucher_code,
-        password: v.password || v.voucher_code,
-        status: (v.status === 'Aktif' || v.status === 'Terjual') ? 'PAID' : v.status,
-        total_amount: 0,
-        package_id: 'Voucher Fisik',
-        created_at: v.created_at
-      });
-    }
-
-    res.status(404).json({ error: 'Data tidak ditemukan' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
 
 
 
@@ -1272,6 +1227,54 @@ router.get('/restore-voucher/:device_id', async (req, res) => {
     } else {
       res.json({ success: false });
     }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 11. Cek Status Transaksi (Untuk Polling di Portal)
+// Route ini diletakkan paling bawah agar tidak menabrak route lain yang memiliki 1 parameter
+router.get('/:order_id', async (req, res) => {
+  const { order_id } = req.params;
+  try {
+    // 1. Coba cari di Jurnal Keuangan (Transaksi Online)
+    let [rows] = await db.query(`
+      SELECT j.*, rc.value as password
+      FROM jurnal_keuangan j
+      LEFT JOIN radcheck rc ON j.voucher_code = rc.username AND rc.attribute = 'Cleartext-Password'
+      WHERE j.order_id = ?
+    `, [order_id]);
+    
+    if (rows.length > 0) {
+      return res.json(rows[0]);
+    }
+
+    // 2. Fallback: Coba cari di Rincian Transaksi Voucher (Voucher Fisik/Manual)
+    const [vRows] = await db.query(`
+      SELECT 
+        v.username as voucher_code,
+        v.status,
+        v.created_at,
+        rc.value as password
+      FROM rincian_transaksi_voucher v
+      LEFT JOIN radcheck rc ON v.username = rc.username AND rc.attribute = 'Cleartext-Password'
+      WHERE v.username = ?
+    `, [order_id]);
+
+    if (vRows.length > 0) {
+      const v = vRows[0];
+      return res.json({
+        order_id: v.voucher_code,
+        voucher_code: v.voucher_code,
+        password: v.password || v.voucher_code,
+        status: (v.status === 'Aktif' || v.status === 'Terjual') ? 'PAID' : v.status,
+        total_amount: 0,
+        package_id: 'Voucher Fisik',
+        created_at: v.created_at
+      });
+    }
+
+    res.status(404).json({ error: 'Data tidak ditemukan' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
