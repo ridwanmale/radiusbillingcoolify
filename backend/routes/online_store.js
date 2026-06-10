@@ -1090,8 +1090,10 @@ const handlePPPoEOnlinePaymentSuccess = async (orderId, amount) => {
 router.get('/blacklist-uuid', async (req, res) => {
   try {
     const [rows] = await db.query('SELECT * FROM blacklist_uuid ORDER BY created_at DESC');
+    console.log('[DEBUG] GET /blacklist-uuid returns:', rows.length, 'rows');
     res.json(rows);
   } catch (error) {
+    console.error('Blacklist GET Error:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -1101,9 +1103,17 @@ router.post('/blacklist-uuid', async (req, res) => {
   const { device_id, reason } = req.body;
   if (!device_id) return res.status(400).json({ error: 'UUID (Device ID) tidak boleh kosong' });
   try {
-    await db.query('INSERT IGNORE INTO blacklist_uuid (device_id, reason) VALUES (?, ?)', [device_id, reason || 'Blacklisted by Admin']);
-    res.json({ success: true, message: 'Berhasil memblokir perangkat secara permanen' });
+    const [result] = await db.query('INSERT IGNORE INTO blacklist_uuid (device_id, reason) VALUES (?, ?)', [device_id, reason || 'Blacklisted by Admin']);
+    if (result.affectedRows === 0) {
+      // Jika affectedRows 0, artinya insert ignore gagal (misal karena duplikat)
+      const [existing] = await db.query('SELECT * FROM blacklist_uuid WHERE device_id = ?', [device_id]);
+      if (existing.length === 0) {
+        throw new Error('Insert gagal tapi data tidak ditemukan. Apakah tabel ada?');
+      }
+    }
+    res.json({ success: true, message: 'Berhasil memblokir perangkat secara permanen', debug: result });
   } catch (error) {
+    console.error('Blacklist Error:', error);
     res.status(500).json({ error: error.message });
   }
 });
