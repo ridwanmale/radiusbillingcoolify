@@ -70,18 +70,19 @@ const checkStoreOpen = async (req, res, next) => {
 
 const checkSpamProtection = async (req, res, next) => {
   try {
-    const [settingsRows] = await db.query('SELECT spam_protection_enabled, spam_max_pending, spam_auto_unblock_minutes FROM portal_settings WHERE id = 1');
+    const [settingsRows] = await db.query('SELECT spam_protection_enabled, spam_max_pending, spam_auto_unblock_minutes, spam_max_auto_blocks FROM portal_settings WHERE id = 1');
     const settings = settingsRows[0];
+    
     if (!settings || !settings.spam_protection_enabled) return next();
 
     const ip_address = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim().substring(0, 45);
-    const device_id = req.body.device_id || '';
+    const device_id = req.body.device_id || req.query.mac || '';
 
     // 0. Check Permanent Blacklist UUID
     if (device_id) {
       const [permBlocks] = await db.query('SELECT id FROM blacklist_uuid WHERE device_id = ?', [device_id]);
       if (permBlocks.length > 0) {
-        return res.status(403).json({ error: 'Perangkat Anda diblokir permanen oleh Admin karena terdeteksi melakukan spam. Hubungi Admin untuk info lebih lanjut.', blocked: true });
+        return res.status(403).json({ error: 'Perangkat Anda telah diblokir permanen oleh sistem.', blocked: true });
       }
     }
 
@@ -140,7 +141,7 @@ const checkSpamProtection = async (req, res, next) => {
         [ip_address, device_id, `Mencapai batas ${maxPending} transaksi PENDING`]
       );
 
-      // Increment History
+      // Increment History & Check Auto Permanent Blacklist
       if (device_id) {
         try {
           await db.query(`
@@ -148,12 +149,25 @@ const checkSpamProtection = async (req, res, next) => {
             VALUES (?, 1, NOW()) 
             ON DUPLICATE KEY UPDATE block_count = block_count + 1, last_blocked_at = NOW()
           `, [device_id]);
+
+          // Cek apakah melampaui batas auto blacklist
+          const maxAutoBlocks = settings.spam_max_auto_blocks || 5;
+          const [historyRows] = await db.query('SELECT block_count FROM spam_history WHERE device_id = ?', [device_id]);
+          if (historyRows.length > 0 && historyRows[0].block_count >= maxAutoBlocks) {
+            // Lempar ke blacklist_uuid
+            await db.query('INSERT IGNORE INTO blacklist_uuid (device_id, reason) VALUES (?, ?)', 
+              [device_id, `Otomatis diblokir permanen setelah ${historyRows[0].block_count} kali melakukan spam.`]
+            );
+            // Opsional: Hapus dari daftar spam_blocklist sementara karena sudah permanen
+            await db.query('DELETE FROM spam_blocklist WHERE device_id = ?', [device_id]);
+            return res.status(403).json({ error: 'Perangkat Anda telah diblokir permanen oleh sistem karena berulang kali melakukan spam.', blocked: true });
+          }
         } catch (e) {
-          console.error('Gagal mencatat spam_history (mungkin tabel belum ada):', e.message);
+          console.error('Gagal memproses spam_history/auto-blacklist (mungkin tabel belum ada):', e.message);
         }
       }
 
-      return res.status(403).json({ error: 'Anda terlalu banyak membuat transaksi tertunda. Akses diblokir. Silakan hubungi Admin.', blocked: true });
+      return res.status(403).json({ error: 'Anda terlalu banyak membuat transaksi tertunda. Akses diblokir sementara.', blocked: true });
     }
 
     next();
@@ -1156,24 +1170,19 @@ router.get('/top-spammers', async (req, res) => {
     try {
       // Coba query dari spam_history dan jurnal_keuangan digabung
       [rows] = await db.query(`
-        SELECT device_id, SUM(spam_count) as spam_count FROM (
-          SELECT s.device_id, s.block_count as spam_count 
-          FROM spam_history s
-          LEFT JOIN blacklist_uuid b ON s.device_id = b.device_id
-          WHERE b.id IS NULL
+        SELECT combined.device_id, SUM(combined.spam_count) as spam_count FROM (
+          SELECT device_id, block_count as spam_count 
+          FROM spam_history
           
           UNION ALL
           
-          SELECT j.device_id, COUNT(j.id) as spam_count 
-          FROM jurnal_keuangan j
-          LEFT JOIN blacklist_uuid b ON j.device_id = b.device_id
-          WHERE j.status = 'PENDING' 
-            AND j.device_id IS NOT NULL 
-            AND j.device_id != ''
-            AND b.id IS NULL
-          GROUP BY j.device_id
+          SELECT device_id, COUNT(id) as spam_count 
+          FROM jurnal_keuangan
+          WHERE status = 'PENDING' AND device_id IS NOT NULL AND device_id != ''
+          GROUP BY device_id
         ) combined
-        GROUP BY device_id
+        WHERE combined.device_id NOT IN (SELECT device_id FROM blacklist_uuid)
+        GROUP BY combined.device_id
         ORDER BY spam_count DESC
         LIMIT 10
       `);
@@ -1182,11 +1191,10 @@ router.get('/top-spammers', async (req, res) => {
       [rows] = await db.query(`
         SELECT j.device_id, COUNT(j.id) as spam_count 
         FROM jurnal_keuangan j
-        LEFT JOIN blacklist_uuid b ON j.device_id = b.device_id
         WHERE j.status = 'PENDING' 
           AND j.device_id IS NOT NULL 
           AND j.device_id != ''
-          AND b.id IS NULL
+          AND j.device_id NOT IN (SELECT device_id FROM blacklist_uuid)
         GROUP BY j.device_id
         ORDER BY spam_count DESC
         LIMIT 10

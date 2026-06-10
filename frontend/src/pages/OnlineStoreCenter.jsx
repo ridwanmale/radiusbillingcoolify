@@ -696,9 +696,9 @@ const OnlineStoreCenter = () => {
                 <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '5px 0 0 26px' }}>Memblokir perangkat yang membuat banyak transaksi PENDING berturut-turut.</p>
               </div>
               {settings.spam_protection_enabled && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px' }}>
                   <div className="form-group">
-                    <label className="label-premium">Batas Maksimal Transaksi PENDING</label>
+                    <label className="label-premium">Maks PENDING</label>
                     <input 
                       type="number" 
                       className="form-input-premium" 
@@ -707,14 +707,22 @@ const OnlineStoreCenter = () => {
                     />
                   </div>
                   <div className="form-group">
-                    <label className="label-premium">Auto Unblock Setelah (Menit)</label>
+                    <label className="label-premium">Auto Unblock (Menit)</label>
                     <input 
                       type="number" 
                       className="form-input-premium" 
                       value={settings.spam_auto_unblock_minutes ?? 60} 
                       onChange={e => setSettings({...settings, spam_auto_unblock_minutes: parseInt(e.target.value)})} 
                     />
-                    <p style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '5px' }}>Isi 0 jika tidak ingin membuka blokir otomatis.</p>
+                  </div>
+                  <div className="form-group">
+                    <label className="label-premium">Auto-Blacklist (x Blokir)</label>
+                    <input 
+                      type="number" 
+                      className="form-input-premium" 
+                      value={settings.spam_max_auto_blocks ?? 5} 
+                      onChange={e => setSettings({...settings, spam_max_auto_blocks: parseInt(e.target.value)})} 
+                    />
                   </div>
                 </div>
               )}
