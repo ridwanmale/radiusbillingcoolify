@@ -1135,46 +1135,20 @@ router.get('/top-spammers', async (req, res) => {
     let debugInfo = {};
     
     try {
-      // Coba query dari spam_history dan jurnal_keuangan digabung
+      // Hanya query dari spam_history sesuai instruksi terbaru
+      // Jangan hitung jurnal_keuangan (pembelian PENDING)
       const [resRows] = await db.query(`
-        SELECT combined.device_id, SUM(combined.spam_count) as spam_count FROM (
-          SELECT device_id COLLATE utf8mb4_unicode_ci as device_id, block_count as spam_count 
-          FROM spam_history
-          UNION ALL
-          SELECT device_id COLLATE utf8mb4_unicode_ci as device_id, COUNT(id) as spam_count 
-          FROM jurnal_keuangan
-          WHERE status = 'PENDING' AND device_id IS NOT NULL AND device_id != ''
-          GROUP BY device_id
-        ) combined
-        LEFT JOIN blacklist_uuid b ON combined.device_id = b.device_id COLLATE utf8mb4_unicode_ci
-        WHERE b.id IS NULL AND combined.device_id IS NOT NULL AND combined.device_id != ''
-        GROUP BY combined.device_id
+        SELECT s.device_id, s.block_count as spam_count 
+        FROM spam_history s
+        LEFT JOIN blacklist_uuid b ON s.device_id = b.device_id COLLATE utf8mb4_unicode_ci
+        WHERE b.id IS NULL AND s.device_id IS NOT NULL AND s.device_id != ''
         ORDER BY spam_count DESC
         LIMIT 10
       `);
       rows = resRows;
-      debugInfo.queryType = 'UNION_ALL';
+      debugInfo.queryType = 'SPAM_HISTORY_ONLY';
     } catch (e) {
       debugInfo.error1 = e.message;
-      // Jika tabel spam_history belum ada, fallback ke jurnal_keuangan saja
-      try {
-        const [fallbackRows] = await db.query(`
-          SELECT j.device_id, COUNT(j.id) as spam_count 
-          FROM jurnal_keuangan j
-          LEFT JOIN blacklist_uuid b ON j.device_id = b.device_id COLLATE utf8mb4_unicode_ci
-          WHERE j.status = 'PENDING' 
-            AND j.device_id IS NOT NULL 
-            AND j.device_id != ''
-            AND b.id IS NULL
-          GROUP BY j.device_id
-          ORDER BY spam_count DESC
-          LIMIT 10
-        `);
-        rows = fallbackRows;
-        debugInfo.queryType = 'FALLBACK';
-      } catch (err2) {
-        debugInfo.error2 = err2.message;
-      }
     }
 
     // Jika kosong, coba ambil raw data untuk debug
