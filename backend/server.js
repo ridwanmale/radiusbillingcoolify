@@ -484,6 +484,34 @@ const cleanupJobs = async () => {
             console.log(`[Cleanup] Berhasil membuka blokir otomatis ${expiredBlocks.length} perangkat (>${unblockMinutes} menit).`);
           }
         }
+        }
+      }
+
+      // 4. Auto Delete Top Spammer List (<= 5 times within 1 hour)
+      try {
+        const [combinedSpam] = await connection.query(`
+          SELECT device_id, SUM(spam_count) as total_spam, MAX(last_act) as max_act FROM (
+            SELECT device_id COLLATE utf8mb4_unicode_ci as device_id, block_count as spam_count, last_blocked_at as last_act 
+            FROM spam_history
+            UNION ALL
+            SELECT device_id COLLATE utf8mb4_unicode_ci as device_id, COUNT(id) as spam_count, MAX(created_at) as last_act 
+            FROM jurnal_keuangan
+            WHERE status = 'PENDING' AND device_id IS NOT NULL AND device_id != ''
+            GROUP BY device_id
+          ) combined
+          GROUP BY device_id
+          HAVING total_spam <= 5 AND max_act < DATE_SUB(NOW(), INTERVAL 1 HOUR)
+        `);
+
+        if (combinedSpam.length > 0) {
+          const arrDevices = combinedSpam.map(r => r.device_id);
+          const placeholders = arrDevices.map(() => '?').join(',');
+          await connection.query(`DELETE FROM spam_history WHERE device_id IN (${placeholders})`, arrDevices);
+          await connection.query(`DELETE FROM jurnal_keuangan WHERE status = 'PENDING' AND device_id IN (${placeholders})`, arrDevices);
+          console.log(`[Auto-Delete] Berhasil membersihkan ${arrDevices.length} rekam jejak spammer ringan (<= 5 pelanggaran, tidak aktif > 1 jam).`);
+        }
+      } catch (spamCleanupErr) {
+        console.error('[Cleanup] Error membersihkan spammer ringan:', spamCleanupErr.message);
       }
 
   } catch (err) {
