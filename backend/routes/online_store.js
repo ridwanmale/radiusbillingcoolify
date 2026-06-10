@@ -401,7 +401,7 @@ router.post('/duitku/create-invoice', checkStoreOpen, checkSpamProtection, async
 
       res.json({ payment_url: data.paymentUrl, order_id });
     } else {
-      res.status(400).json({ error: data.statusMessage || 'Gagal membuat invoice Duitku' });
+      res.status(400).json({ error: data.statusMessage || JSON.stringify(data) || 'Gagal membuat invoice Duitku' });
     }
 
   } catch (error) {
