@@ -1145,18 +1145,49 @@ router.delete('/blacklist-uuid/:id', async (req, res) => {
   }
 });
 
-// GET Top Spammers (from jurnal_keuangan)
+// GET Top Spammers (from jurnal_keuangan & spam_history)
 router.get('/top-spammers', async (req, res) => {
   try {
-    // Ambil rekam jejak pelanggaran dari spam_history yang belum diblokir permanen
-    const [rows] = await db.query(`
-      SELECT s.device_id, s.block_count as spam_count 
-      FROM spam_history s
-      LEFT JOIN blacklist_uuid b ON s.device_id = b.device_id
-      WHERE b.id IS NULL
-      ORDER BY s.block_count DESC, s.last_blocked_at DESC
-      LIMIT 10
-    `);
+    let rows = [];
+    try {
+      // Coba query dari spam_history dan jurnal_keuangan digabung
+      [rows] = await db.query(`
+        SELECT device_id, SUM(spam_count) as spam_count FROM (
+          SELECT s.device_id, s.block_count as spam_count 
+          FROM spam_history s
+          LEFT JOIN blacklist_uuid b ON s.device_id = b.device_id
+          WHERE b.id IS NULL
+          
+          UNION ALL
+          
+          SELECT j.device_id, COUNT(j.id) as spam_count 
+          FROM jurnal_keuangan j
+          LEFT JOIN blacklist_uuid b ON j.device_id = b.device_id
+          WHERE j.status = 'PENDING' 
+            AND j.device_id IS NOT NULL 
+            AND j.device_id != ''
+            AND b.id IS NULL
+          GROUP BY j.device_id
+        ) combined
+        GROUP BY device_id
+        ORDER BY spam_count DESC
+        LIMIT 10
+      `);
+    } catch (e) {
+      // Jika tabel spam_history belum ada (karena backend belum restart), fallback ke jurnal_keuangan saja
+      [rows] = await db.query(`
+        SELECT j.device_id, COUNT(j.id) as spam_count 
+        FROM jurnal_keuangan j
+        LEFT JOIN blacklist_uuid b ON j.device_id = b.device_id
+        WHERE j.status = 'PENDING' 
+          AND j.device_id IS NOT NULL 
+          AND j.device_id != ''
+          AND b.id IS NULL
+        GROUP BY j.device_id
+        ORDER BY spam_count DESC
+        LIMIT 10
+      `);
+    }
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
