@@ -141,6 +141,17 @@ const OnlineStoreCenter = () => {
     }
   };
 
+  const handleDeleteSpammer = async (deviceId) => {
+    if (!window.confirm(`Yakin ingin menghapus rekam jejak spammer ${deviceId}?`)) return;
+    try {
+      await axios.delete(`/api/online-store/top-spammers/${encodeURIComponent(deviceId)}`);
+      toast.success('Rekam jejak spammer berhasil dihapus!');
+      fetchData();
+    } catch (err) {
+      toast.error('Gagal menghapus spammer: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
   const handleRemovePermanentBlacklist = async (id) => {
     try {
       await axios.delete(`/api/online-store/blacklist-uuid/${id}`);
@@ -525,7 +536,10 @@ const OnlineStoreCenter = () => {
                         <td style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.05)', color: 'white', fontFamily: 'monospace' }}>{ts.device_id}</td>
                         <td style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.05)', color: '#ef4444', fontWeight: 'bold' }}>{ts.spam_count} kali diblokir</td>
                         <td style={{ padding: '12px 15px', borderBottom: '1px solid rgba(255,255,255,0.05)', textAlign: 'center' }}>
-                          <button type="button" onClick={() => handleAddPermanentBlacklist(ts.device_id)} className="btn-danger-small" style={{ padding: '6px 12px', fontSize: '0.75rem' }}>Blokir Permanen</button>
+                          <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                            <button type="button" onClick={() => handleAddPermanentBlacklist(ts.device_id)} className="btn-danger-small" style={{ padding: '6px 12px', fontSize: '0.75rem' }}>Blokir Permanen</button>
+                            <button type="button" onClick={() => handleDeleteSpammer(ts.device_id)} className="btn-glass-delete" style={{ padding: '6px 12px', fontSize: '0.75rem', borderRadius: '8px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)', cursor: 'pointer' }} title="Hapus Data Spammer">Hapus</button>
+                          </div>
                         </td>
                       </tr>
                     ))

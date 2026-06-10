@@ -1210,6 +1210,21 @@ router.get('/top-spammers', async (req, res) => {
   }
 });
 
+// DELETE Top Spammer History
+router.delete('/top-spammers/:device_id', async (req, res) => {
+  try {
+    const { device_id } = req.params;
+    // Hapus dari spam_history
+    await db.query('DELETE FROM spam_history WHERE device_id = ?', [device_id]);
+    // Hapus jurnal_keuangan pending untuk device ini agar spam count reset
+    await db.query('DELETE FROM jurnal_keuangan WHERE status = "PENDING" AND device_id = ?', [device_id]);
+    res.json({ success: true, message: 'Berhasil menghapus rekam jejak spammer' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
 // GET Restore Voucher by device_id (for iOS Captive Portal)
 router.get('/restore-voucher/:device_id', async (req, res) => {
   try {
