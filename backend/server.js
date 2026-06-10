@@ -296,6 +296,15 @@ const upgradePool = async (pool, name) => {
       ) ENGINE=InnoDB;
     `);
 
+    // 8b. Create Spam History Table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS spam_history (
+        device_id VARCHAR(128) PRIMARY KEY,
+        block_count INT DEFAULT 1,
+        last_blocked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB;
+    `);
+
     // 9. Create Permanent Blacklist UUID Table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS blacklist_uuid (
