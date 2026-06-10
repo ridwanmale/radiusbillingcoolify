@@ -1173,15 +1173,14 @@ router.get('/top-spammers', async (req, res) => {
         SELECT combined.device_id, SUM(combined.spam_count) as spam_count FROM (
           SELECT device_id, block_count as spam_count 
           FROM spam_history
-          
           UNION ALL
-          
           SELECT device_id, COUNT(id) as spam_count 
           FROM jurnal_keuangan
           WHERE status = 'PENDING' AND device_id IS NOT NULL AND device_id != ''
           GROUP BY device_id
         ) combined
-        WHERE combined.device_id NOT IN (SELECT device_id FROM blacklist_uuid)
+        LEFT JOIN blacklist_uuid b ON combined.device_id = b.device_id
+        WHERE b.id IS NULL AND combined.device_id IS NOT NULL AND combined.device_id != ''
         GROUP BY combined.device_id
         ORDER BY spam_count DESC
         LIMIT 10
@@ -1191,10 +1190,11 @@ router.get('/top-spammers', async (req, res) => {
       [rows] = await db.query(`
         SELECT j.device_id, COUNT(j.id) as spam_count 
         FROM jurnal_keuangan j
+        LEFT JOIN blacklist_uuid b ON j.device_id = b.device_id
         WHERE j.status = 'PENDING' 
           AND j.device_id IS NOT NULL 
           AND j.device_id != ''
-          AND j.device_id NOT IN (SELECT device_id FROM blacklist_uuid)
+          AND b.id IS NULL
         GROUP BY j.device_id
         ORDER BY spam_count DESC
         LIMIT 10
