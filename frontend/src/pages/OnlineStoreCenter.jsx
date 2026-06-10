@@ -120,6 +120,42 @@ const OnlineStoreCenter = () => {
     }
   };
 
+  const handleAddPermanentBlacklist = async (deviceId) => {
+    if (!deviceId || !deviceId.trim()) {
+      toast.error('Device ID tidak boleh kosong');
+      return;
+    }
+    try {
+      await axios.post('/api/online-store/blacklist-uuid', {
+        device_id: deviceId.trim(),
+        reason: 'Diblokir permanen oleh Admin'
+      });
+      toast.success(`Perangkat ${deviceId} berhasil diblokir permanen!`);
+      setNewUuidBlacklist('');
+      fetchData();
+    } catch (err) {
+      toast.error('Gagal memblokir permanen: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const handleRemovePermanentBlacklist = async (id) => {
+    try {
+      await axios.delete(`/api/online-store/blacklist-uuid/${id}`);
+      toast.success('Perangkat berhasil dihapus dari blacklist permanen!');
+      fetchData();
+    } catch (err) {
+      toast.error('Gagal menghapus dari blacklist: ' + (err.response?.data?.error || err.message));
+    }
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text).then(() => {
+      toast.info('UUID disalin!');
+    }).catch(() => {
+      toast.error('Gagal menyalin');
+    });
+  };
+
   return (
     <div className="online-store-center" style={{ padding: '20px', color: 'white' }}>
       {/* HEADER SECTION */}
