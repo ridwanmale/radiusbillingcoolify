@@ -699,47 +699,51 @@ const OnlineStoreCenter = () => {
               Pengaturan Keamanan & Anti Spam
             </h3>
             
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '30px' }}>
-              <div className="form-group">
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'white', fontWeight: '600' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '30px' }}>
+              <div className="form-group" style={{ padding: '20px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'white', fontWeight: '600', fontSize: '1.05rem', cursor: 'pointer' }}>
                   <input 
                     type="checkbox" 
                     checked={settings.spam_protection_enabled} 
                     onChange={e => setSettings({...settings, spam_protection_enabled: e.target.checked})} 
-                    style={{ width: '18px', height: '18px', accentColor: '#ef4444' }}
+                    style={{ width: '20px', height: '20px', accentColor: '#ef4444', cursor: 'pointer' }}
                   />
                   Aktifkan Proteksi Spam (Rate Limit)
                 </label>
-                <p style={{ fontSize: '0.75rem', color: '#94a3b8', margin: '5px 0 0 26px' }}>Memblokir perangkat yang membuat banyak transaksi PENDING berturut-turut.</p>
+                <p style={{ fontSize: '0.85rem', color: '#94a3b8', margin: '8px 0 0 30px', lineHeight: '1.4' }}>Sistem cerdas untuk mendeteksi dan memblokir perangkat yang dengan sengaja membuat banyak pesanan (transaksi PENDING) tanpa dibayar.</p>
               </div>
+
               {settings.spam_protection_enabled && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '15px' }}>
-                  <div className="form-group">
-                    <label className="label-premium">Maks PENDING</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '20px', padding: '20px', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label className="label-premium" style={{ marginBottom: '8px' }}>Batas Maksimal PENDING</label>
                     <input 
                       type="number" 
                       className="form-input-premium" 
                       value={settings.spam_max_pending || 3} 
                       onChange={e => setSettings({...settings, spam_max_pending: parseInt(e.target.value)})} 
                     />
+                    <small style={{ color: '#64748b', fontSize: '0.75rem', display: 'block', marginTop: '6px' }}>Batas wajar (cth: 3 invoice)</small>
                   </div>
-                  <div className="form-group">
-                    <label className="label-premium">Auto Unblock (Menit)</label>
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label className="label-premium" style={{ marginBottom: '8px' }}>Auto-Unblock (Menit)</label>
                     <input 
                       type="number" 
                       className="form-input-premium" 
                       value={settings.spam_auto_unblock_minutes ?? 60} 
                       onChange={e => setSettings({...settings, spam_auto_unblock_minutes: parseInt(e.target.value)})} 
                     />
+                    <small style={{ color: '#64748b', fontSize: '0.75rem', display: 'block', marginTop: '6px' }}>Waktu penalti (cth: 60 mnt)</small>
                   </div>
-                  <div className="form-group">
-                    <label className="label-premium">Auto-Blacklist (x Blokir)</label>
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label className="label-premium" style={{ marginBottom: '8px' }}>Auto-Blacklist (x Blokir)</label>
                     <input 
                       type="number" 
                       className="form-input-premium" 
                       value={settings.spam_max_auto_blocks ?? 5} 
                       onChange={e => setSettings({...settings, spam_max_auto_blocks: parseInt(e.target.value)})} 
                     />
+                    <small style={{ color: '#64748b', fontSize: '0.75rem', display: 'block', marginTop: '6px' }}>Otomatis Blacklist Permanen</small>
                   </div>
                 </div>
               )}
