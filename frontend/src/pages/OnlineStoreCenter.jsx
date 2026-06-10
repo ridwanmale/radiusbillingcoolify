@@ -121,16 +121,19 @@ const OnlineStoreCenter = () => {
   };
 
   const handleAddPermanentBlacklist = async (deviceId) => {
-    if (!deviceId || !deviceId.trim()) {
-      toast.error('Device ID tidak boleh kosong');
-      return;
-    }
     try {
+      // Pastikan deviceId diubah ke string dulu sebelum di trim, mencegah TypeError
+      const safeId = deviceId ? String(deviceId).trim() : '';
+      if (!safeId) {
+        toast.error('Device ID tidak boleh kosong');
+        return;
+      }
+      
       await axios.post('/api/online-store/blacklist-uuid', {
-        device_id: deviceId.trim(),
+        device_id: safeId,
         reason: 'Diblokir permanen oleh Admin'
       });
-      toast.success(`Perangkat ${deviceId} berhasil diblokir permanen!`);
+      toast.success(`Perangkat ${safeId} berhasil diblokir permanen!`);
       setNewUuidBlacklist('');
       fetchData();
     } catch (err) {
