@@ -142,11 +142,15 @@ const checkSpamProtection = async (req, res, next) => {
 
       // Increment History
       if (device_id) {
-        await db.query(`
-          INSERT INTO spam_history (device_id, block_count, last_blocked_at) 
-          VALUES (?, 1, NOW()) 
-          ON DUPLICATE KEY UPDATE block_count = block_count + 1, last_blocked_at = NOW()
-        `, [device_id]);
+        try {
+          await db.query(`
+            INSERT INTO spam_history (device_id, block_count, last_blocked_at) 
+            VALUES (?, 1, NOW()) 
+            ON DUPLICATE KEY UPDATE block_count = block_count + 1, last_blocked_at = NOW()
+          `, [device_id]);
+        } catch (e) {
+          console.error('Gagal mencatat spam_history (mungkin tabel belum ada):', e.message);
+        }
       }
 
       return res.status(403).json({ error: 'Anda terlalu banyak membuat transaksi tertunda. Akses diblokir. Silakan hubungi Admin.', blocked: true });
