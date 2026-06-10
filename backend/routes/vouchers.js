@@ -732,8 +732,6 @@ router.put('/access-rules', async (req, res) => {
   }
 });
 
-module.exports = router;
-
 
 
 // --- QUICK GENERATE PRESETS ---
@@ -801,3 +799,5 @@ router.delete('/presets/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to delete preset' });
   }
 });
+
+module.exports = router;

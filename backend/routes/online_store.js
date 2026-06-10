@@ -356,8 +356,11 @@ router.post('/duitku/create-invoice', checkStoreOpen, checkSpamProtection, async
       ? 'https://sandbox.duitku.com/webapi/api/merchant/v2/inquiry' 
       : 'https://passport.duitku.com/webapi/api/merchant/v2/inquiry';
 
-    // Set paymentMethod default ke 'SP' (ShopeePay) karena 'QR' tidak tersedia di sandbox
-    body.paymentMethod = 'SP';
+    // paymentMethod kosong = tampilkan semua metode pembayaran yang tersedia di Duitku
+    // Jika user memilih spesifik (dari parameter payment_method), gunakan itu
+    if (!body.paymentMethod) {
+      body.paymentMethod = payment_method || ''; 
+    }
 
     console.log('[Duitku] Creating invoice with body:', JSON.stringify(body, null, 2));
 
@@ -1091,7 +1094,6 @@ const handlePPPoEOnlinePaymentSuccess = async (orderId, amount) => {
     console.log(`[PPPoE Webhook] Successfully processed payment and activated internet for customer: ${customer.name}`);
 
     // 9. Send Telegram notification to Admin
-    const { notifyTelegram } = require('./telegram');
     const tgMessage = `🔔 <b>PEMBAYARAN TAGIHAN PPPoE BERHASIL</b>\n\n` +
                       `Pelanggan: <b>${customer.name}</b> (${customer.pppoe_username})\n` +
                       `Invoice: <b>#${invoice.invoice_number}</b>\n` +

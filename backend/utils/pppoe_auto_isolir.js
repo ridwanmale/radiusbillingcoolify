@@ -220,15 +220,15 @@ class PPPoEAutoIsolir {
       );
 
       // 2. Restore original FreeRADIUS group
-      const [package] = await connection.query(
+      const [pkgRows] = await connection.query(
         'SELECT slug FROM pppoe_packages WHERE id = ?',
         [cust.package_id]
       );
 
-      if (package.length > 0) {
+      if (pkgRows.length > 0) {
         await connection.query(
           'UPDATE radusergroup SET groupname = ? WHERE username = ?',
-          [package[0].slug, cust.pppoe_username]
+          [pkgRows[0].slug, cust.pppoe_username]
         );
       }
 

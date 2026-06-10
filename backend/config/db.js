@@ -11,7 +11,7 @@ const primaryConfig = {
   queueLimit: 0,
   timezone: '+07:00',
   multipleStatements: true,
-  connectTimeout: 2000
+  connectTimeout: 10000
 };
 
 // sementara arahkan backup ke db juga, atau kosongkan env DB_BACKUP_HOST

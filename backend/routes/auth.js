@@ -24,7 +24,7 @@ router.post('/login', async (req, res) => {
         "⚠️ <b>Percobaan Login Gagal</b>\n\n" +
         "Username: " + username +
         "\nAlasan: User tidak ditemukan" +
-        "\nIP: " + (req.headers['x-forwarded-for'] || req.connection.remoteAddress),
+        "\nIP: " + (req.headers['x-forwarded-for'] || req.socket.remoteAddress),
         'Telegram Admin'
       );
 
@@ -40,7 +40,7 @@ router.post('/login', async (req, res) => {
         "⚠️ <b>Percobaan Login Gagal</b>\n\n" +
         "Username: " + username +
         "\nAlasan: Password salah" +
-        "\nIP: " + (req.headers['x-forwarded-for'] || req.connection.remoteAddress),
+        "\nIP: " + (req.headers['x-forwarded-for'] || req.socket.remoteAddress),
         'Telegram Admin'
       );
 
