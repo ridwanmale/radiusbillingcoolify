@@ -374,10 +374,10 @@ router.post('/duitku/create-invoice', checkStoreOpen, checkSpamProtection, async
       ? 'https://sandbox.duitku.com/webapi/api/merchant/v2/inquiry' 
       : 'https://passport.duitku.com/webapi/api/merchant/v2/inquiry';
 
-    // Jika paymentMethod kosong, Duitku akan menampilkan halamannya (semua metode).
-    // Tapi key-nya harus dihapus dari JSON, bukan dikirim sebagai string kosong ("").
+    // paymentMethod kosong = tampilkan semua metode pembayaran yang tersedia di Duitku
+    // Jika user memilih spesifik (dari parameter payment_method), gunakan itu
     if (!body.paymentMethod) {
-      delete body.paymentMethod; 
+      body.paymentMethod = payment_method || ''; 
     }
 
     console.log('[Duitku] Creating invoice with body:', JSON.stringify(body, null, 2));
