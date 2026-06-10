@@ -1167,9 +1167,11 @@ router.delete('/blacklist-uuid/:id', async (req, res) => {
 router.get('/top-spammers', async (req, res) => {
   try {
     let rows = [];
+    let debugInfo = {};
+    
     try {
       // Coba query dari spam_history dan jurnal_keuangan digabung
-      [rows] = await db.query(`
+      const [resRows] = await db.query(`
         SELECT combined.device_id, SUM(combined.spam_count) as spam_count FROM (
           SELECT device_id, block_count as spam_count 
           FROM spam_history
@@ -1185,21 +1187,58 @@ router.get('/top-spammers', async (req, res) => {
         ORDER BY spam_count DESC
         LIMIT 10
       `);
+      rows = resRows;
+      debugInfo.queryType = 'UNION_ALL';
     } catch (e) {
-      // Jika tabel spam_history belum ada (karena backend belum restart), fallback ke jurnal_keuangan saja
-      [rows] = await db.query(`
-        SELECT j.device_id, COUNT(j.id) as spam_count 
-        FROM jurnal_keuangan j
-        LEFT JOIN blacklist_uuid b ON j.device_id = b.device_id
-        WHERE j.status = 'PENDING' 
-          AND j.device_id IS NOT NULL 
-          AND j.device_id != ''
-          AND b.id IS NULL
-        GROUP BY j.device_id
-        ORDER BY spam_count DESC
-        LIMIT 10
-      `);
+      debugInfo.error1 = e.message;
+      // Jika tabel spam_history belum ada, fallback ke jurnal_keuangan saja
+      try {
+        const [fallbackRows] = await db.query(`
+          SELECT j.device_id, COUNT(j.id) as spam_count 
+          FROM jurnal_keuangan j
+          LEFT JOIN blacklist_uuid b ON j.device_id = b.device_id
+          WHERE j.status = 'PENDING' 
+            AND j.device_id IS NOT NULL 
+            AND j.device_id != ''
+            AND b.id IS NULL
+          GROUP BY j.device_id
+          ORDER BY spam_count DESC
+          LIMIT 10
+        `);
+        rows = fallbackRows;
+        debugInfo.queryType = 'FALLBACK';
+      } catch (err2) {
+        debugInfo.error2 = err2.message;
+      }
     }
+
+    // Jika kosong, coba ambil raw data untuk debug
+    if (rows.length === 0) {
+       try {
+         const [rawJurnal] = await db.query('SELECT id, status, device_id FROM jurnal_keuangan WHERE status = "PENDING"');
+         let rawHistory = [];
+         try {
+           const [hist] = await db.query('SELECT * FROM spam_history');
+           rawHistory = hist;
+         } catch(eh) { debugInfo.historyError = eh.message; }
+         
+         debugInfo.rawJurnalPending = rawJurnal;
+         debugInfo.rawHistory = rawHistory;
+       } catch (edbg) {
+         debugInfo.rawJurnalError = edbg.message;
+       }
+    }
+
+    // Return rows but attach debug in headers so we can see it in network tab
+    res.set('X-Debug-Info', JSON.stringify(debugInfo));
+    
+    // Jika user mengakses URL ini langsung di browser, kita bisa kirim JSON dengan debug info
+    // Tapi karena dipanggil React, kalau kita kembalikan object selain array, React akan meresetnya jadi []
+    // Jadi jika dipanggil via ?debug=true kita kembalikan object
+    if (req.query.debug === 'true') {
+      return res.json({ rows, debugInfo });
+    }
+
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
