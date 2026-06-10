@@ -374,9 +374,11 @@ router.post('/duitku/create-invoice', checkStoreOpen, checkSpamProtection, async
       ? 'https://sandbox.duitku.com/webapi/api/merchant/v2/inquiry' 
       : 'https://passport.duitku.com/webapi/api/merchant/v2/inquiry';
 
-    // HARCODED UNTUK TEST: Memaksa menggunakan Credit Card ('VC') 
-    // Jika ini berhasil, berarti Duitku menolak string kosong karena Duitku Pop di akun dinonaktifkan
-    body.paymentMethod = 'VC';
+    // Jika paymentMethod kosong, Duitku akan menampilkan halamannya (semua metode).
+    // Tapi key-nya harus dihapus dari JSON, bukan dikirim sebagai string kosong ("").
+    if (!body.paymentMethod) {
+      delete body.paymentMethod; 
+    }
 
     console.log('[Duitku] Creating invoice with body:', JSON.stringify(body, null, 2));
 
