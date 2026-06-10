@@ -484,7 +484,6 @@ const cleanupJobs = async () => {
             console.log(`[Cleanup] Berhasil membuka blokir otomatis ${expiredBlocks.length} perangkat (>${unblockMinutes} menit).`);
           }
         }
-        }
       }
 
       // 4. Auto Delete Top Spammer List (<= 5 times within 1 hour)
